@@ -992,26 +992,23 @@
 
         .reels-wrapper {
             display: flex;
-            gap: 15px;
+            gap: 8px;
             background: rgba(0, 0, 0, 0.03);
             border: 2px solid var(--border-color);
-            padding: 16px;
+            padding: 12px;
             border-radius: 20px;
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
             position: relative;
         }
 
         .reel-window {
-            width: 90px;
-            height: 100px;
-            background: radial-gradient(circle at 50% 50%, #ffffff 0%, #ece9e6 100%);
+            width: 80px;
+            height: 320px;
+            background: rgba(255, 255, 255, 0.55);
             border: 2px solid rgba(0, 0, 0, 0.08);
             border-radius: 14px;
             overflow: hidden;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             box-shadow: inset 0 5px 15px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.03);
         }
 
@@ -1028,11 +1025,24 @@
 
         .reel-symbol {
             width: 100%;
-            height: 100px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.8rem;
+            font-size: 2.2rem;
+            box-sizing: border-box;
+            border-bottom: 1px dashed rgba(118, 93, 160, 0.04);
+        }
+
+        /* SVG Payline Animation */
+        .payline-path {
+            stroke-dasharray: 800;
+            stroke-dashoffset: 800;
+            animation: drawPayline 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes drawPayline {
+            to { stroke-dashoffset: 0; }
         }
 
         .payout-table {
@@ -1259,7 +1269,10 @@
         <!-- 3. SLOT MACHINE GAME PANEL -->
         <div class="game-panel" id="panel-slots-game">
             <div class="slot-machine-container">
-                <div class="reels-wrapper">
+                <div class="reels-wrapper" style="position:relative;">
+                    <!-- Reels SVG Overlay for winning lines -->
+                    <svg id="paylines-overlay" viewBox="0 0 344 320" style="position:absolute; top:12px; left:12px; width:calc(100% - 24px); height:calc(100% - 24px); pointer-events:none; z-index: 20;"></svg>
+                    
                     <div class="reel-window">
                         <div class="reel-strip" id="reel-1"></div>
                     </div>
@@ -1269,6 +1282,9 @@
                     <div class="reel-window">
                         <div class="reel-strip" id="reel-3"></div>
                     </div>
+                    <div class="reel-window">
+                        <div class="reel-strip" id="reel-4"></div>
+                    </div>
                 </div>
             </div>
 
@@ -1277,14 +1293,13 @@
             </button>
             
             <div class="payout-table">
-                <div style="font-weight: 800; margin-bottom: 8px; color: var(--text-main); text-align: center;">🎰 슬롯 당첨 배당 정보</div>
+                <div style="font-weight: 800; margin-bottom: 8px; color: var(--text-main); text-align: center;">🎰 4x4 슬롯 당첨 배당 정보 (10개 라인 합산)</div>
                 <div class="payout-table-grid">
-                    <div>🎰🎰🎰 (잭팟) : <span>30.0배</span></div>
-                    <div>👑👑👑 (왕관) : <span>20.0배</span></div>
-                    <div>💎💎💎 (보석) : <span>15.0배</span></div>
-                    <div>🔔🔔🔔 (종) : <span>10.0배</span></div>
-                    <div>🍒🍒🍒/🍋🍋🍋/🍊🍊🍊 : <span>5.0배</span></div>
-                    <div>임의 기호 2개 일치 : <span>1.5배</span></div>
+                    <div>🎰 잭팟 : <span>4개 100배 / 3개 20배</span></div>
+                    <div>👑 왕관 : <span>4개 50배 / 3개 12배</span></div>
+                    <div>💎 보석 : <span>4개 30배 / 3개 8배</span></div>
+                    <div>🔔 종 : <span>4개 15배 / 3개 5배</span></div>
+                    <div style="grid-column: span 2; text-align:center;">과일 (🍒/🍋/🍊) : <span>4개 8배 / 3개 2.5배</span></div>
                 </div>
             </div>
             
@@ -1946,13 +1961,46 @@
         // --- SLOT MACHINE GAME LOGIC ---
         const SLOT_SYMBOLS = ['🍒', '🍋', '🍊', '💎', '🔔', '👑', '🎰'];
         
+        const SLOT_PAYOUTS = {
+            '🎰': { 3: 20, 4: 100 },
+            '👑': { 3: 12, 4: 50 },
+            '💎': { 3: 8, 4: 30 },
+            '🔔': { 3: 5, 4: 15 },
+            '🍒': { 3: 2.5, 4: 8 },
+            '🍋': { 3: 2.5, 4: 8 },
+            '🍊': { 3: 2.5, 4: 8 }
+        };
+
+        const PAYLINE_COLORS = {
+            '🎰': '#ffaa00',
+            '👑': '#d4af37',
+            '💎': '#0077cc',
+            '🔔': '#b8860b',
+            '🍒': '#d90062',
+            '🍋': '#05b375',
+            '🍊': '#ff8800'
+        };
+
+        const PAYLINES = [
+            [0, 0, 0, 0], // Line 1: Top row horizontal
+            [1, 1, 1, 1], // Line 2: Second row horizontal
+            [2, 2, 2, 2], // Line 3: Third row horizontal
+            [3, 3, 3, 3], // Line 4: Bottom row horizontal
+            [0, 1, 2, 3], // Line 5: Diagonal top-left to bottom-right
+            [3, 2, 1, 0], // Line 6: Diagonal bottom-left to top-right
+            [0, 1, 1, 0], // Line 7: U-shape top
+            [3, 2, 2, 3], // Line 8: U-shape bottom
+            [1, 2, 2, 1], // Line 9: Center horizontal wave
+            [2, 1, 1, 2]  // Line 10: Inverse center wave
+        ];
+
         function initSlots() {
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 4; i++) {
                 const strip = document.getElementById(`reel-${i}`);
                 if (!strip) continue;
                 strip.innerHTML = '';
-                // Repeat symbols list 5 times for scroll padding
-                const totalRepeats = 5;
+                // Repeat symbols list 7 times for scroll padding (7 * 7 = 49 symbols)
+                const totalRepeats = 7;
                 for (let r = 0; r < totalRepeats; r++) {
                     SLOT_SYMBOLS.forEach(symbol => {
                         const div = document.createElement('div');
@@ -1964,9 +2012,44 @@
                 // Set initial random position
                 const initialIdx = Math.floor(Math.random() * SLOT_SYMBOLS.length);
                 strip.style.transition = 'none';
-                strip.style.transform = `translateY(-${initialIdx * 100}px)`;
+                strip.style.transform = `translateY(-${initialIdx * 80}px)`;
                 strip.dataset.currentIdx = initialIdx;
             }
+            
+            // Clear SVG overlay initial state
+            const overlay = document.getElementById('paylines-overlay');
+            if (overlay) overlay.innerHTML = '';
+        }
+
+        function drawPayline(lineIdx, matchCount, symbol) {
+            const overlay = document.getElementById('paylines-overlay');
+            if (!overlay) return;
+            
+            const line = PAYLINES[lineIdx];
+            const color = PAYLINE_COLORS[symbol] || '#c69b00';
+            
+            // X coordinates for the 4 reels center inside the viewBox (0 to 344)
+            // Column widths: 80px. Gap: 8px.
+            // Center X of column c is c * 88 + 40
+            const xCoords = [40, 128, 216, 304];
+            
+            // Generate path string
+            let d = `M ${xCoords[0]} ${line[0] * 80 + 40}`;
+            for (let i = 1; i < matchCount; i++) {
+                d += ` L ${xCoords[i]} ${line[i] * 80 + 40}`;
+            }
+            
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', d);
+            path.setAttribute('stroke', color);
+            path.setAttribute('stroke-width', '5');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke-linecap', 'round');
+            path.setAttribute('stroke-linejoin', 'round');
+            path.setAttribute('class', 'payline-path');
+            path.style.filter = `drop-shadow(0 0 5px ${color})`;
+            
+            overlay.appendChild(path);
         }
 
         function playSlots() {
@@ -1980,6 +2063,10 @@
 
             setInteractiveState(false);
             
+            // Clear previous payline highlights
+            const overlay = document.getElementById('paylines-overlay');
+            if (overlay) overlay.innerHTML = '';
+            
             // Deduct balance
             const oldBalance = state.balance;
             state.balance -= state.bet;
@@ -1991,14 +2078,16 @@
             splash.innerHTML = "슬롯 머신 회전 중...";
 
             // Determine final symbols (Honest Odds)
+            // Storing the base index we start displaying at
             const finalIndices = [
+                Math.floor(Math.random() * SLOT_SYMBOLS.length),
                 Math.floor(Math.random() * SLOT_SYMBOLS.length),
                 Math.floor(Math.random() * SLOT_SYMBOLS.length),
                 Math.floor(Math.random() * SLOT_SYMBOLS.length)
             ];
 
             // Perform spin animation with staggered stop times
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 4; i++) {
                 const strip = document.getElementById(`reel-${i}`);
                 const finalIdx = finalIndices[i - 1];
                 
@@ -2006,7 +2095,7 @@
                 const spinCount = 21 + finalIdx;
                 
                 strip.style.transition = `transform ${1.8 + i * 0.4}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
-                strip.style.transform = `translateY(-${spinCount * 100}px)`;
+                strip.style.transform = `translateY(-${spinCount * 80}px)`;
                 strip.style.filter = 'blur(2px)';
                 
                 strip.dataset.currentIdx = finalIdx;
@@ -2015,7 +2104,7 @@
             // Play spin click sounds repeatedly
             let clickCount = 0;
             const clickInterval = setInterval(() => {
-                if (clickCount < 18) {
+                if (clickCount < 22) {
                     audio.playClick();
                     clickCount++;
                 } else {
@@ -2023,88 +2112,111 @@
                 }
             }, 100);
 
-            // Wait until the 3rd reel stops spinning (2.8s total duration)
+            // Wait until the 4th reel stops spinning (3.4s total duration)
             setTimeout(() => {
                 // Snap position back to modulo 7 (reset offset instantly)
-                for (let i = 1; i <= 3; i++) {
+                for (let i = 1; i <= 4; i++) {
                     const strip = document.getElementById(`reel-${i}`);
                     const finalIdx = finalIndices[i - 1];
                     strip.style.transition = 'none';
-                    strip.style.transform = `translateY(-${finalIdx * 100}px)`;
+                    strip.style.transform = `translateY(-${finalIdx * 80}px)`;
                     strip.style.filter = 'none';
                 }
 
-                // Check outcomes
-                const s1 = SLOT_SYMBOLS[finalIndices[0]];
-                const s2 = SLOT_SYMBOLS[finalIndices[1]];
-                const s3 = SLOT_SYMBOLS[finalIndices[2]];
-
-                let multiplier = 0;
-                let outcomeLabel = "";
-                let isJackpot = false;
-
-                if (s1 === s2 && s2 === s3) {
-                    // Match 3
-                    const matchedSymbol = s1;
-                    if (matchedSymbol === '🎰') {
-                        multiplier = 30;
-                        outcomeLabel = "🎰 잭팟!! 🎰";
-                        isJackpot = true;
-                    } else if (matchedSymbol === '👑') {
-                        multiplier = 20;
-                        outcomeLabel = "👑 왕관 트리플! 👑";
-                    } else if (matchedSymbol === '💎') {
-                        multiplier = 15;
-                        outcomeLabel = "💎 보석 트리플! 💎";
-                    } else if (matchedSymbol === '🔔') {
-                        multiplier = 10;
-                        outcomeLabel = "🔔 종 트리플! 🔔";
-                    } else {
-                        multiplier = 5; // 🍒, 🍋, 🍊
-                        outcomeLabel = `${matchedSymbol} 트리플!`;
+                // Check outcomes in 4x4 matrix
+                const grid = [
+                    [null, null, null, null],
+                    [null, null, null, null],
+                    [null, null, null, null],
+                    [null, null, null, null]
+                ];
+                
+                for (let r = 0; r < 4; r++) {
+                    for (let c = 0; c < 4; c++) {
+                        grid[r][c] = SLOT_SYMBOLS[(finalIndices[c] + r) % SLOT_SYMBOLS.length];
                     }
-                } else if (s1 === s2 || s2 === s3 || s1 === s3) {
-                    // Match 2
-                    multiplier = 1.5;
-                    const matchedSymbol = (s1 === s2 || s1 === s3) ? s1 : s2;
-                    outcomeLabel = `${matchedSymbol} 더블! (2개 일치)`;
-                } else {
-                    // Match 0
-                    multiplier = 0;
-                    outcomeLabel = "꽝";
                 }
 
-                const isWin = multiplier > 0;
-                const payout = Math.floor(state.bet * multiplier);
+                let totalMultiplier = 0;
+                let winningLinesInfo = [];
+                let jackpotHit = false;
+
+                PAYLINES.forEach((line, lineIdx) => {
+                    const s0 = grid[line[0]][0];
+                    const s1 = grid[line[1]][1];
+                    const s2 = grid[line[2]][2];
+                    const s3 = grid[line[3]][3];
+
+                    let matchCount = 0;
+                    let matchSymbol = null;
+
+                    if (s0 === s1 && s1 === s2 && s2 === s3) {
+                        matchCount = 4;
+                        matchSymbol = s0;
+                    } else if (s0 === s1 && s1 === s2) {
+                        matchCount = 3;
+                        matchSymbol = s0;
+                    }
+
+                    if (matchCount >= 3) {
+                        const payoutInfo = SLOT_PAYOUTS[matchSymbol];
+                        if (payoutInfo) {
+                            const multiplier = payoutInfo[matchCount];
+                            totalMultiplier += multiplier;
+                            winningLinesInfo.push({
+                                lineIdx: lineIdx + 1,
+                                symbol: matchSymbol,
+                                count: matchCount,
+                                mult: multiplier
+                            });
+                            
+                            if (matchSymbol === '🎰' && matchCount === 4) {
+                                jackpotHit = true;
+                            }
+                            
+                            // Draw winning payline vector
+                            drawPayline(lineIdx, matchCount, matchSymbol);
+                        }
+                    }
+                });
+
+                const isWin = totalMultiplier > 0;
+                // Bet per line is state.bet / 10
+                const totalBetFactor = totalMultiplier / 10;
+                const payout = Math.floor(state.bet * totalBetFactor);
                 const oldBal = state.balance;
 
                 if (isWin) {
                     state.balance += payout;
                     splash.className = "result-splash-box win";
-                    splash.innerHTML = `승리! ${outcomeLabel} (+₩${formatNumber(payout)})`;
+                    
+                    const linesStr = winningLinesInfo.map(w => `${w.lineIdx}번(${w.symbol} x${w.count})`).join(', ');
+                    splash.innerHTML = `승리! [${winningLinesInfo.length}개 라인 당첨] ${linesStr} (+₩${formatNumber(payout)})`;
                     showToast(`축하합니다! +₩${formatNumber(payout)}`, "win");
                     
-                    if (isJackpot) {
+                    if (jackpotHit || totalMultiplier >= 30) {
                         triggerConfetti();
+                        setTimeout(triggerConfetti, 400);
                         audio.playJackpot();
                     } else {
+                        triggerConfetti();
                         audio.playWin();
                     }
                 } else {
                     splash.className = "result-splash-box lose";
-                    splash.innerHTML = `실패... 아쉽게도 기호가 일치하지 않습니다. (-₩${formatNumber(state.bet)})`;
+                    splash.innerHTML = `실패... 당첨된 라인이 없습니다. (-₩${formatNumber(state.bet)})`;
                     showToast(`실패했습니다. -₩${formatNumber(state.bet)}`, "lose");
                     shakeWindow();
                     audio.playLose();
                 }
 
-                const symbolCombo = `[${s1} ${s2} ${s3}]`;
-                addHistoryItem('슬롯머신', symbolCombo, isWin ? `${outcomeLabel}` : '실패', isWin, state.bet, payout);
+                const outcomeStr = isWin ? `${winningLinesInfo.length}개 라인 당첨` : '실패';
+                addHistoryItem('슬롯머신 (4x4)', '10개 라인 배팅', outcomeStr, isWin, state.bet, payout);
                 updateBalanceUI(oldBal);
                 saveState();
                 setInteractiveState(true);
 
-            }, 2800);
+            }, 3400); // 3.4 seconds (Reel 4 stops at 3.2s + buffer)
         }
 
         // --- TAB NAVIGATION EVENT HANDLERS ---
