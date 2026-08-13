@@ -294,7 +294,7 @@
 
         .quick-bet-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 8px;
         }
 
@@ -317,6 +317,30 @@
 
         .btn-quick:active:not(:disabled) {
             transform: scale(0.96);
+        }
+
+        .btn-quick.decrease {
+            color: var(--glow-neon-pink);
+            border-color: rgba(255, 0, 127, 0.15);
+            background: rgba(255, 0, 127, 0.02);
+        }
+
+        .btn-quick.decrease:hover:not(:disabled) {
+            background: rgba(255, 0, 127, 0.1);
+            border-color: var(--glow-neon-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.15);
+        }
+
+        .btn-quick.increase {
+            color: var(--glow-neon-green);
+            border-color: rgba(0, 255, 170, 0.15);
+            background: rgba(0, 255, 170, 0.02);
+        }
+
+        .btn-quick.increase:hover:not(:disabled) {
+            background: rgba(0, 255, 170, 0.1);
+            border-color: var(--glow-neon-green);
+            box-shadow: 0 0 10px rgba(0, 255, 170, 0.15);
         }
 
         .btn-quick.special {
@@ -1019,10 +1043,13 @@
                 <input type="text" class="bet-input" id="bet-amount" value="1,000" readonly>
             </div>
             <div class="quick-bet-grid">
-                <button class="btn-quick" data-val="1000">+1K</button>
-                <button class="btn-quick" data-val="5000">+5K</button>
-                <button class="btn-quick" data-val="10000">+10K</button>
+                <button class="btn-quick decrease" data-val="-1000">-1K</button>
+                <button class="btn-quick decrease" data-val="-5000">-5K</button>
+                <button class="btn-quick decrease" data-val="-10000">-10K</button>
                 <button class="btn-quick special" id="btn-bet-half">50%</button>
+                <button class="btn-quick increase" data-val="1000">+1K</button>
+                <button class="btn-quick increase" data-val="5000">+5K</button>
+                <button class="btn-quick increase" data-val="10000">+10K</button>
                 <button class="btn-quick special" id="btn-bet-max">All In</button>
             </div>
         </div>
