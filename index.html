@@ -981,6 +981,79 @@
             opacity: 0.6;
         }
 
+        /* SLOTS Specific UI */
+        .slot-machine-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 15px auto;
+        }
+
+        .reels-wrapper {
+            display: flex;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.03);
+            border: 2px solid var(--border-color);
+            padding: 16px;
+            border-radius: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .reel-window {
+            width: 90px;
+            height: 100px;
+            background: radial-gradient(circle at 50% 50%, #ffffff 0%, #ece9e6 100%);
+            border: 2px solid rgba(0, 0, 0, 0.08);
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        .reel-strip {
+            position: absolute;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            transition: transform 2.5s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+
+        .reel-symbol {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+        }
+
+        .payout-table {
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+            margin-top: 20px;
+        }
+
+        .payout-table-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .payout-table-grid span {
+            color: var(--glow-gold);
+            font-weight: 800;
+        }
+
     </style>
 </head>
 <body>
@@ -1070,6 +1143,17 @@
                     <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 5c.83 0 1.5-.67 1.5-1.5S12.83 5 12 5s-1.5.67-1.5 1.5S11.17 8 12 8zm-4 4c.83 0 1.5-.67 1.5-1.5S8.83 9 8 9s-1.5.67-1.5 1.5S7.17 12 8 12zm8 0c.83 0 1.5-.67 1.5-1.5S16.83 9 16 9s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5zm-4 4c.83 0 1.5-.67 1.5-1.5S12.83 13 12 13s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5z"/>
                 </svg>
                 주사위 roll
+            </button>
+            <button class="tab-btn" data-game="slots-game">
+                <svg viewBox="0 0 24 24">
+                    <rect x="2" y="2" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" stroke-width="2"/>
+                    <line x1="2" y1="15" x2="22" y2="15" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="7" cy="12" r="1.5" fill="currentColor"/>
+                    <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                    <circle cx="17" cy="12" r="1.5" fill="currentColor"/>
+                </svg>
+                슬롯머신 spin
             </button>
         </div>
 
@@ -1170,6 +1254,41 @@
             </button>
             <div class="payout-tag" id="dice-payout-info">당첨 시 <span>2.0배</span> 지급</div>
             <div class="result-splash-box empty" id="dice-splash">주사위 배팅을 설정하고 시작하세요.</div>
+        </div>
+
+        <!-- 3. SLOT MACHINE GAME PANEL -->
+        <div class="game-panel" id="panel-slots-game">
+            <div class="slot-machine-container">
+                <div class="reels-wrapper">
+                    <div class="reel-window">
+                        <div class="reel-strip" id="reel-1"></div>
+                    </div>
+                    <div class="reel-window">
+                        <div class="reel-strip" id="reel-2"></div>
+                    </div>
+                    <div class="reel-window">
+                        <div class="reel-strip" id="reel-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-play-action" id="btn-play-slots" style="margin-top: 15px;">
+                레버 당기기 (Spin)
+            </button>
+            
+            <div class="payout-table">
+                <div style="font-weight: 800; margin-bottom: 8px; color: var(--text-main); text-align: center;">🎰 슬롯 당첨 배당 정보</div>
+                <div class="payout-table-grid">
+                    <div>🎰🎰🎰 (잭팟) : <span>30.0배</span></div>
+                    <div>👑👑👑 (왕관) : <span>20.0배</span></div>
+                    <div>💎💎💎 (보석) : <span>15.0배</span></div>
+                    <div>🔔🔔🔔 (종) : <span>10.0배</span></div>
+                    <div>🍒🍒🍒/🍋🍋🍋/🍊🍊🍊 : <span>5.0배</span></div>
+                    <div>임의 기호 2개 일치 : <span>1.5배</span></div>
+                </div>
+            </div>
+            
+            <div class="result-splash-box empty" id="slots-splash" style="margin-top: 20px;">배팅 설정을 완료하고 레버를 당기세요!</div>
         </div>
 
         <!-- HISTORY BOARD -->
@@ -1576,6 +1695,7 @@
             const navTabs = document.getElementById('game-tab-nav');
             const playOeBtn = document.getElementById('btn-play-oe');
             const playDiceBtn = document.getElementById('btn-play-dice');
+            const playSlotsBtn = document.getElementById('btn-play-slots');
             const resetBtn = document.getElementById('btn-reset-balance');
             const coinBtn = document.querySelectorAll('#panel-odd-even .choice-btn');
             const diceBtn = document.querySelectorAll('#panel-dice-game .choice-btn, #panel-dice-game .btn-number, #panel-dice-game .mode-btn');
@@ -1585,23 +1705,27 @@
                 navTabs.classList.remove('disabled-element');
                 playOeBtn.disabled = false;
                 playDiceBtn.disabled = false;
+                if (playSlotsBtn) playSlotsBtn.disabled = false;
                 resetBtn.disabled = false;
                 coinBtn.forEach(b => b.classList.remove('disabled-element'));
                 diceBtn.forEach(b => b.classList.remove('disabled-element'));
                 
                 playOeBtn.innerHTML = "배팅 시작";
                 playDiceBtn.innerHTML = "배팅 시작";
+                if (playSlotsBtn) playSlotsBtn.innerHTML = "레버 당기기 (Spin)";
             } else {
                 actionSection.classList.add('disabled-element');
                 navTabs.classList.add('disabled-element');
                 playOeBtn.disabled = true;
                 playDiceBtn.disabled = true;
+                if (playSlotsBtn) playSlotsBtn.disabled = true;
                 resetBtn.disabled = true;
                 coinBtn.forEach(b => b.classList.add('disabled-element'));
                 diceBtn.forEach(b => b.classList.add('disabled-element'));
                 
                 playOeBtn.innerHTML = "배팅 진행 중...";
                 playDiceBtn.innerHTML = "배팅 진행 중...";
+                if (playSlotsBtn) playSlotsBtn.innerHTML = "릴 회전 중...";
             }
         }
 
@@ -1819,11 +1943,176 @@
             }, 1500);
         }
 
+        // --- SLOT MACHINE GAME LOGIC ---
+        const SLOT_SYMBOLS = ['🍒', '🍋', '🍊', '💎', '🔔', '👑', '🎰'];
+        
+        function initSlots() {
+            for (let i = 1; i <= 3; i++) {
+                const strip = document.getElementById(`reel-${i}`);
+                if (!strip) continue;
+                strip.innerHTML = '';
+                // Repeat symbols list 5 times for scroll padding
+                const totalRepeats = 5;
+                for (let r = 0; r < totalRepeats; r++) {
+                    SLOT_SYMBOLS.forEach(symbol => {
+                        const div = document.createElement('div');
+                        div.className = 'reel-symbol';
+                        div.innerText = symbol;
+                        strip.appendChild(div);
+                    });
+                }
+                // Set initial random position
+                const initialIdx = Math.floor(Math.random() * SLOT_SYMBOLS.length);
+                strip.style.transition = 'none';
+                strip.style.transform = `translateY(-${initialIdx * 100}px)`;
+                strip.dataset.currentIdx = initialIdx;
+            }
+        }
+
+        function playSlots() {
+            if (state.isPlaying) return;
+            if (state.balance < state.bet) {
+                showToast("잔액이 부족합니다! 충전 버튼을 누르거나 배팅액을 줄여주세요.", "lose");
+                shakeWindow();
+                audio.playLose();
+                return;
+            }
+
+            setInteractiveState(false);
+            
+            // Deduct balance
+            const oldBalance = state.balance;
+            state.balance -= state.bet;
+            updateBalanceUI(oldBalance);
+            saveState();
+
+            const splash = document.getElementById('slots-splash');
+            splash.className = "result-splash-box empty";
+            splash.innerHTML = "슬롯 머신 회전 중...";
+
+            // Determine final symbols (Honest Odds)
+            const finalIndices = [
+                Math.floor(Math.random() * SLOT_SYMBOLS.length),
+                Math.floor(Math.random() * SLOT_SYMBOLS.length),
+                Math.floor(Math.random() * SLOT_SYMBOLS.length)
+            ];
+
+            // Perform spin animation with staggered stop times
+            for (let i = 1; i <= 3; i++) {
+                const strip = document.getElementById(`reel-${i}`);
+                const finalIdx = finalIndices[i - 1];
+                
+                // Spin distance: add 3 full rotations (21 symbols) plus final index
+                const spinCount = 21 + finalIdx;
+                
+                strip.style.transition = `transform ${1.8 + i * 0.4}s cubic-bezier(0.1, 0.8, 0.1, 1)`;
+                strip.style.transform = `translateY(-${spinCount * 100}px)`;
+                strip.style.filter = 'blur(2px)';
+                
+                strip.dataset.currentIdx = finalIdx;
+            }
+
+            // Play spin click sounds repeatedly
+            let clickCount = 0;
+            const clickInterval = setInterval(() => {
+                if (clickCount < 18) {
+                    audio.playClick();
+                    clickCount++;
+                } else {
+                    clearInterval(clickInterval);
+                }
+            }, 100);
+
+            // Wait until the 3rd reel stops spinning (2.8s total duration)
+            setTimeout(() => {
+                // Snap position back to modulo 7 (reset offset instantly)
+                for (let i = 1; i <= 3; i++) {
+                    const strip = document.getElementById(`reel-${i}`);
+                    const finalIdx = finalIndices[i - 1];
+                    strip.style.transition = 'none';
+                    strip.style.transform = `translateY(-${finalIdx * 100}px)`;
+                    strip.style.filter = 'none';
+                }
+
+                // Check outcomes
+                const s1 = SLOT_SYMBOLS[finalIndices[0]];
+                const s2 = SLOT_SYMBOLS[finalIndices[1]];
+                const s3 = SLOT_SYMBOLS[finalIndices[2]];
+
+                let multiplier = 0;
+                let outcomeLabel = "";
+                let isJackpot = false;
+
+                if (s1 === s2 && s2 === s3) {
+                    // Match 3
+                    const matchedSymbol = s1;
+                    if (matchedSymbol === '🎰') {
+                        multiplier = 30;
+                        outcomeLabel = "🎰 잭팟!! 🎰";
+                        isJackpot = true;
+                    } else if (matchedSymbol === '👑') {
+                        multiplier = 20;
+                        outcomeLabel = "👑 왕관 트리플! 👑";
+                    } else if (matchedSymbol === '💎') {
+                        multiplier = 15;
+                        outcomeLabel = "💎 보석 트리플! 💎";
+                    } else if (matchedSymbol === '🔔') {
+                        multiplier = 10;
+                        outcomeLabel = "🔔 종 트리플! 🔔";
+                    } else {
+                        multiplier = 5; // 🍒, 🍋, 🍊
+                        outcomeLabel = `${matchedSymbol} 트리플!`;
+                    }
+                } else if (s1 === s2 || s2 === s3 || s1 === s3) {
+                    // Match 2
+                    multiplier = 1.5;
+                    const matchedSymbol = (s1 === s2 || s1 === s3) ? s1 : s2;
+                    outcomeLabel = `${matchedSymbol} 더블! (2개 일치)`;
+                } else {
+                    // Match 0
+                    multiplier = 0;
+                    outcomeLabel = "꽝";
+                }
+
+                const isWin = multiplier > 0;
+                const payout = Math.floor(state.bet * multiplier);
+                const oldBal = state.balance;
+
+                if (isWin) {
+                    state.balance += payout;
+                    splash.className = "result-splash-box win";
+                    splash.innerHTML = `승리! ${outcomeLabel} (+₩${formatNumber(payout)})`;
+                    showToast(`축하합니다! +₩${formatNumber(payout)}`, "win");
+                    
+                    if (isJackpot) {
+                        triggerConfetti();
+                        audio.playJackpot();
+                    } else {
+                        audio.playWin();
+                    }
+                } else {
+                    splash.className = "result-splash-box lose";
+                    splash.innerHTML = `실패... 아쉽게도 기호가 일치하지 않습니다. (-₩${formatNumber(state.bet)})`;
+                    showToast(`실패했습니다. -₩${formatNumber(state.bet)}`, "lose");
+                    shakeWindow();
+                    audio.playLose();
+                }
+
+                const symbolCombo = `[${s1} ${s2} ${s3}]`;
+                addHistoryItem('슬롯머신', symbolCombo, isWin ? `${outcomeLabel}` : '실패', isWin, state.bet, payout);
+                updateBalanceUI(oldBal);
+                saveState();
+                setInteractiveState(true);
+
+            }, 2800);
+        }
+
         // --- TAB NAVIGATION EVENT HANDLERS ---
         function setupNavigation() {
             const tabs = document.querySelectorAll('#game-tab-nav .tab-btn');
             const oePanel = document.getElementById('panel-odd-even');
             const dicePanel = document.getElementById('panel-dice-game');
+            const slotsPanel = document.getElementById('panel-slots-game');
             
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
@@ -1834,12 +2123,16 @@
                     tab.classList.add('active');
                     
                     const selectedGame = tab.getAttribute('data-game');
+                    oePanel.classList.remove('active');
+                    dicePanel.classList.remove('active');
+                    slotsPanel.classList.remove('active');
+                    
                     if (selectedGame === 'odd-even') {
                         oePanel.classList.add('active');
-                        dicePanel.classList.remove('active');
-                    } else {
-                        oePanel.classList.remove('active');
+                    } else if (selectedGame === 'dice-game') {
                         dicePanel.classList.add('active');
+                    } else {
+                        slotsPanel.classList.add('active');
                     }
                 });
             });
@@ -1977,6 +2270,9 @@
             // Set initial bet validation
             setBetAmount(state.bet);
 
+            // Initialize slot machine reels
+            initSlots();
+
             // Tab nav
             setupNavigation();
             
@@ -2005,6 +2301,7 @@
             // Play trigger button bindings
             document.getElementById('btn-play-oe').addEventListener('click', playOddEven);
             document.getElementById('btn-play-dice').addEventListener('click', playDice);
+            document.getElementById('btn-play-slots').addEventListener('click', playSlots);
         }
 
         // Launch on document loaded
