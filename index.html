@@ -1337,7 +1337,9 @@
             selectedDiceMode: 'high-low', // 'high-low' or 'exact'
             selectedDiceHl: 'Low',     // 'Low' or 'High'
             selectedDiceNum: '1',     // '1' to '6'
-            isPlaying: false
+            isPlaying: false,
+            rechargeCharges: 3,
+            lastRegenTime: null
         };
 
         // --- PERSISTENCE (LOCAL STORAGE) ---
@@ -1351,6 +1353,14 @@
                 if (savedHistory !== null) {
                     state.history = JSON.parse(savedHistory);
                 }
+                const savedCharges = localStorage.getItem('royal_neon_recharge_charges');
+                if (savedCharges !== null) {
+                    state.rechargeCharges = parseInt(savedCharges, 10);
+                }
+                const savedRegen = localStorage.getItem('royal_neon_last_regen_time');
+                if (savedRegen) {
+                    state.lastRegenTime = parseInt(savedRegen, 10);
+                }
             } catch (e) {
                 console.error("로컬 스토리지를 로드하지 못했습니다.", e);
             }
@@ -1360,6 +1370,8 @@
             try {
                 localStorage.setItem('royal_neon_balance', state.balance.toString());
                 localStorage.setItem('royal_neon_history', JSON.stringify(state.history));
+                localStorage.setItem('royal_neon_recharge_charges', state.rechargeCharges.toString());
+                localStorage.setItem('royal_neon_last_regen_time', state.lastRegenTime ? state.lastRegenTime.toString() : '');
             } catch (e) {
                 console.error("로컬 스토리지를 저장하지 못했습니다.", e);
             }
@@ -1953,26 +1965,83 @@
             });
         }
 
-        // --- RECHARGE COOLDOWN TIMER ---
+        // --- RECHARGE COOLDOWN TIMER (3 CHARGES STAMINA SYSTEM) ---
         const COOLDOWN_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
         let rechargeCooldownInterval = null;
 
-        function getRechargeCooldownRemaining() {
-            const lastRecharge = localStorage.getItem('royal_neon_last_recharge');
-            if (!lastRecharge) return 0;
-            const elapsed = Date.now() - parseInt(lastRecharge, 10);
+        function checkAndRegenCharges() {
+            if (state.rechargeCharges >= 3) {
+                state.lastRegenTime = null;
+                return;
+            }
+            if (!state.lastRegenTime) {
+                state.lastRegenTime = Date.now();
+                return;
+            }
+            
+            const elapsed = Date.now() - state.lastRegenTime;
+            if (elapsed >= COOLDOWN_MS) {
+                const regened = Math.floor(elapsed / COOLDOWN_MS);
+                state.rechargeCharges = Math.min(3, state.rechargeCharges + regened);
+                if (state.rechargeCharges >= 3) {
+                    state.lastRegenTime = null;
+                } else {
+                    // Slide regen time forward
+                    state.lastRegenTime = state.lastRegenTime + (regened * COOLDOWN_MS);
+                }
+                saveState();
+            }
+        }
+
+        function getNextRegenTimeRemaining() {
+            if (state.rechargeCharges >= 3) return 0;
+            if (!state.lastRegenTime) return 0;
+            const elapsed = Date.now() - state.lastRegenTime;
             return Math.max(0, COOLDOWN_MS - elapsed);
         }
 
         function updateRechargeButtonState() {
+            checkAndRegenCharges();
             const btn = document.getElementById('btn-reset-balance');
-            const remaining = getRechargeCooldownRemaining();
+            const charges = state.rechargeCharges;
             
-            if (remaining > 0) {
+            if (charges > 0) {
+                btn.disabled = false;
+                btn.classList.remove('disabled-element');
+                
+                if (charges < 3) {
+                    const remaining = getNextRegenTimeRemaining();
+                    const minutes = Math.floor(remaining / 60000);
+                    const seconds = Math.floor((remaining % 60000) / 1000);
+                    const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    btn.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                        </svg>
+                        자금 충전 (${charges}/3) <span style="font-size:0.75rem;opacity:0.75;margin-left:4px;">(${timeStr})</span>
+                    `;
+                    
+                    if (!rechargeCooldownInterval) {
+                        rechargeCooldownInterval = setInterval(updateRechargeButtonState, 1000);
+                    }
+                } else {
+                    btn.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                        </svg>
+                        자금 충전 (${charges}/3)
+                    `;
+                    if (rechargeCooldownInterval) {
+                        clearInterval(rechargeCooldownInterval);
+                        rechargeCooldownInterval = null;
+                    }
+                }
+            } else {
                 btn.disabled = true;
                 btn.classList.add('disabled-element');
                 
-                // Format remaining time to MM:SS
+                const remaining = getNextRegenTimeRemaining();
                 const minutes = Math.floor(remaining / 60000);
                 const seconds = Math.floor((remaining % 60000) / 1000);
                 const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
@@ -1981,25 +2050,11 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                     </svg>
-                    충전 대기 (${timeStr})
+                    충전 대기 (${timeStr}) (0/3)
                 `;
                 
                 if (!rechargeCooldownInterval) {
                     rechargeCooldownInterval = setInterval(updateRechargeButtonState, 1000);
-                }
-            } else {
-                btn.disabled = false;
-                btn.classList.remove('disabled-element');
-                btn.innerHTML = `
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-                    </svg>
-                    자금 충전 (1만)
-                `;
-                
-                if (rechargeCooldownInterval) {
-                    clearInterval(rechargeCooldownInterval);
-                    rechargeCooldownInterval = null;
                 }
             }
         }
@@ -2032,11 +2087,13 @@
             document.getElementById('btn-reset-balance').addEventListener('click', () => {
                 if (state.isPlaying) return;
                 
-                const remaining = getRechargeCooldownRemaining();
-                if (remaining > 0) {
+                checkAndRegenCharges();
+                
+                if (state.rechargeCharges <= 0) {
+                    const remaining = getNextRegenTimeRemaining();
                     const minutes = Math.floor(remaining / 60000);
                     const seconds = Math.floor((remaining % 60000) / 1000);
-                    showToast(`충전 대기 시간이 ${minutes}분 ${seconds}초 남았습니다.`, "lose");
+                    showToast(`충전 횟수가 부족합니다. ${minutes}분 ${seconds}초 후 1회 충전이 생성됩니다.`, "lose");
                     audio.playLose();
                     return;
                 }
@@ -2047,12 +2104,15 @@
                 setBetAmount(1000);
                 updateBalanceUI(oldBal);
                 
-                // Save cooldown time
-                localStorage.setItem('royal_neon_last_recharge', Date.now().toString());
-                saveState();
+                // Consume 1 charge
+                state.rechargeCharges--;
+                if (state.rechargeCharges === 2 && !state.lastRegenTime) {
+                    state.lastRegenTime = Date.now();
+                }
                 
+                saveState();
                 updateRechargeButtonState();
-                showToast("10,000원이 충전되었습니다!", "win");
+                showToast(`10,000원으로 충전되었습니다! (남은 충전 횟수: ${state.rechargeCharges}회)`, "win");
             });
 
             // Play trigger button bindings
