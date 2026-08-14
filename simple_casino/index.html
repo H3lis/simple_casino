@@ -902,13 +902,15 @@
         }
 
         .card-face.card-front.mult-00,
-        .card-face.card-front.mult-05 {
+        .card-face.card-front.mult-05,
+        .card-face.card-front.mult-025 {
             border-color: rgba(217, 0, 98, 0.45);
             background: linear-gradient(145deg, #ffffff, #fff0f5);
         }
 
         .card-face.card-front.mult-00 .card-mult-val,
-        .card-face.card-front.mult-05 .card-mult-val {
+        .card-face.card-front.mult-05 .card-mult-val,
+        .card-face.card-front.mult-025 .card-mult-val {
             color: var(--glow-neon-pink);
             text-shadow: 0 0 8px rgba(217, 0, 98, 0.25);
             font-size: 1.65rem;
@@ -1693,7 +1695,7 @@
                     <span>🃏</span> 3장의 카드 중 1장을 선택하세요!
                 </div>
                 <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">
-                    3장의 카드에 <strong style="color:var(--glow-neon-pink);">0.5배 (반환)</strong>, <strong style="color:var(--glow-neon-blue);">1.0배 (원금)</strong>, <strong style="color:var(--glow-neon-green);">2.0배 (대박)</strong>가 1장씩 무작위 셔플되어 숨겨져 있습니다. (각 1/3 확률)
+                    3장의 카드 중 <strong style="color:var(--glow-neon-green);">2.0배 (대박 2배)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.25배 (부분 환급)</strong>입니다.
                 </div>
             </div>
 
@@ -1705,9 +1707,9 @@
                             <div class="card-pattern">?</div>
                             <div class="card-badge">CARD 1</div>
                         </div>
-                        <div class="card-face card-front mult-20">
-                            <div class="card-mult-val">2.0x</div>
-                            <div class="card-mult-sub">WIN (+100%)</div>
+                        <div class="card-face card-front mult-025">
+                            <div class="card-mult-val">0.25x</div>
+                            <div class="card-mult-sub">환급 (-75%)</div>
                         </div>
                     </div>
                 </div>
@@ -1718,9 +1720,9 @@
                             <div class="card-pattern">?</div>
                             <div class="card-badge">CARD 2</div>
                         </div>
-                        <div class="card-face card-front mult-10">
-                            <div class="card-mult-val">1.0x</div>
-                            <div class="card-mult-sub">DRAW (원금)</div>
+                        <div class="card-face card-front mult-20">
+                            <div class="card-mult-val">2.0x</div>
+                            <div class="card-mult-sub">WIN (+100%)</div>
                         </div>
                     </div>
                 </div>
@@ -1731,9 +1733,9 @@
                             <div class="card-pattern">?</div>
                             <div class="card-badge">CARD 3</div>
                         </div>
-                        <div class="card-face card-front mult-05">
-                            <div class="card-mult-val">0.5x</div>
-                            <div class="card-mult-sub">HALF (-50%)</div>
+                        <div class="card-face card-front mult-025">
+                            <div class="card-mult-val">0.25x</div>
+                            <div class="card-mult-sub">환급 (-75%)</div>
                         </div>
                     </div>
                 </div>
@@ -1744,7 +1746,7 @@
             </button>
             
             <div class="payout-tag" id="card-payout-info">
-                선택한 카드의 배당에 따라 배팅금(0.5배 / 1.0배 / 2.0배)이 지급됩니다.
+                선택한 카드의 배당에 따라 배팅금(0.25배 환급 / 2.0배 대박)이 지급됩니다.
             </div>
 
             <div class="result-splash-box empty" id="card-splash" style="margin-top: 20px;">원하는 카드를 선택하고 뒤집으세요!</div>
@@ -3092,8 +3094,8 @@
                 setTimeout(() => {
                     if (container) container.classList.remove('shuffling');
                     
-                    // Cryptographically Secure Fisher-Yates Shuffle: 0.5(반환), 1.0(원금), 2.0(대박)
-                    const mults = [0.5, 1.0, 2.0];
+                    // Cryptographically Secure Fisher-Yates Shuffle: 1장 2.0배, 2장 0.25배
+                    const mults = [0.25, 0.25, 2.0];
                     if (window.crypto && window.crypto.getRandomValues) {
                         const randBuf = new Uint32Array(2);
                         window.crypto.getRandomValues(randBuf);
@@ -3119,14 +3121,10 @@
                         let valText = '';
                         let label = '';
                         let multClass = '';
-                        if (mult === 0.5) {
-                            multClass = 'mult-05';
-                            valText = '0.5x';
-                            label = '반환 (-50%)';
-                        } else if (mult === 1.0) {
-                            multClass = 'mult-10';
-                            valText = '1.0x';
-                            label = '원금 (±0)';
+                        if (mult === 0.25) {
+                            multClass = 'mult-025';
+                            valText = '0.25x';
+                            label = '환급 (-75%)';
                         } else {
                             multClass = 'mult-20';
                             valText = '2.0x';
@@ -3164,8 +3162,7 @@
                         const chosenMult = mults[selectedIdx];
                         const payout = Math.floor(state.bet * chosenMult);
                         const oldBal = state.balance;
-                        const isWin = chosenMult > 1.0;
-                        const isDraw = chosenMult === 1.0;
+                        const isWin = chosenMult === 2.0;
 
                         state.balance += payout;
 
@@ -3175,21 +3172,16 @@
                             showToast(`대박! 2.0배 당첨 (+₩${formatNumber(payout - state.bet)})`, "win");
                             triggerConfetti();
                             audio.playWin();
-                        } else if (isDraw) {
-                            splash.className = "result-splash-box empty";
-                            splash.innerHTML = `✨ 원금 보존! 1.0배 카드로 배팅금을 그대로 돌려받았습니다. (₩${formatNumber(payout)})`;
-                            showToast("1.0배 원금 보존!", "win");
-                            audio.playClick();
                         } else {
                             splash.className = "result-splash-box lose";
-                            splash.innerHTML = `😢 아쉽네요! 0.5배 카드로 배팅금의 절반만 돌려받았습니다. (-₩${formatNumber(state.bet - payout)})`;
-                            showToast(`0.5배 반환 (-₩${formatNumber(state.bet - payout)})`, "lose");
+                            splash.innerHTML = `😢 아쉽네요! 0.25배 카드로 ₩${formatNumber(payout)}만 환급되었습니다. (-₩${formatNumber(state.bet - payout)})`;
+                            showToast(`0.25배 환급 (-₩${formatNumber(state.bet - payout)})`, "lose");
                             shakeWindow();
                             audio.playLose();
                         }
 
-                        const outcomeLabel = isWin ? '2.0배 대박' : (isDraw ? '1.0배 보존' : '0.5배 반환');
-                        addHistoryItem('카드 뽑기 (1/3)', `${selectedIdx + 1}번 카드`, outcomeLabel, isWin || isDraw, state.bet, payout);
+                        const outcomeLabel = isWin ? '2.0배 대박' : '0.25배 환급';
+                        addHistoryItem('카드 뽑기 (1/3)', `${selectedIdx + 1}번 카드`, outcomeLabel, isWin, state.bet, payout);
                         updateBalanceUI(oldBal);
                         saveState();
 
