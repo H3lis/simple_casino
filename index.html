@@ -1110,6 +1110,117 @@
             opacity: 0.7;
         }
 
+        /* Leaderboard Styling */
+        .leaderboard-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin-top: 24px;
+        }
+
+        .btn-edit-nick {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-main);
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit-nick:hover {
+            background: var(--glow-gold);
+            color: #000;
+            border-color: var(--glow-gold);
+            transform: translateY(-1px);
+        }
+
+        .leaderboard-table-wrap {
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.86rem;
+        }
+
+        .leaderboard-table th {
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .leaderboard-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            color: var(--text-main);
+        }
+
+        .leaderboard-row {
+            transition: background 0.2s ease;
+        }
+
+        .leaderboard-row:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .leaderboard-row.is-me {
+            background: rgba(198, 155, 0, 0.08);
+            font-weight: 800;
+            border-left: 3px solid var(--glow-gold);
+        }
+
+        .leaderboard-row.is-me td {
+            color: var(--text-main);
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 0.85rem;
+        }
+
+        .rank-1 { color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); font-size: 1.1rem; }
+        .rank-2 { color: #c0c0c0; text-shadow: 0 0 6px rgba(192, 192, 192, 0.4); font-size: 1.05rem; }
+        .rank-3 { color: #cd7f32; text-shadow: 0 0 6px rgba(205, 127, 50, 0.4); font-size: 1.0rem; }
+        .rank-other { color: var(--text-secondary); font-size: 0.82rem; font-weight: 700; }
+
+        .player-tag-me {
+            font-size: 0.7rem;
+            color: var(--glow-gold);
+            background: rgba(198, 155, 0, 0.15);
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-left: 6px;
+            font-weight: 800;
+        }
+
+        .player-balance-val {
+            font-family: monospace;
+            font-weight: 800;
+            color: var(--glow-neon-green);
+        }
+
         /* Shake animation for losses */
         .shake {
             animation: shakeAnim 0.4s ease-in-out;
@@ -1598,6 +1709,37 @@
             <div class="result-splash-box empty" id="card-splash" style="margin-top: 20px;">원하는 카드를 선택하고 뒤집으세요!</div>
         </div>
 
+        <!-- LEADERBOARD -->
+        <div class="leaderboard-card">
+            <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+                    </svg>
+                    실시간 플레이어 랭킹
+                </div>
+                <button class="btn-edit-nick" id="btn-edit-nick">
+                    <svg viewBox="0 0 24 24" style="width: 13px; height: 13px;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/></svg>
+                    닉네임 변경
+                </button>
+            </div>
+            
+            <div class="leaderboard-table-wrap">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 65px; text-align: center;">순위</th>
+                            <th>플레이어</th>
+                            <th style="text-align: right;">보유 자산</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-tbody">
+                        <!-- Dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- HISTORY BOARD -->
         <div class="history-card">
             <div class="section-title">
@@ -1840,15 +1982,15 @@
             }
             
             // Check if player is broke
-            const playOeBtn = document.getElementById('btn-play-oe');
-            const playDiceBtn = document.getElementById('btn-play-dice');
             const resetBtn = document.getElementById('btn-reset-balance');
-            
             if (state.balance === 0) {
                 resetBtn.classList.add('glow-gold-pulse');
             } else {
                 resetBtn.classList.remove('glow-gold-pulse');
             }
+
+            // Real-time update leaderboard
+            renderLeaderboard();
         }
 
         // --- TOAST NOTIFICATIONS ---
@@ -1993,6 +2135,70 @@
                             <span class="history-payout">배팅금 ₩${formatNumber(item.betVal)}</span>
                         </div>
                     </div>
+                `;
+            }).join('');
+        }
+
+        // --- LEADERBOARD CONTROLLER ---
+        const DEFAULT_LEADERBOARD = [
+            { name: '강남타짜 👑', balance: 58000 },
+            { name: '로얄마스터', balance: 35000 },
+            { name: '잭팟헌터', balance: 22000 },
+            { name: '네온고니', balance: 16000 },
+            { name: '올인러버', balance: 12000 },
+            { name: '행운의별', balance: 8000 },
+            { name: '다이스킹', balance: 5000 },
+        ];
+
+        function getNickname() {
+            return localStorage.getItem('royal_neon_nickname') || '플레이어 (Player)';
+        }
+
+        function setNickname(name) {
+            const clean = name ? name.trim().slice(0, 12) : '';
+            if (clean) {
+                localStorage.setItem('royal_neon_nickname', clean);
+                renderLeaderboard();
+                showToast(`닉네임이 "${clean}"(으)로 설정되었습니다!`, 'win');
+            }
+        }
+
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboard-tbody');
+            if (!tbody) return;
+
+            const myNick = getNickname();
+            // Merge competitors with current player
+            const allPlayers = [
+                ...DEFAULT_LEADERBOARD,
+                { name: myNick, balance: state.balance, isMe: true }
+            ];
+
+            // Sort descending by balance
+            allPlayers.sort((a, b) => b.balance - a.balance);
+
+            tbody.innerHTML = allPlayers.map((player, idx) => {
+                const rankNum = idx + 1;
+                let rankIcon = '';
+                if (rankNum === 1) rankIcon = '<span class="rank-badge rank-1">🥇 1</span>';
+                else if (rankNum === 2) rankIcon = '<span class="rank-badge rank-2">🥈 2</span>';
+                else if (rankNum === 3) rankIcon = '<span class="rank-badge rank-3">🥉 3</span>';
+                else rankIcon = `<span class="rank-badge rank-other">${rankNum}</span>`;
+
+                const isMeClass = player.isMe ? 'is-me' : '';
+                const meTag = player.isMe ? '<span class="player-tag-me">ME</span>' : '';
+
+                return `
+                    <tr class="leaderboard-row ${isMeClass}">
+                        <td style="text-align: center;">${rankIcon}</td>
+                        <td>
+                            <span>${player.name}</span>
+                            ${meTag}
+                        </td>
+                        <td style="text-align: right;">
+                            <span class="player-balance-val">₩${formatNumber(player.balance)}</span>
+                        </td>
+                    </tr>
                 `;
             }).join('');
         }
@@ -2971,6 +3177,18 @@
                 updateBalanceUI(oldBal);
                 saveState();
                 showToast("10,000원으로 충전되었습니다!", "win");
+            });
+
+            // Leaderboard initial render & Nickname edit binding
+            renderLeaderboard();
+            document.getElementById('btn-edit-nick').addEventListener('click', () => {
+                if (state.isPlaying) return;
+                audio.playClick();
+                const current = getNickname();
+                const newName = prompt('카지노 랭킹에 표시될 닉네임을 입력하세요 (최대 12자):', current);
+                if (newName !== null) {
+                    setNickname(newName);
+                }
             });
 
             // Play trigger button bindings
