@@ -1684,14 +1684,17 @@
             </div>
             
             <div class="payout-table">
-                <div style="font-weight: 800; margin-bottom: 8px; color: var(--text-main); text-align: center;">🎰 4x4 슬롯 당첨 배당 정보 (10개 라인 합산)</div>
+                <div style="font-weight: 800; margin-bottom: 8px; color: var(--text-main); text-align: center;">🎰 5-심볼 4x4 슬롯 당첨 배당 및 기댓값 (10개 라인 합산)</div>
+                <div style="display:flex; justify-content:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+                    <span style="background: rgba(5, 179, 117, 0.12); color: var(--glow-neon-green); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(5, 179, 117, 0.3);">📊 당첨 확률: 95.84%</span>
+                    <span style="background: rgba(198, 155, 0, 0.12); color: var(--glow-gold); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(198, 155, 0, 0.3);">💎 기댓값(EV/RTP): 621.60% (평균 6.22배)</span>
+                </div>
                 <div class="payout-table-grid">
                     <div style="grid-column: span 2; text-align:center; color: #d90062; font-weight:800;">⭐ 조커 (WILD) : <span>모든 심볼 대체 만능 조커! (4개 150배 / 3개 30배)</span></div>
                     <div>🎰 잭팟 : <span>4개 100배 / 3개 20배</span></div>
-                    <div>👑 왕관 : <span>4개 50배 / 3개 12배</span></div>
                     <div>💎 보석 : <span>4개 30배 / 3개 8배</span></div>
-                    <div>🔔 종 : <span>4개 15배 / 3개 5배</span></div>
-                    <div style="grid-column: span 2; text-align:center;">과일 (🍒/🍋/🍊) : <span>4개 8배 / 3개 2.5배</span></div>
+                    <div>🔔 황금종 : <span>4개 15배 / 3개 5배</span></div>
+                    <div>🍒 체리 : <span>4개 8배 / 3개 2.5배</span></div>
                 </div>
             </div>
             
@@ -2670,29 +2673,23 @@
             }, 1500);
         }
 
-        // --- SLOT MACHINE GAME LOGIC ---
-        const SLOT_SYMBOLS = ['🍒', '🍋', '🍊', '💎', '🔔', '👑', '🎰', '⭐'];
+        // --- SLOT MACHINE GAME LOGIC (5 SYMBOLS) ---
+        const SLOT_SYMBOLS = ['🍒', '🔔', '💎', '🎰', '⭐'];
         
         const SLOT_PAYOUTS = {
             '⭐': { 3: 30, 4: 150 }, // 만능 조커 (WILD)
             '🎰': { 3: 20, 4: 100 },
-            '👑': { 3: 12, 4: 50 },
             '💎': { 3: 8, 4: 30 },
             '🔔': { 3: 5, 4: 15 },
-            '🍒': { 3: 2.5, 4: 8 },
-            '🍋': { 3: 2.5, 4: 8 },
-            '🍊': { 3: 2.5, 4: 8 }
+            '🍒': { 3: 2.5, 4: 8 }
         };
 
         const PAYLINE_COLORS = {
             '⭐': '#d90062',
             '🎰': '#ffaa00',
-            '👑': '#d4af37',
             '💎': '#0077cc',
             '🔔': '#b8860b',
-            '🍒': '#d90062',
-            '🍋': '#05b375',
-            '🍊': '#ff8800'
+            '🍒': '#d90062'
         };
 
         const PAYLINES = [
@@ -2713,8 +2710,8 @@
                 const strip = document.getElementById(`reel-${i}`);
                 if (!strip) continue;
                 strip.innerHTML = '';
-                // Repeat symbols list 7 times for scroll padding (7 * 7 = 49 symbols)
-                const totalRepeats = 7;
+                // Repeat symbols list 8 times for smooth scrolling (8 * 5 = 40 symbols)
+                const totalRepeats = 8;
                 for (let r = 0; r < totalRepeats; r++) {
                     SLOT_SYMBOLS.forEach(symbol => {
                         const div = document.createElement('div');
@@ -2846,8 +2843,8 @@
                 const strip = document.getElementById(`reel-${i}`);
                 const finalIdx = finalIndices[i - 1];
                 
-                // Spin distance: 14 symbols (2 fast cycles) plus final index
-                const spinCount = 14 + finalIdx;
+                // Spin distance: 15 symbols (3 full 5-symbol cycles) plus final index
+                const spinCount = 15 + finalIdx;
                 const duration = 0.45 + (i - 1) * 0.15;
                 
                 strip.style.transition = `transform ${duration}s cubic-bezier(0.12, 0.82, 0.165, 1)`;
@@ -2905,7 +2902,7 @@
                         grid[line[3]][3]
                     ];
 
-                    const symOrder = ['⭐', '🎰', '👑', '💎', '🔔', '🍒', '🍋', '🍊'];
+                    const symOrder = ['⭐', '🎰', '💎', '🔔', '🍒'];
                     let bestLineMatch = null;
 
                     // 1. Check 4-match with wildcard support
