@@ -1474,13 +1474,13 @@
             <div class="balance-value-row">
                 <div class="balance-amount">
                     <span class="currency-symbol">₩</span>
-                    <span id="player-balance">10,000</span>
+                    <span id="player-balance">100,000</span>
                 </div>
                 <button class="btn-reset" id="btn-reset-balance">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
                     </svg>
-                    자금 충전 (1만)
+                    자금 충전 (10만)
                 </button>
             </div>
         </div>
@@ -1948,7 +1948,7 @@
 
         // --- GAME CORE STATE ---
         let state = {
-            balance: 10000,
+            balance: 100000,
             bet: 1000,
             history: [],
             selectedOe: 'Odd',       // 'Odd' or 'Even'
@@ -3340,11 +3340,11 @@
                 
                 audio.playWin();
                 const oldBal = state.balance;
-                state.balance = 10000;
+                state.balance = 100000;
                 setBetAmount(1000);
                 updateBalanceUI(oldBal);
                 saveState();
-                showToast("10,000원으로 충전되었습니다!", "win");
+                showToast("100,000원으로 충전되었습니다!", "win");
             });
 
             // Leaderboard initial render, Firebase Sync & Nickname edit binding
