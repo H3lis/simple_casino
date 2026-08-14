@@ -8,6 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK for Realtime Online Global Leaderboard -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --bg-color: #f7f6fc;
@@ -1122,6 +1126,43 @@
             margin-top: 24px;
         }
 
+        .leaderboard-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.03);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .leaderboard-status .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #9ca3af;
+        }
+
+        .leaderboard-status.online .status-dot {
+            background: var(--glow-neon-green);
+            box-shadow: 0 0 8px rgba(5, 179, 117, 0.6);
+            animation: pulseDot 1.5s infinite;
+        }
+
+        .leaderboard-status.online {
+            color: var(--glow-neon-green);
+            border-color: rgba(5, 179, 117, 0.25);
+            background: rgba(5, 179, 117, 0.06);
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+        }
+
         .btn-edit-nick {
             display: inline-flex;
             align-items: center;
@@ -1718,10 +1759,16 @@
                     </svg>
                     실시간 플레이어 랭킹
                 </div>
-                <button class="btn-edit-nick" id="btn-edit-nick">
-                    <svg viewBox="0 0 24 24" style="width: 13px; height: 13px;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/></svg>
-                    닉네임 변경
-                </button>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="leaderboard-status" id="firebase-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">로컬 모드</span>
+                    </div>
+                    <button class="btn-edit-nick" id="btn-edit-nick">
+                        <svg viewBox="0 0 24 24" style="width: 13px; height: 13px;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/></svg>
+                        닉네임 변경
+                    </button>
+                </div>
             </div>
             
             <div class="leaderboard-table-wrap">
@@ -1989,8 +2036,9 @@
                 resetBtn.classList.remove('glow-gold-pulse');
             }
 
-            // Real-time update leaderboard
+            // Real-time update leaderboard & sync to cloud
             renderLeaderboard();
+            syncScoreToCloud();
         }
 
         // --- TOAST NOTIFICATIONS ---
@@ -2139,8 +2187,27 @@
             }).join('');
         }
 
-        // --- LEADERBOARD CONTROLLER ---
-        const DEFAULT_LEADERBOARD = [
+        // --- REALTIME ONLINE LEADERBOARD CONTROLLER (Firebase Firestore) ---
+        /**
+         * [🔥 Firebase 실시간 온라인 연동 설정]
+         * 실제 다른 사람들과 실시간 랭킹을 공유하려면 아래 firebaseConfig 객체에
+         * 본인의 Firebase 프로젝트 설정값(apiKey, projectId 등)을 입력하시면 즉시 전 세계 실시간 연동됩니다.
+         * (설정값이 비어있을 경우 자동으로 로컬 시뮬레이션 모드로 안전하게 작동합니다.)
+         */
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        let firestoreDb = null;
+        let isFirebaseOnline = false;
+        let cloudLeaderboardData = null;
+
+        const DEFAULT_SIMULATED_LEADERBOARD = [
             { name: '강남타짜 👑', balance: 58000 },
             { name: '로얄마스터', balance: 35000 },
             { name: '잭팟헌터', balance: 22000 },
@@ -2150,6 +2217,15 @@
             { name: '다이스킹', balance: 5000 },
         ];
 
+        function getUserId() {
+            let uid = localStorage.getItem('royal_neon_uid');
+            if (!uid) {
+                uid = 'user_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+                localStorage.setItem('royal_neon_uid', uid);
+            }
+            return uid;
+        }
+
         function getNickname() {
             return localStorage.getItem('royal_neon_nickname') || '플레이어 (Player)';
         }
@@ -2158,9 +2234,86 @@
             const clean = name ? name.trim().slice(0, 12) : '';
             if (clean) {
                 localStorage.setItem('royal_neon_nickname', clean);
+                syncScoreToCloud();
                 renderLeaderboard();
                 showToast(`닉네임이 "${clean}"(으)로 설정되었습니다!`, 'win');
             }
+        }
+
+        // Initialize Firebase Firestore Realtime Listener
+        function initFirebaseSync() {
+            const statusEl = document.getElementById('firebase-status');
+            
+            // Check if user filled in firebaseConfig
+            if (firebaseConfig.apiKey && firebaseConfig.projectId && typeof firebase !== 'undefined') {
+                try {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    firestoreDb = firebase.firestore();
+                    isFirebaseOnline = true;
+
+                    if (statusEl) {
+                        statusEl.className = 'leaderboard-status online';
+                        statusEl.querySelector('.status-text').innerText = '온라인 실시간 연동됨';
+                    }
+
+                    // Attach Realtime Listener to Firestore Rankings
+                    firestoreDb.collection('casino_leaderboard')
+                        .orderBy('balance', 'desc')
+                        .limit(10)
+                        .onSnapshot((snapshot) => {
+                            const cloudList = [];
+                            const myUid = getUserId();
+                            
+                            snapshot.forEach(doc => {
+                                const data = doc.data();
+                                cloudList.push({
+                                    uid: doc.id,
+                                    name: data.name || '익명',
+                                    balance: data.balance || 0,
+                                    isMe: (doc.id === myUid)
+                                });
+                            });
+
+                            cloudLeaderboardData = cloudList;
+                            renderLeaderboard();
+                        }, (error) => {
+                            console.warn('Firebase sync error, fallback to local:', error);
+                            isFirebaseOnline = false;
+                            if (statusEl) {
+                                statusEl.className = 'leaderboard-status';
+                                statusEl.querySelector('.status-text').innerText = '로컬 모드';
+                            }
+                        });
+
+                    // Sync initial score
+                    syncScoreToCloud();
+
+                } catch (e) {
+                    console.warn('Firebase init failed, using local mode:', e);
+                    isFirebaseOnline = false;
+                }
+            } else {
+                if (statusEl) {
+                    statusEl.className = 'leaderboard-status';
+                    statusEl.querySelector('.status-text').innerText = '로컬 모드';
+                }
+            }
+        }
+
+        function syncScoreToCloud() {
+            if (!isFirebaseOnline || !firestoreDb) return;
+            const uid = getUserId();
+            const nickname = getNickname();
+
+            firestoreDb.collection('casino_leaderboard').doc(uid).set({
+                name: nickname,
+                balance: state.balance,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }).catch(err => {
+                console.warn('Cloud score upload error:', err);
+            });
         }
 
         function renderLeaderboard() {
@@ -2168,14 +2321,27 @@
             if (!tbody) return;
 
             const myNick = getNickname();
-            // Merge competitors with current player
-            const allPlayers = [
-                ...DEFAULT_LEADERBOARD,
-                { name: myNick, balance: state.balance, isMe: true }
-            ];
+            let allPlayers = [];
 
-            // Sort descending by balance
-            allPlayers.sort((a, b) => b.balance - a.balance);
+            if (isFirebaseOnline && cloudLeaderboardData && cloudLeaderboardData.length > 0) {
+                allPlayers = [...cloudLeaderboardData];
+                // Ensure current user is in list if not in top 10
+                const hasMe = allPlayers.some(p => p.isMe);
+                if (!hasMe) {
+                    allPlayers.push({
+                        name: myNick,
+                        balance: state.balance,
+                        isMe: true
+                    });
+                    allPlayers.sort((a, b) => b.balance - a.balance);
+                }
+            } else {
+                allPlayers = [
+                    ...DEFAULT_SIMULATED_LEADERBOARD,
+                    { name: myNick, balance: state.balance, isMe: true }
+                ];
+                allPlayers.sort((a, b) => b.balance - a.balance);
+            }
 
             tbody.innerHTML = allPlayers.map((player, idx) => {
                 const rankNum = idx + 1;
@@ -3179,8 +3345,9 @@
                 showToast("10,000원으로 충전되었습니다!", "win");
             });
 
-            // Leaderboard initial render & Nickname edit binding
+            // Leaderboard initial render, Firebase Sync & Nickname edit binding
             renderLeaderboard();
+            initFirebaseSync();
             document.getElementById('btn-edit-nick').addEventListener('click', () => {
                 if (state.isPlaying) return;
                 audio.playClick();
