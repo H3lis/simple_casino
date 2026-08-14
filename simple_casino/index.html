@@ -1500,14 +1500,23 @@
                 <input type="text" class="bet-input" id="bet-amount" value="100,000" readonly>
             </div>
             <div class="quick-bet-grid">
+                <!-- 10만, 50만 단위 -->
                 <button class="btn-quick decrease" data-val="-500000">-50만</button>
-                <button class="btn-quick decrease" data-val="-200000">-20만</button>
                 <button class="btn-quick decrease" data-val="-100000">-10만</button>
-                <button class="btn-quick special" id="btn-bet-half">50%</button>
                 <button class="btn-quick increase" data-val="100000">+10만</button>
-                <button class="btn-quick increase" data-val="200000">+20만</button>
                 <button class="btn-quick increase" data-val="500000">+50만</button>
+                
+                <!-- 100만, 1000만 고액 단위 -->
+                <button class="btn-quick decrease" data-val="-10000000">-1000만</button>
+                <button class="btn-quick decrease" data-val="-1000000">-100만</button>
+                <button class="btn-quick increase" data-val="1000000">+100만</button>
+                <button class="btn-quick increase" data-val="10000000">+1000만</button>
+                
+                <!-- 20만 & 50% / All-in -->
+                <button class="btn-quick decrease" data-val="-200000">-20만</button>
+                <button class="btn-quick special" id="btn-bet-half">50%</button>
                 <button class="btn-quick special" id="btn-bet-max">All In</button>
+                <button class="btn-quick increase" data-val="200000">+20만</button>
             </div>
         </div>
 
