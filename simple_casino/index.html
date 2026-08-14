@@ -818,6 +818,41 @@
             transform: rotateY(180deg);
         }
 
+        /* 3D Card Shuffling Animation */
+        @keyframes shuffleCard1 {
+            0% { transform: translate(0, 0) rotate(0deg); z-index: 1; }
+            25% { transform: translate(110px, -20px) rotate(12deg) scale(1.08); z-index: 10; }
+            50% { transform: translate(-20px, 12px) rotate(-8deg) scale(0.96); z-index: 1; }
+            75% { transform: translate(70px, -8px) rotate(5deg); z-index: 5; }
+            100% { transform: translate(0, 0) rotate(0deg); z-index: 1; }
+        }
+
+        @keyframes shuffleCard2 {
+            0% { transform: translate(0, 0) rotate(0deg); z-index: 2; }
+            25% { transform: translate(-100px, 18px) rotate(-10deg) scale(0.95); z-index: 1; }
+            50% { transform: translate(100px, -15px) rotate(10deg) scale(1.08); z-index: 10; }
+            75% { transform: translate(-50px, 8px) rotate(-4deg); z-index: 3; }
+            100% { transform: translate(0, 0) rotate(0deg); z-index: 2; }
+        }
+
+        @keyframes shuffleCard3 {
+            0% { transform: translate(0, 0) rotate(0deg); z-index: 3; }
+            25% { transform: translate(-110px, -12px) rotate(-8deg); z-index: 2; }
+            50% { transform: translate(-70px, -20px) rotate(8deg) scale(1.08); z-index: 10; }
+            75% { transform: translate(40px, 12px) rotate(-5deg); z-index: 2; }
+            100% { transform: translate(0, 0) rotate(0deg); z-index: 3; }
+        }
+
+        .cards-container.shuffling .card-wrapper:nth-child(1) {
+            animation: shuffleCard1 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .cards-container.shuffling .card-wrapper:nth-child(2) {
+            animation: shuffleCard2 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .cards-container.shuffling .card-wrapper:nth-child(3) {
+            animation: shuffleCard3 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
         .card-face {
             position: absolute;
             width: 100%;
@@ -2660,107 +2695,143 @@
             saveState();
 
             const splash = document.getElementById('card-splash');
-            splash.className = "result-splash-box empty";
-            splash.innerHTML = "카드를 셔플하고 뒤집는 중...";
+            const container = document.getElementById('cards-container');
+            const playCardBtn = document.getElementById('btn-play-card');
 
-            // Unflip cards first
+            // 1. Immediately unflip any cards if previously revealed
             for (let i = 0; i < 3; i++) {
                 const cardEl = document.getElementById(`card-${i}`);
                 if (cardEl) cardEl.classList.remove('flipped');
             }
 
-            // Shuffle multipliers: 0.5, 1.0, 2.0 (Equal 1/3 probability)
-            const mults = [0.5, 1.0, 2.0];
-            for (let i = mults.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [mults[i], mults[j]] = [mults[j], mults[i]];
-            }
+            splash.className = "result-splash-box empty";
+            splash.innerHTML = "카드를 3D로 섞고 있습니다 (Shuffling)...";
+            if (playCardBtn) playCardBtn.innerHTML = "카드를 섞는 중...";
 
-            audio.playRoll();
-
+            // 2. Play Shuffle 3D Animation
             setTimeout(() => {
-                // Assign faces
-                for (let i = 0; i < 3; i++) {
-                    const cardEl = document.getElementById(`card-${i}`);
-                    if (!cardEl) continue;
-                    const frontFace = cardEl.querySelector('.card-front');
-                    const mult = mults[i];
-                    
-                    frontFace.className = 'card-face card-front';
-                    let label = '';
-                    let multClass = '';
-                    if (mult === 0.5) {
-                        multClass = 'mult-05';
-                        label = '50% (-50%)';
-                    } else if (mult === 1.0) {
-                        multClass = 'mult-10';
-                        label = '원금 (±0)';
-                    } else {
-                        multClass = 'mult-20';
-                        label = '2배 (+100%)';
-                    }
-                    frontFace.classList.add(multClass);
-                    frontFace.innerHTML = `
-                        <div class="card-mult-val">${mult.toFixed(1)}x</div>
-                        <div class="card-mult-sub">${label}</div>
-                    `;
-                }
-
-                // Staggered flip animation: selected card flips first!
-                const selectedIdx = state.selectedCardIdx;
-                const cardEls = [0, 1, 2].map(i => document.getElementById(`card-${i}`));
+                if (container) container.classList.add('shuffling');
+                audio.playRoll();
                 
-                setTimeout(() => {
-                    if (cardEls[selectedIdx]) cardEls[selectedIdx].classList.add('flipped');
-                    audio.playClick();
+                // Repeated shuffling audio ticks
+                let tickCount = 0;
+                const shuffleTicks = setInterval(() => {
+                    if (tickCount < 4) {
+                        audio.playClick();
+                        tickCount++;
+                    } else {
+                        clearInterval(shuffleTicks);
+                    }
                 }, 150);
 
+                // 3. Shuffle completes -> Assign randomized hidden multipliers
                 setTimeout(() => {
-                    [0, 1, 2].forEach(i => {
-                        if (i !== selectedIdx && cardEls[i]) {
-                            cardEls[i].classList.add('flipped');
-                        }
-                    });
-                }, 450);
-
-                // Outcome processing
-                setTimeout(() => {
-                    const chosenMult = mults[selectedIdx];
-                    const payout = Math.floor(state.bet * chosenMult);
-                    const oldBal = state.balance;
-                    const isWin = chosenMult > 1.0;
-                    const isDraw = chosenMult === 1.0;
-
-                    state.balance += payout;
-
-                    if (isWin) {
-                        splash.className = "result-splash-box win";
-                        splash.innerHTML = `🎉 대박! 2.0배 카드 당첨! (+₩${formatNumber(payout - state.bet)})`;
-                        showToast(`대박! 2.0배 당첨 (+₩${formatNumber(payout - state.bet)})`, "win");
-                        triggerConfetti();
-                        audio.playWin();
-                    } else if (isDraw) {
-                        splash.className = "result-splash-box empty";
-                        splash.innerHTML = `✨ 원금 보존! 1.0배 카드로 배팅금을 그대로 돌려받았습니다. (₩${formatNumber(payout)})`;
-                        showToast("1.0배 원금 보존!", "win");
-                        audio.playClick();
-                    } else {
-                        splash.className = "result-splash-box lose";
-                        splash.innerHTML = `😢 아쉽습니다! 0.5배 카드로 50%만 환급되었습니다. (-₩${formatNumber(state.bet - payout)})`;
-                        showToast(`0.5배 환급 (-₩${formatNumber(state.bet - payout)})`, "lose");
-                        shakeWindow();
-                        audio.playLose();
+                    if (container) container.classList.remove('shuffling');
+                    
+                    // Shuffle multipliers: 0.5, 1.0, 2.0 (Equal 1/3 probability)
+                    const mults = [0.5, 1.0, 2.0];
+                    for (let i = mults.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [mults[i], mults[j]] = [mults[j], mults[i]];
                     }
 
-                    const outcomeLabel = isWin ? '2.0배 승리' : (isDraw ? '1.0배 보존' : '0.5배 환급');
-                    addHistoryItem('카드 뽑기 (1/3)', `${selectedIdx + 1}번 카드`, `${chosenMult.toFixed(1)}x (${outcomeLabel})`, isWin || isDraw, state.bet, payout);
-                    updateBalanceUI(oldBal);
-                    saveState();
-                    setInteractiveState(true);
+                    // Assign faces
+                    for (let i = 0; i < 3; i++) {
+                        const cardEl = document.getElementById(`card-${i}`);
+                        if (!cardEl) continue;
+                        const frontFace = cardEl.querySelector('.card-front');
+                        const mult = mults[i];
+                        
+                        frontFace.className = 'card-face card-front';
+                        let label = '';
+                        let multClass = '';
+                        if (mult === 0.5) {
+                            multClass = 'mult-05';
+                            label = '50% (-50%)';
+                        } else if (mult === 1.0) {
+                            multClass = 'mult-10';
+                            label = '원금 (±0)';
+                        } else {
+                            multClass = 'mult-20';
+                            label = '2배 (+100%)';
+                        }
+                        frontFace.classList.add(multClass);
+                        frontFace.innerHTML = `
+                            <div class="card-mult-val">${mult.toFixed(1)}x</div>
+                            <div class="card-mult-sub">${label}</div>
+                        `;
+                    }
 
-                }, 1000);
+                    splash.innerHTML = "선택한 카드를 오픈합니다...";
+                    if (playCardBtn) playCardBtn.innerHTML = "카드 오픈 중...";
 
-            }, 250);
+                    // 4. Staggered reveal: selected card opens first, then remaining 2
+                    const selectedIdx = state.selectedCardIdx;
+                    const cardEls = [0, 1, 2].map(i => document.getElementById(`card-${i}`));
+                    
+                    setTimeout(() => {
+                        if (cardEls[selectedIdx]) cardEls[selectedIdx].classList.add('flipped');
+                        audio.playClick();
+                    }, 200);
+
+                    setTimeout(() => {
+                        [0, 1, 2].forEach(i => {
+                            if (i !== selectedIdx && cardEls[i]) {
+                                cardEls[i].classList.add('flipped');
+                            }
+                        });
+                    }, 500);
+
+                    // 5. Outcome processing & celebration
+                    setTimeout(() => {
+                        const chosenMult = mults[selectedIdx];
+                        const payout = Math.floor(state.bet * chosenMult);
+                        const oldBal = state.balance;
+                        const isWin = chosenMult > 1.0;
+                        const isDraw = chosenMult === 1.0;
+
+                        state.balance += payout;
+
+                        if (isWin) {
+                            splash.className = "result-splash-box win";
+                            splash.innerHTML = `🎉 대박! 2.0배 카드 당첨! (+₩${formatNumber(payout - state.bet)})`;
+                            showToast(`대박! 2.0배 당첨 (+₩${formatNumber(payout - state.bet)})`, "win");
+                            triggerConfetti();
+                            audio.playWin();
+                        } else if (isDraw) {
+                            splash.className = "result-splash-box empty";
+                            splash.innerHTML = `✨ 원금 보존! 1.0배 카드로 배팅금을 그대로 돌려받았습니다. (₩${formatNumber(payout)})`;
+                            showToast("1.0배 원금 보존!", "win");
+                            audio.playClick();
+                        } else {
+                            splash.className = "result-splash-box lose";
+                            splash.innerHTML = `😢 아쉽습니다! 0.5배 카드로 50%만 환급되었습니다. (-₩${formatNumber(state.bet - payout)})`;
+                            showToast(`0.5배 환급 (-₩${formatNumber(state.bet - payout)})`, "lose");
+                            shakeWindow();
+                            audio.playLose();
+                        }
+
+                        const outcomeLabel = isWin ? '2.0배 승리' : (isDraw ? '1.0배 보존' : '0.5배 환급');
+                        addHistoryItem('카드 뽑기 (1/3)', `${selectedIdx + 1}번 카드`, `${chosenMult.toFixed(1)}x (${outcomeLabel})`, isWin || isDraw, state.bet, payout);
+                        updateBalanceUI(oldBal);
+                        saveState();
+
+                        // 6. After showing results (1.6s delay), smoothly flip cards back to backside & re-enable
+                        setTimeout(() => {
+                            for (let i = 0; i < 3; i++) {
+                                if (cardEls[i]) cardEls[i].classList.remove('flipped');
+                            }
+                            audio.playClick();
+                            
+                            // Re-enable controls for the next round
+                            setInteractiveState(true);
+                        }, 1600);
+
+                    }, 900);
+
+                }, 850); // After shuffle animation finishes
+
+            }, 200);
         }
 
         // --- BUTTON CHOICE EVENT HANDLERS ---
