@@ -1474,13 +1474,13 @@
             <div class="balance-value-row">
                 <div class="balance-amount">
                     <span class="currency-symbol">₩</span>
-                    <span id="player-balance">100,000</span>
+                    <span id="player-balance">1,000,000</span>
                 </div>
                 <button class="btn-reset" id="btn-reset-balance">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
                     </svg>
-                    자금 충전 (10만)
+                    자금 충전 (100만)
                 </button>
             </div>
         </div>
@@ -1491,20 +1491,20 @@
                 <svg viewBox="0 0 24 24">
                     <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
                 </svg>
-                배팅 설정 (1,000원 단위)
+                배팅 설정 (100,000원 단위)
             </div>
             <div class="bet-input-wrapper">
                 <span class="bet-currency">₩</span>
-                <input type="text" class="bet-input" id="bet-amount" value="1,000" readonly>
+                <input type="text" class="bet-input" id="bet-amount" value="100,000" readonly>
             </div>
             <div class="quick-bet-grid">
-                <button class="btn-quick decrease" data-val="-1000">-1K</button>
-                <button class="btn-quick decrease" data-val="-5000">-5K</button>
-                <button class="btn-quick decrease" data-val="-10000">-10K</button>
+                <button class="btn-quick decrease" data-val="-500000">-50만</button>
+                <button class="btn-quick decrease" data-val="-200000">-20만</button>
+                <button class="btn-quick decrease" data-val="-100000">-10만</button>
                 <button class="btn-quick special" id="btn-bet-half">50%</button>
-                <button class="btn-quick increase" data-val="1000">+1K</button>
-                <button class="btn-quick increase" data-val="5000">+5K</button>
-                <button class="btn-quick increase" data-val="10000">+10K</button>
+                <button class="btn-quick increase" data-val="100000">+10만</button>
+                <button class="btn-quick increase" data-val="200000">+20만</button>
+                <button class="btn-quick increase" data-val="500000">+50만</button>
                 <button class="btn-quick special" id="btn-bet-max">All In</button>
             </div>
         </div>
@@ -1948,8 +1948,8 @@
 
         // --- GAME CORE STATE ---
         let state = {
-            balance: 100000,
-            bet: 1000,
+            balance: 1000000,
+            bet: 100000,
             history: [],
             selectedOe: 'Odd',       // 'Odd' or 'Even'
             selectedDiceMode: 'high-low', // 'high-low' or 'exact'
@@ -2110,11 +2110,11 @@
 
         // --- INPUT VALIDATION & BET CONTROLS ---
         function setBetAmount(amount) {
-            amount = Math.max(1000, Math.floor(amount / 1000) * 1000); // minimum 1000 & multiples of 1000
+            amount = Math.max(100000, Math.floor(amount / 100000) * 100000); // minimum 100,000 & multiples of 100,000
             
             // Check if player has enough money, limit to balance if not
             if (amount > state.balance) {
-                amount = Math.floor(state.balance / 1000) * 1000;
+                amount = Math.floor(state.balance / 100000) * 100000;
             }
             
             state.bet = amount;
@@ -2210,13 +2210,13 @@
         let cloudLeaderboardData = null;
 
         const DEFAULT_SIMULATED_LEADERBOARD = [
-            { name: '강남타짜 👑', balance: 58000 },
-            { name: '로얄마스터', balance: 35000 },
-            { name: '잭팟헌터', balance: 22000 },
-            { name: '네온고니', balance: 16000 },
-            { name: '올인러버', balance: 12000 },
-            { name: '행운의별', balance: 8000 },
-            { name: '다이스킹', balance: 5000 },
+            { name: '강남타짜 👑', balance: 5800000 },
+            { name: '로얄마스터', balance: 3500000 },
+            { name: '잭팟헌터', balance: 2200000 },
+            { name: '네온고니', balance: 1600000 },
+            { name: '올인러버', balance: 1200000 },
+            { name: '행운의별', balance: 800000 },
+            { name: '다이스킹', balance: 500000 },
         ];
 
         function getUserId() {
@@ -3285,7 +3285,7 @@
             document.getElementById('btn-bet-half').addEventListener('click', () => {
                 if (state.isPlaying) return;
                 audio.playClick();
-                const half = Math.floor((state.balance / 2) / 1000) * 1000;
+                const half = Math.floor((state.balance / 2) / 100000) * 100000;
                 setBetAmount(half);
             });
 
@@ -3293,7 +3293,7 @@
             document.getElementById('btn-bet-max').addEventListener('click', () => {
                 if (state.isPlaying) return;
                 audio.playClick();
-                const max = Math.floor(state.balance / 1000) * 1000;
+                const max = Math.floor(state.balance / 100000) * 100000;
                 setBetAmount(max);
             });
         }
@@ -3349,11 +3349,11 @@
                 
                 audio.playWin();
                 const oldBal = state.balance;
-                state.balance = 100000;
-                setBetAmount(1000);
+                state.balance = 1000000;
+                setBetAmount(100000);
                 updateBalanceUI(oldBal);
                 saveState();
-                showToast("100,000원으로 충전되었습니다!", "win");
+                showToast("1,000,000원으로 충전되었습니다!", "win");
             });
 
             // Leaderboard initial render, Firebase Sync & Nickname edit binding
