@@ -594,6 +594,120 @@
             border-color: var(--glow-gold);
         }
 
+        /* --- Percentage (%) Bet Slider & Quick Buttons --- */
+        .bet-percent-bar-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            border-radius: 14px;
+            padding: 10px 14px;
+        }
+
+        .bet-percent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .bet-percent-val-badge {
+            background: linear-gradient(135deg, rgba(198, 155, 0, 0.18), rgba(255, 215, 0, 0.08));
+            border: 1px solid rgba(198, 155, 0, 0.4);
+            color: #996e00;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.82rem;
+            font-family: monospace;
+        }
+
+        .bet-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bet-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.08);
+            outline: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .bet-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--glow-gold);
+            box-shadow: 0 0 10px rgba(198, 155, 0, 0.5);
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .bet-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+
+        .percent-quick-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .btn-percent {
+            background: rgba(198, 155, 0, 0.06);
+            border: 1px solid rgba(198, 155, 0, 0.2);
+            color: #8c6d00;
+            padding: 8px 2px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn-percent:hover:not(:disabled) {
+            background: var(--glow-gold);
+            color: #000;
+            border-color: var(--glow-gold);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(198, 155, 0, 0.25);
+        }
+
+        .btn-percent.active-pct {
+            background: var(--glow-gold);
+            color: #000;
+            border-color: var(--glow-gold);
+            font-weight: 900;
+        }
+
+        .btn-percent.all-in {
+            background: linear-gradient(135deg, rgba(217, 0, 98, 0.12), rgba(255, 0, 127, 0.06));
+            border-color: rgba(217, 0, 98, 0.35);
+            color: var(--glow-neon-pink);
+        }
+
+        .btn-percent.all-in:hover:not(:disabled) {
+            background: var(--glow-neon-pink);
+            color: #fff;
+            border-color: var(--glow-neon-pink);
+            box-shadow: 0 2px 10px rgba(217, 0, 98, 0.3);
+        }
+
         /* Game Navigation Tabs */
         .game-tabs {
             display: flex;
@@ -1797,16 +1911,45 @@
 
         <!-- Bet Settings Dashboard -->
         <div class="bet-card" id="betting-controls">
-            <div class="section-title">
-                <svg viewBox="0 0 24 24">
-                    <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-                </svg>
-                배팅 설정 (100,000원 단위)
+            <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                    </svg>
+                    배팅 설정 (금액 & 자산 비율)
+                </div>
+                <div class="bet-percent-val-badge" id="bet-percent-badge">보유액의 10%</div>
             </div>
+
             <div class="bet-input-wrapper">
                 <span class="bet-currency">₩</span>
                 <input type="text" class="bet-input" id="bet-amount" value="100,000" readonly>
             </div>
+
+            <!-- Percentage Slider Section -->
+            <div class="bet-percent-bar-wrap">
+                <div class="bet-percent-header">
+                    <span>📊 자산 비율 슬라이더</span>
+                    <span id="slider-pct-label" style="font-weight: 800; color: var(--glow-gold);">10%</span>
+                </div>
+                <div class="bet-slider-row">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">1%</span>
+                    <input type="range" id="bet-percent-slider" min="1" max="100" step="1" value="10" class="bet-slider" title="보유 자산 비율 조절">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">100%</span>
+                </div>
+            </div>
+
+            <!-- Percentage Quick Buttons Grid -->
+            <div class="percent-quick-grid">
+                <button class="btn-percent" data-pct="10">10%</button>
+                <button class="btn-percent" data-pct="20">20%</button>
+                <button class="btn-percent" data-pct="25">25%</button>
+                <button class="btn-percent" data-pct="50">50%</button>
+                <button class="btn-percent" data-pct="75">75%</button>
+                <button class="btn-percent all-in" data-pct="100">All In</button>
+            </div>
+
+            <!-- Fixed Amount Quick Bet Grid -->
             <div class="quick-bet-grid">
                 <!-- 10만, 50만 단위 -->
                 <button class="btn-quick decrease" data-val="-500000">-50만</button>
@@ -1819,12 +1962,6 @@
                 <button class="btn-quick decrease" data-val="-1000000">-100만</button>
                 <button class="btn-quick increase" data-val="1000000">+100만</button>
                 <button class="btn-quick increase" data-val="10000000">+1000만</button>
-                
-                <!-- 20만 & 50% / All-in -->
-                <button class="btn-quick decrease" data-val="-200000">-20만</button>
-                <button class="btn-quick special" id="btn-bet-half">50%</button>
-                <button class="btn-quick special" id="btn-bet-max">All In</button>
-                <button class="btn-quick increase" data-val="200000">+20만</button>
             </div>
         </div>
 
@@ -2559,6 +2696,15 @@ playJackpot() {
                 resetBtn.classList.remove('glow-gold-pulse');
             }
 
+            // Ensure bet does not exceed current balance
+            if (state.bet > state.balance && state.balance > 0) {
+                state.bet = Math.floor(state.balance / 100000) * 100000;
+                if (state.bet === 0) state.bet = state.balance;
+            } else if (state.balance === 0) {
+                state.bet = 0;
+            }
+            updateBetDisplay();
+
             // Real-time update leaderboard & sync to cloud
             renderLeaderboard();
         }
@@ -2625,16 +2771,83 @@ playJackpot() {
         }
 
         // --- INPUT VALIDATION & BET CONTROLS ---
+        function updateBetDisplay() {
+            const betInput = document.getElementById('bet-amount');
+            const pctBadge = document.getElementById('bet-percent-badge');
+            const slider = document.getElementById('bet-percent-slider');
+            const sliderLabel = document.getElementById('slider-pct-label');
+
+            if (betInput) betInput.value = formatNumber(state.bet);
+
+            // Calculate current bet ratio vs balance
+            let pct = 0;
+            if (state.balance > 0) {
+                pct = Math.round((state.bet / state.balance) * 100);
+            }
+            if (pct > 100) pct = 100;
+
+            if (pctBadge) {
+                pctBadge.innerText = `보유액의 ${pct}%`;
+            }
+            if (slider && document.activeElement !== slider) {
+                slider.value = pct;
+            }
+            if (sliderLabel) {
+                sliderLabel.innerText = `${pct}%`;
+            }
+
+            // Highlight active percent button if matches exactly
+            const pctBtns = document.querySelectorAll('.percent-quick-grid .btn-percent');
+            pctBtns.forEach(btn => {
+                const bPct = parseInt(btn.getAttribute('data-pct'), 10);
+                if (bPct === pct) {
+                    btn.classList.add('active-pct');
+                } else {
+                    btn.classList.remove('active-pct');
+                }
+            });
+        }
+
         function setBetAmount(amount) {
+            if (state.balance === 0) {
+                state.bet = 0;
+                updateBetDisplay();
+                return;
+            }
+
             amount = Math.max(100000, Math.floor(amount / 100000) * 100000); // minimum 100,000 & multiples of 100,000
             
             // Check if player has enough money, limit to balance if not
             if (amount > state.balance) {
                 amount = Math.floor(state.balance / 100000) * 100000;
+                if (amount === 0 && state.balance > 0) amount = state.balance;
             }
             
             state.bet = amount;
-            document.getElementById('bet-amount').value = formatNumber(state.bet);
+            updateBetDisplay();
+        }
+
+        function setBetPercentage(percent) {
+            if (state.balance <= 0) {
+                setBetAmount(0);
+                return;
+            }
+            
+            percent = Math.max(1, Math.min(100, percent));
+            let target = 0;
+            if (percent === 100) {
+                target = state.balance;
+            } else {
+                target = Math.floor((state.balance * (percent / 100)) / 100000) * 100000;
+                target = Math.max(100000, target);
+            }
+
+            if (target > state.balance) {
+                target = state.balance;
+            }
+
+            state.bet = target;
+            updateBetDisplay();
         }
 
         function adjustBetAmount(delta) {
@@ -4020,8 +4233,9 @@ playJackpot() {
             });
         }
 
-        // --- QUICK BET HANDLERS ---
+        // --- QUICK BET HANDLERS (PERCENTAGE & FIXED AMOUNT) ---
         function setupQuickBets() {
+            // Fixed amount delta buttons (+10만, -10만, +100만, etc.)
             const amountButtons = document.querySelectorAll('.quick-bet-grid .btn-quick[data-val]');
             amountButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -4031,21 +4245,26 @@ playJackpot() {
                 });
             });
 
-            // 50% bet
-            document.getElementById('btn-bet-half').addEventListener('click', () => {
-                if (state.isPlaying) return;
-                audio.playClick();
-                const half = Math.floor((state.balance / 2) / 100000) * 100000;
-                setBetAmount(half);
+            // Percentage Quick Buttons (10%, 20%, 25%, 50%, 75%, 100%)
+            const percentButtons = document.querySelectorAll('.percent-quick-grid .btn-percent[data-pct]');
+            percentButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (state.isPlaying) return;
+                    audio.playClick();
+                    const pct = parseInt(btn.getAttribute('data-pct'), 10);
+                    setBetPercentage(pct);
+                });
             });
 
-            // All-in
-            document.getElementById('btn-bet-max').addEventListener('click', () => {
-                if (state.isPlaying) return;
-                audio.playClick();
-                const max = Math.floor(state.balance / 100000) * 100000;
-                setBetAmount(max);
-            });
+            // Interactive Percentage Slider
+            const slider = document.getElementById('bet-percent-slider');
+            if (slider) {
+                slider.addEventListener('input', (e) => {
+                    if (state.isPlaying) return;
+                    const pct = parseInt(e.target.value, 10);
+                    setBetPercentage(pct);
+                });
+            }
         }
 
         // --- SOUND TOGGLE ---
