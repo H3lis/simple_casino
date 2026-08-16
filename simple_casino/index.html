@@ -1494,6 +1494,64 @@
             font-weight: 800;
         }
 
+        /* Champion of Previous Season Title Badge */
+        .champion-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 170, 0, 0.15));
+            border: 1px solid rgba(255, 215, 0, 0.6);
+            color: #8c6d00;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+            vertical-align: middle;
+            animation: goldGlow 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes goldGlow {
+            from { box-shadow: 0 0 4px rgba(255, 215, 0, 0.2); }
+            to { box-shadow: 0 0 12px rgba(255, 215, 0, 0.5); }
+        }
+
+        /* Hall of Fame Banner */
+        .hall-of-fame-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.14), rgba(255, 245, 220, 0.85));
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            border-radius: 16px;
+            padding: 10px 16px;
+            margin-bottom: 15px;
+            font-size: 0.84rem;
+            color: #6e5200;
+            box-shadow: 0 4px 12px rgba(198, 155, 0, 0.08);
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .hall-of-fame-banner .hof-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+        }
+
+        .hall-of-fame-banner .hof-champ-name {
+            font-weight: 800;
+            color: #996e00;
+        }
+
+        .hall-of-fame-banner .hof-champ-score {
+            font-family: monospace;
+            font-weight: 800;
+            color: var(--glow-neon-green);
+        }
+
         .player-balance-val {
             font-family: monospace;
             font-weight: 800;
@@ -2036,6 +2094,19 @@
                 </div>
             </div>
             
+            <!-- Hall of Fame / Previous Season Champion Banner -->
+            <div class="hall-of-fame-banner" id="hof-banner">
+                <div class="hof-title">
+                    <span>👑</span>
+                    <span>지난 시즌 챔피언 :</span>
+                    <span class="hof-champ-name" id="hof-champ-name">강남타짜</span>
+                </div>
+                <div>
+                    <span style="font-size: 0.78rem; opacity: 0.85;">최종 자산: </span>
+                    <span class="hof-champ-score" id="hof-champ-score">₩5,800,000</span>
+                </div>
+            </div>
+            
             <div class="leaderboard-table-wrap">
                 <table class="leaderboard-table">
                     <thead>
@@ -2296,6 +2367,15 @@ playJackpot() {
             return `season_${y}_${m}_${d}`;
         }
 
+        function getPrevSeasonKey(now = new Date()) {
+            const currentSeasonStart = new Date(getNextSundayNoon(now).getTime() - 7 * 24 * 60 * 60 * 1000);
+            const prevSeasonStart = new Date(currentSeasonStart.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const y = prevSeasonStart.getFullYear();
+            const m = String(prevSeasonStart.getMonth() + 1).padStart(2, '0');
+            const d = String(prevSeasonStart.getDate()).padStart(2, '0');
+            return `season_${y}_${m}_${d}`;
+        }
+
         let countdownInterval = null;
         function startResetCountdown() {
             if (countdownInterval) clearInterval(countdownInterval);
@@ -2333,9 +2413,35 @@ playJackpot() {
             countdownInterval = setInterval(update, 1000);
         }
 
-        function checkAndPerformWeeklyReset(isLiveTrigger = false) {
+        async function checkAndPerformWeeklyReset(isLiveTrigger = false) {
             const currentSeasonKey = getCurrentSeasonKey();
+            const prevSeasonKey = getPrevSeasonKey();
+
             if (!state.lastSeasonKey || state.lastSeasonKey !== currentSeasonKey) {
+                // If switching seasons and connected to Firebase, determine last season's top 1 player
+                if (isFirebaseOnline && firestoreDb && state.lastSeasonKey) {
+                    try {
+                        const prevBoardSnap = await firestoreDb.collection(`casino_leaderboard_${state.lastSeasonKey}`)
+                            .orderBy('balance', 'desc')
+                            .limit(1)
+                            .get();
+                        
+                        if (!prevBoardSnap.empty) {
+                            const champDoc = prevBoardSnap.docs[0];
+                            const champData = champDoc.data();
+                            await firestoreDb.collection('casino_metadata').doc('hall_of_fame').set({
+                                seasonKey: state.lastSeasonKey,
+                                championName: champData.name || '무명 타짜',
+                                championUid: champDoc.id,
+                                finalBalance: champData.balance || 1000000,
+                                crownedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            }, { merge: true });
+                        }
+                    } catch (e) {
+                        console.warn('Champion crowning on reset error:', e);
+                    }
+                }
+
                 state.lastSeasonKey = currentSeasonKey;
                 const oldBal = state.balance;
                 state.balance = 1000000;
@@ -2344,6 +2450,10 @@ playJackpot() {
                 updateBalanceUI(oldBal);
                 renderHistory();
                 saveState();
+                
+                // Re-attach leaderboard listener to the new season collection
+                attachSeasonLeaderboardListener();
+
                 showToast("🎉 새로운 주간 시즌이 시작되었습니다! 자금이 ₩1,000,000으로 초기화되었습니다.", "win");
                 if (isLiveTrigger) {
                     triggerConfetti();
@@ -2609,9 +2719,17 @@ playJackpot() {
         let firestoreDb = null;
         let isFirebaseOnline = false;
         let cloudLeaderboardData = null;
+        let leaderboardUnsubscribe = null;
+
+        // Previous Season Champion / Hall of Fame
+        let lastChampionInfo = {
+            name: '강남타짜',
+            balance: 5800000,
+            uid: 'user_champ'
+        };
 
         const DEFAULT_SIMULATED_LEADERBOARD = [
-            { name: '강남타짜 👑', balance: 5800000 },
+            { name: '강남타짜', balance: 5800000, uid: 'user_champ' },
             { name: '로얄마스터', balance: 3500000 },
             { name: '잭팟헌터', balance: 2200000 },
             { name: '네온고니', balance: 1600000 },
@@ -2619,6 +2737,11 @@ playJackpot() {
             { name: '행운의별', balance: 800000 },
             { name: '다이스킹', balance: 500000 },
         ];
+
+        function isChampion(nickname, uid) {
+            if (!lastChampionInfo || !lastChampionInfo.name) return false;
+            return (lastChampionInfo.name === nickname || (uid && lastChampionInfo.uid === uid));
+        }
 
         function getUserId() {
             if (state.isLoggedIn && state.currentUid) {
@@ -2656,34 +2779,27 @@ playJackpot() {
                         statusEl.querySelector('.status-text').innerText = '온라인 실시간 연동됨';
                     }
 
-                    // Attach Realtime Listener to Firestore Rankings
-                    firestoreDb.collection('casino_leaderboard')
-                        .orderBy('balance', 'desc')
-                        .limit(10)
-                        .onSnapshot((snapshot) => {
-                            const cloudList = [];
-                            const myUid = getUserId();
-                            
-                            snapshot.forEach(doc => {
+                    // 1. Listen to Hall of Fame (Previous Season Champion)
+                    firestoreDb.collection('casino_metadata').doc('hall_of_fame')
+                        .onSnapshot((doc) => {
+                            if (doc.exists) {
                                 const data = doc.data();
-                                cloudList.push({
-                                    uid: doc.id,
-                                    name: data.name || '익명',
-                                    balance: data.balance || 0,
-                                    isMe: (doc.id === myUid)
-                                });
-                            });
-
-                            cloudLeaderboardData = cloudList;
-                            renderLeaderboard();
-                        }, (error) => {
-                            console.warn('Firebase sync error, fallback to local:', error);
-                            isFirebaseOnline = false;
-                            if (statusEl) {
-                                statusEl.className = 'leaderboard-status';
-                                statusEl.querySelector('.status-text').innerText = '로컬 모드';
+                                if (data && data.championName) {
+                                    lastChampionInfo = {
+                                        name: data.championName,
+                                        balance: data.finalBalance || 0,
+                                        uid: data.championUid || ''
+                                    };
+                                    renderLeaderboard();
+                                    updateAuthUI();
+                                }
                             }
+                        }, (err) => {
+                            console.warn('Hall of Fame sync error:', err);
                         });
+
+                    // 2. Attach Realtime Listener to Current Season Leaderboard
+                    attachSeasonLeaderboardListener();
 
                     // Auto login if session exists
                     const sessionNick = localStorage.getItem('royal_neon_session_nick');
@@ -2702,6 +2818,40 @@ playJackpot() {
                     statusEl.querySelector('.status-text').innerText = '로컬 모드';
                 }
             }
+        }
+
+        function attachSeasonLeaderboardListener() {
+            if (!isFirebaseOnline || !firestoreDb) return;
+            const currentSeasonKey = getCurrentSeasonKey();
+            const collectionName = `casino_leaderboard_${currentSeasonKey}`;
+
+            if (leaderboardUnsubscribe) {
+                leaderboardUnsubscribe();
+                leaderboardUnsubscribe = null;
+            }
+
+            leaderboardUnsubscribe = firestoreDb.collection(collectionName)
+                .orderBy('balance', 'desc')
+                .limit(10)
+                .onSnapshot((snapshot) => {
+                    const cloudList = [];
+                    const myUid = getUserId();
+                    
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        cloudList.push({
+                            uid: doc.id,
+                            name: data.name || '익명',
+                            balance: data.balance || 0,
+                            isMe: (doc.id === myUid)
+                        });
+                    });
+
+                    cloudLeaderboardData = cloudList;
+                    renderLeaderboard();
+                }, (error) => {
+                    console.warn('Firebase season leaderboard sync error:', error);
+                });
         }
 
         // Login or Register with Nickname & 4-digit PIN
@@ -2834,15 +2984,23 @@ playJackpot() {
             const modalDesc = document.getElementById('auth-modal-desc-text');
             const modalHeader = document.getElementById('auth-modal-header-text');
 
+            const isMeChamp = state.currentUser && isChampion(state.currentUser, state.currentUid);
+
             if (state.isLoggedIn && state.currentUser) {
-                if (btnLabel) btnLabel.innerText = state.currentUser;
-                if (btnIcon) btnIcon.innerText = '👤';
+                if (btnLabel) btnLabel.innerText = isMeChamp ? `👑 ${state.currentUser}` : state.currentUser;
+                if (btnIcon) btnIcon.innerText = isMeChamp ? '👑' : '👤';
                 if (authBtn) authBtn.classList.add('logged-in');
                 if (formArea) formArea.style.display = 'none';
                 if (loggedInArea) loggedInArea.style.display = 'block';
-                if (loggedNickDisplay) loggedNickDisplay.innerText = `👤 ${state.currentUser}`;
+                if (loggedNickDisplay) {
+                    loggedNickDisplay.innerHTML = isMeChamp 
+                        ? `👑 ${state.currentUser} <span class="champion-badge">전 시즌 챔피언</span>` 
+                        : `👤 ${state.currentUser}`;
+                }
                 if (modalHeader) modalHeader.innerText = "내 계정 정보";
-                if (modalDesc) modalDesc.innerText = "현재 클라우드 데이터베이스에 로그인되어 데이터가 실시간 백업 중입니다.";
+                if (modalDesc) modalDesc.innerText = isMeChamp 
+                    ? "축하합니다! 회원님은 지난 시즌 1등 챔피언 명예 칭호를 보유하고 계십니다!" 
+                    : "현재 클라우드 데이터베이스에 로그인되어 데이터가 실시간 백업 중입니다.";
             } else {
                 if (btnLabel) btnLabel.innerText = '로그인';
                 if (btnIcon) btnIcon.innerText = '🔑';
@@ -2858,6 +3016,7 @@ playJackpot() {
             if (!isFirebaseOnline || !firestoreDb) return;
             const uid = getUserId();
             const nickname = getNickname();
+            const currentSeasonKey = getCurrentSeasonKey();
 
             // 1. Sync User Private State
             if (state.isLoggedIn) {
@@ -2867,15 +3026,15 @@ playJackpot() {
                     balance: state.balance,
                     history: state.history,
                     rechargeCharges: state.rechargeCharges,
-                    lastSeasonKey: state.lastSeasonKey || getCurrentSeasonKey(),
+                    lastSeasonKey: state.lastSeasonKey || currentSeasonKey,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true }).catch(err => {
                     console.warn('User state cloud sync error:', err);
                 });
             }
 
-            // 2. Sync Public Leaderboard
-            firestoreDb.collection('casino_leaderboard').doc(uid).set({
+            // 2. Sync Current Season Public Leaderboard
+            firestoreDb.collection(`casino_leaderboard_${currentSeasonKey}`).doc(uid).set({
                 name: nickname,
                 balance: state.balance,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2888,7 +3047,18 @@ playJackpot() {
             const tbody = document.getElementById('leaderboard-tbody');
             if (!tbody) return;
 
+            // Update Hall of Fame Champion Banner
+            const hofNameEl = document.getElementById('hof-champ-name');
+            const hofScoreEl = document.getElementById('hof-champ-score');
+            if (hofNameEl && lastChampionInfo) {
+                hofNameEl.innerText = lastChampionInfo.name || '챔피언 없음';
+            }
+            if (hofScoreEl && lastChampionInfo) {
+                hofScoreEl.innerText = `₩${formatNumber(lastChampionInfo.balance || 0)}`;
+            }
+
             const myNick = getNickname();
+            const myUid = getUserId();
             let allPlayers = [];
 
             if (isFirebaseOnline && cloudLeaderboardData && cloudLeaderboardData.length > 0) {
@@ -2897,6 +3067,7 @@ playJackpot() {
                 const hasMe = allPlayers.some(p => p.isMe);
                 if (!hasMe) {
                     allPlayers.push({
+                        uid: myUid,
                         name: myNick,
                         balance: state.balance,
                         isMe: true
@@ -2906,7 +3077,7 @@ playJackpot() {
             } else {
                 allPlayers = [
                     ...DEFAULT_SIMULATED_LEADERBOARD,
-                    { name: myNick, balance: state.balance, isMe: true }
+                    { uid: myUid, name: myNick, balance: state.balance, isMe: true }
                 ];
                 allPlayers.sort((a, b) => b.balance - a.balance);
             }
@@ -2921,12 +3092,14 @@ playJackpot() {
 
                 const isMeClass = player.isMe ? 'is-me' : '';
                 const meTag = player.isMe ? '<span class="player-tag-me">ME</span>' : '';
+                const champBadge = isChampion(player.name, player.uid) ? '<span class="champion-badge">👑 전 시즌 1위</span>' : '';
 
                 return `
                     <tr class="leaderboard-row ${isMeClass}">
                         <td style="text-align: center;">${rankIcon}</td>
                         <td>
                             <span>${player.name}</span>
+                            ${champBadge}
                             ${meTag}
                         </td>
                         <td style="text-align: right;">
