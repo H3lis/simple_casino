@@ -90,21 +90,89 @@
         /* Sound & Action buttons in Header */
         .header-actions {
             display: flex;
-            gap: 12px;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        /* Weekly Sunday 12:00 PM Reset Countdown Badge */
+        .reset-countdown-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(198, 155, 0, 0.35);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #8c6d00;
+            box-shadow: 0 4px 12px rgba(198, 155, 0, 0.12);
+            backdrop-filter: blur(10px);
+            transition: all var(--transition-speed);
+        }
+
+        .reset-countdown-badge .timer-icon {
+            font-size: 0.95rem;
+            animation: spinTimer 4s linear infinite;
+        }
+
+        @keyframes spinTimer {
+            0%, 85% { transform: rotate(0deg); }
+            90% { transform: rotate(15deg); }
+            95% { transform: rotate(-15deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .reset-countdown-badge .timer-val {
+            font-family: 'Outfit', monospace;
+            color: var(--glow-gold);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        /* Header Auth Button */
+        .btn-auth-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(118, 93, 160, 0.08), rgba(0, 119, 204, 0.08));
+            border: 1px solid rgba(0, 119, 204, 0.3);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--glow-neon-blue);
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .btn-auth-header:hover {
+            background: rgba(0, 119, 204, 0.15);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 119, 204, 0.2);
+        }
+
+        .btn-auth-header.logged-in {
+            border-color: rgba(5, 179, 117, 0.35);
+            color: var(--glow-neon-green);
+            background: rgba(5, 179, 117, 0.08);
         }
 
         .icon-btn {
             background: rgba(0, 0, 0, 0.03);
             border: 1px solid var(--border-color);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all var(--transition-speed);
             color: var(--text-main);
+            flex-shrink: 0;
         }
 
         .icon-btn:hover {
@@ -123,6 +191,174 @@
             color: var(--glow-neon-pink);
             border-color: rgba(217, 0, 98, 0.25);
             background: rgba(217, 0, 98, 0.04);
+        }
+
+        /* --- AUTH MODAL STYLES --- */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 10, 30, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+            padding: 20px;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-modal-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(118, 93, 160, 0.2);
+            border-radius: 28px;
+            padding: 30px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25), 0 0 40px rgba(0, 119, 204, 0.15);
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .modal-backdrop.active .auth-modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            line-height: 1;
+            padding: 5px;
+            transition: color 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--text-main);
+        }
+
+        .auth-modal-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auth-modal-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+
+        .auth-input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .auth-input-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .auth-input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: rgba(245, 243, 252, 0.8);
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .auth-input-field:focus {
+            border-color: var(--glow-neon-blue);
+            box-shadow: 0 0 0 3px rgba(0, 119, 204, 0.15);
+            background: #ffffff;
+        }
+
+        .auth-status-msg {
+            font-size: 0.82rem;
+            margin-bottom: 16px;
+            min-height: 18px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .auth-status-msg.error {
+            display: block;
+            color: var(--glow-neon-pink);
+        }
+
+        .auth-status-msg.success {
+            display: block;
+            color: var(--glow-neon-green);
+        }
+
+        .auth-btn-primary {
+            width: 100%;
+            padding: 14px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, #0077cc, #05b375);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 20px rgba(0, 119, 204, 0.3);
+        }
+
+        .auth-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 119, 204, 0.4);
+        }
+
+        .auth-btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .auth-btn-secondary {
+            width: 100%;
+            padding: 11px;
+            border-radius: 14px;
+            border: 1px solid rgba(217, 0, 98, 0.3);
+            background: rgba(217, 0, 98, 0.05);
+            color: var(--glow-neon-pink);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .auth-btn-secondary:hover {
+            background: rgba(217, 0, 98, 0.12);
         }
 
         /* Balance Dashboard */
@@ -1451,6 +1687,20 @@
                 ROYAL NEON CASINO
             </div>
             <div class="header-actions">
+                <!-- Weekly Reset Countdown Timer Badge -->
+                <div class="reset-countdown-badge" id="reset-countdown-badge" title="매주 일요일 낮 12:00 정기 시즌 초기화">
+                    <span class="timer-icon">⏳</span>
+                    <span>시즌 리셋:</span>
+                    <span class="timer-val" id="countdown-timer-text">계산 중...</span>
+                </div>
+
+                <!-- Account / Login Button -->
+                <button class="btn-auth-header" id="btn-auth-header">
+                    <span id="auth-btn-icon">🔑</span>
+                    <span id="auth-btn-label">로그인</span>
+                </button>
+
+                <!-- Sound Toggle Button -->
                 <button class="icon-btn" id="btn-sound" title="소리 켜기/끄기">
                     <!-- Volume High Icon -->
                     <svg id="svg-sound-on" viewBox="0 0 24 24">
@@ -1816,6 +2066,48 @@
         </div>
     </div>
 
+    <!-- Auth / Account Modal -->
+    <div class="modal-backdrop" id="auth-modal-backdrop">
+        <div class="auth-modal-card">
+            <button class="modal-close-btn" id="btn-close-auth-modal">&times;</button>
+            <div class="auth-modal-title">
+                <span>🔐</span> <span id="auth-modal-header-text">계정 로그인 / 가입</span>
+            </div>
+            <div class="auth-modal-desc" id="auth-modal-desc-text">
+                닉네임과 4자리 비밀번호(PIN)를 입력하세요.<br>
+                처음 입력하는 닉네임은 <strong>자동으로 신규 계정이 생성</strong>되며 클라우드 DB에 안전하게 저장됩니다!
+            </div>
+
+            <!-- Login / Signup Form -->
+            <div id="auth-form-area">
+                <div class="auth-input-group">
+                    <label for="input-auth-nick">플레이어 닉네임 (2~12자)</label>
+                    <input type="text" class="auth-input-field" id="input-auth-nick" placeholder="예: 잭팟마스터" maxlength="12">
+                </div>
+                <div class="auth-input-group">
+                    <label for="input-auth-pin">4자리 비밀번호 (숫자 PIN)</label>
+                    <input type="password" class="auth-input-field" id="input-auth-pin" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+                </div>
+                <div class="auth-status-msg" id="auth-status-msg"></div>
+                <button class="auth-btn-primary" id="btn-submit-auth">✨ 로그인 및 플레이</button>
+            </div>
+
+            <!-- Already Logged-in Account Info View (Hidden by default) -->
+            <div id="auth-logged-in-area" style="display:none; text-align:center;">
+                <div style="font-size: 1.1rem; font-weight:800; color:var(--text-main); margin-bottom:6px;" id="logged-nick-display">
+                    👤 플레이어
+                </div>
+                <div style="font-size: 0.85rem; color:var(--glow-neon-green); font-weight:700; margin-bottom:15px;">
+                    🟢 클라우드 DB 실시간 동기화 중
+                </div>
+                <div style="background:rgba(0,0,0,0.03); border:1px solid var(--border-color); border-radius:14px; padding:12px; margin-bottom:15px; font-size:0.88rem; color:var(--text-secondary);">
+                    매주 일요일 낮 12:00에 주간 랭킹 및 자금이 100만 원으로 자동 리셋됩니다.
+                </div>
+                <button class="auth-btn-secondary" id="btn-logout-account">🚪 다른 계정으로 로그인 / 로그아웃</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast elements -->
     <div class="toast" id="game-toast"></div>
 
@@ -1931,7 +2223,7 @@
                 osc.stop(now + 0.5);
             }
 
-            playJackpot() {
+playJackpot() {
                 if (this.isMuted) return;
                 this.init();
                 if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -1975,12 +2267,102 @@
             isAutoSpin: false,
             autoSpinTimer: null,
             rechargeCharges: 3,
-            lastRegenTime: null
+            lastRegenTime: null,
+            // Account & Weekly Season fields
+            currentUser: null,       // Logged-in Nickname
+            currentPin: null,        // 4-digit PIN
+            currentUid: null,        // Firestore doc ID
+            isLoggedIn: false,
+            lastSeasonKey: null      // Season identifier e.g. 'season_2026_08_16'
         };
 
-        // --- PERSISTENCE (LOCAL STORAGE) ---
+        // --- WEEKLY SUNDAY 12:00 PM SEASON RESET SYSTEM ---
+        function getNextSundayNoon(now = new Date()) {
+            const currentDay = now.getDay(); // 0 is Sunday, 1 is Monday, ... 6 is Saturday
+            let daysAhead = (7 - currentDay) % 7;
+            const target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysAhead, 12, 0, 0, 0);
+            if (target.getTime() <= now.getTime()) {
+                target.setDate(target.getDate() + 7);
+            }
+            return target;
+        }
+
+        function getCurrentSeasonKey(now = new Date()) {
+            const nextSunday = getNextSundayNoon(now);
+            const seasonStart = new Date(nextSunday.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const y = seasonStart.getFullYear();
+            const m = String(seasonStart.getMonth() + 1).padStart(2, '0');
+            const d = String(seasonStart.getDate()).padStart(2, '0');
+            return `season_${y}_${m}_${d}`;
+        }
+
+        let countdownInterval = null;
+        function startResetCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            function update() {
+                const now = new Date();
+                const nextSunday = getNextSundayNoon(now);
+                const diffMs = nextSunday.getTime() - now.getTime();
+                
+                if (diffMs <= 0) {
+                    checkAndPerformWeeklyReset(true);
+                    return;
+                }
+
+                const totalSec = Math.floor(diffMs / 1000);
+                const days = Math.floor(totalSec / 86400);
+                const hours = Math.floor((totalSec % 86400) / 3600);
+                const minutes = Math.floor((totalSec % 3600) / 60);
+                const seconds = totalSec % 60;
+
+                const timerEl = document.getElementById('countdown-timer-text');
+                if (timerEl) {
+                    const hStr = String(hours).padStart(2, '0');
+                    const mStr = String(minutes).padStart(2, '0');
+                    const sStr = String(seconds).padStart(2, '0');
+                    if (days > 0) {
+                        timerEl.innerText = `${days}일 ${hStr}:${mStr}:${sStr}`;
+                    } else {
+                        timerEl.innerText = `${hStr}:${mStr}:${sStr}`;
+                    }
+                }
+            }
+            
+            update();
+            countdownInterval = setInterval(update, 1000);
+        }
+
+        function checkAndPerformWeeklyReset(isLiveTrigger = false) {
+            const currentSeasonKey = getCurrentSeasonKey();
+            if (!state.lastSeasonKey || state.lastSeasonKey !== currentSeasonKey) {
+                state.lastSeasonKey = currentSeasonKey;
+                const oldBal = state.balance;
+                state.balance = 1000000;
+                state.history = [];
+                state.rechargeCharges = 3;
+                updateBalanceUI(oldBal);
+                renderHistory();
+                saveState();
+                showToast("🎉 새로운 주간 시즌이 시작되었습니다! 자금이 ₩1,000,000으로 초기화되었습니다.", "win");
+                if (isLiveTrigger) {
+                    triggerConfetti();
+                    audio.playWin();
+                }
+            }
+        }
+
+        // --- PERSISTENCE & DATABASE SYNC ---
+        function getNormalizedUid(nickname) {
+            return 'user_' + encodeURIComponent(nickname.trim().toLowerCase());
+        }
+
         function loadState() {
             try {
+                // Check local session first
+                const sessionNick = localStorage.getItem('royal_neon_session_nick');
+                const sessionPin = localStorage.getItem('royal_neon_session_pin');
+
                 const savedBalance = localStorage.getItem('royal_neon_balance');
                 if (savedBalance !== null) {
                     state.balance = parseInt(savedBalance, 10);
@@ -1993,10 +2375,21 @@
                 if (savedCharges !== null) {
                     state.rechargeCharges = parseInt(savedCharges, 10);
                 }
-                const savedRegen = localStorage.getItem('royal_neon_last_regen_time');
-                if (savedRegen) {
-                    state.lastRegenTime = parseInt(savedRegen, 10);
+                const savedSeason = localStorage.getItem('royal_neon_season_key');
+                if (savedSeason) {
+                    state.lastSeasonKey = savedSeason;
                 }
+
+                if (sessionNick && sessionPin) {
+                    state.currentUser = sessionNick;
+                    state.currentPin = sessionPin;
+                    state.currentUid = getNormalizedUid(sessionNick);
+                    state.isLoggedIn = true;
+                }
+
+                // Check local weekly reset
+                checkAndPerformWeeklyReset();
+
             } catch (e) {
                 console.error("로컬 스토리지를 로드하지 못했습니다.", e);
             }
@@ -2007,10 +2400,15 @@
                 localStorage.setItem('royal_neon_balance', state.balance.toString());
                 localStorage.setItem('royal_neon_history', JSON.stringify(state.history));
                 localStorage.setItem('royal_neon_recharge_charges', state.rechargeCharges.toString());
-                localStorage.setItem('royal_neon_last_regen_time', state.lastRegenTime ? state.lastRegenTime.toString() : '');
+                if (state.lastSeasonKey) {
+                    localStorage.setItem('royal_neon_season_key', state.lastSeasonKey);
+                }
             } catch (e) {
                 console.error("로컬 스토리지를 저장하지 못했습니다.", e);
             }
+
+            // Sync to Firestore Cloud Database if online & logged in
+            syncScoreToCloud();
         }
 
         // --- UI FORMATTING UTILS ---
@@ -2053,7 +2451,6 @@
 
             // Real-time update leaderboard & sync to cloud
             renderLeaderboard();
-            syncScoreToCloud();
         }
 
         // --- TOAST NOTIFICATIONS ---
@@ -2099,28 +2496,22 @@
                 const height = Math.random() * 12 + 6;
                 piece.style.width = `${width}px`;
                 piece.style.height = `${height}px`;
-                piece.style.opacity = Math.random() * 0.8 + 0.2;
-                
-                const initialRotation = Math.random() * 360;
-                const speedX = (Math.random() - 0.5) * 25; // drift amount
-                const fallDuration = Math.random() * 1.8 + 1.2; // seconds
-                
-                piece.style.transform = `rotate(${initialRotation}deg)`;
+                piece.style.animationDuration = Math.random() * 2 + 1.5 + 's';
+                piece.style.animationDelay = Math.random() * 0.4 + 's';
                 container.appendChild(piece);
-                
-                piece.animate([
-                    { transform: `translate(0, 0) rotate(${initialRotation}deg)`, opacity: 1 },
-                    { transform: `translate(${speedX}vw, 105vh) rotate(${initialRotation + 1080}deg)`, opacity: 0 }
-                ], {
-                    duration: fallDuration * 1000,
-                    easing: 'cubic-bezier(0.12, 0.82, 0.165, 1)',
-                    fill: 'forwards'
-                });
-                
-                setTimeout(() => {
-                    piece.remove();
-                }, fallDuration * 1000);
             }
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 4000);
+        }
+
+        // --- SHAKE WINDOW EFFECT (ON LOSS) ---
+        function shakeWindow() {
+            document.body.classList.add('shake-anim');
+            setTimeout(() => {
+                document.body.classList.remove('shake-anim');
+            }, 500);
         }
 
         // --- INPUT VALIDATION & BET CONTROLS ---
@@ -2172,6 +2563,7 @@
 
         function renderHistory() {
             const listContainer = document.getElementById('history-list');
+            if (!listContainer) return;
             if (state.history.length === 0) {
                 listContainer.innerHTML = `<div class="history-empty">아직 기록된 게임이 없습니다.</div>`;
                 return;
@@ -2202,13 +2594,7 @@
             }).join('');
         }
 
-        // --- REALTIME ONLINE LEADERBOARD CONTROLLER (Firebase Firestore) ---
-        /**
-         * [🔥 Firebase 실시간 온라인 연동 설정]
-         * 실제 다른 사람들과 실시간 랭킹을 공유하려면 아래 firebaseConfig 객체에
-         * 본인의 Firebase 프로젝트 설정값(apiKey, projectId 등)을 입력하시면 즉시 전 세계 실시간 연동됩니다.
-         * (설정값이 비어있을 경우 자동으로 로컬 시뮬레이션 모드로 안전하게 작동합니다.)
-         */
+        // --- REALTIME ONLINE AUTH & LEADERBOARD (Firebase Firestore) ---
         const firebaseConfig = {
             apiKey: "AIzaSyAkwUwtm4G3spvJj46H1eYoSNgEck3pOFA",
             authDomain: "project-simca.firebaseapp.com",
@@ -2235,6 +2621,9 @@
         ];
 
         function getUserId() {
+            if (state.isLoggedIn && state.currentUid) {
+                return state.currentUid;
+            }
             let uid = localStorage.getItem('royal_neon_uid');
             if (!uid) {
                 uid = 'user_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
@@ -2244,24 +2633,16 @@
         }
 
         function getNickname() {
-            return localStorage.getItem('royal_neon_nickname') || '플레이어 (Player)';
-        }
-
-        function setNickname(name) {
-            const clean = name ? name.trim().slice(0, 12) : '';
-            if (clean) {
-                localStorage.setItem('royal_neon_nickname', clean);
-                syncScoreToCloud();
-                renderLeaderboard();
-                showToast(`닉네임이 "${clean}"(으)로 설정되었습니다!`, 'win');
+            if (state.isLoggedIn && state.currentUser) {
+                return state.currentUser;
             }
+            return localStorage.getItem('royal_neon_nickname') || '플레이어 (Player)';
         }
 
         // Initialize Firebase Firestore Realtime Listener
         function initFirebaseSync() {
             const statusEl = document.getElementById('firebase-status');
             
-            // Check if user filled in firebaseConfig
             if (firebaseConfig.apiKey && firebaseConfig.projectId && typeof firebase !== 'undefined') {
                 try {
                     if (!firebase.apps.length) {
@@ -2304,8 +2685,12 @@
                             }
                         });
 
-                    // Sync initial score
-                    syncScoreToCloud();
+                    // Auto login if session exists
+                    const sessionNick = localStorage.getItem('royal_neon_session_nick');
+                    const sessionPin = localStorage.getItem('royal_neon_session_pin');
+                    if (sessionNick && sessionPin) {
+                        loginOrRegister(sessionNick, sessionPin, true);
+                    }
 
                 } catch (e) {
                     console.warn('Firebase init failed, using local mode:', e);
@@ -2319,17 +2704,183 @@
             }
         }
 
+        // Login or Register with Nickname & 4-digit PIN
+        async function loginOrRegister(nickname, pin, isAutoLogin = false) {
+            nickname = nickname ? nickname.trim().slice(0, 12) : '';
+            if (!nickname || nickname.length < 2) {
+                return { success: false, msg: "닉네임은 2자 이상 12자 이하로 입력해주세요." };
+            }
+            if (!/^\d{4}$/.test(pin)) {
+                return { success: false, msg: "비밀번호는 4자리 숫자(PIN)로 입력해주세요." };
+            }
+
+            const uid = getNormalizedUid(nickname);
+            const seasonKey = getCurrentSeasonKey();
+
+            if (isFirebaseOnline && firestoreDb) {
+                try {
+                    const userRef = firestoreDb.collection('casino_users').doc(uid);
+                    const doc = await userRef.get();
+
+                    if (doc.exists) {
+                        const data = doc.data();
+                        if (data.pin !== pin) {
+                            return { success: false, msg: "비밀번호(PIN 4자리)가 일치하지 않습니다." };
+                        }
+                        
+                        // Existing user login
+                        state.currentUser = data.nickname || nickname;
+                        state.currentPin = pin;
+                        state.currentUid = uid;
+                        state.isLoggedIn = true;
+                        state.lastSeasonKey = data.lastSeasonKey || seasonKey;
+
+                        // Check weekly reset
+                        if (state.lastSeasonKey !== seasonKey) {
+                            state.balance = 1000000;
+                            state.history = [];
+                            state.rechargeCharges = 3;
+                            state.lastSeasonKey = seasonKey;
+                        } else {
+                            state.balance = typeof data.balance === 'number' ? data.balance : 1000000;
+                            state.history = Array.isArray(data.history) ? data.history : [];
+                            state.rechargeCharges = typeof data.rechargeCharges === 'number' ? data.rechargeCharges : 3;
+                        }
+
+                    } else {
+                        // New user registration
+                        state.currentUser = nickname;
+                        state.currentPin = pin;
+                        state.currentUid = uid;
+                        state.isLoggedIn = true;
+                        state.balance = 1000000;
+                        state.history = [];
+                        state.rechargeCharges = 3;
+                        state.lastSeasonKey = seasonKey;
+
+                        await userRef.set({
+                            nickname: nickname,
+                            pin: pin,
+                            balance: state.balance,
+                            history: state.history,
+                            rechargeCharges: state.rechargeCharges,
+                            lastSeasonKey: seasonKey,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+
+                    // Save session locally
+                    localStorage.setItem('royal_neon_session_nick', nickname);
+                    localStorage.setItem('royal_neon_session_pin', pin);
+                    localStorage.setItem('royal_neon_nickname', nickname);
+                    localStorage.setItem('royal_neon_uid', uid);
+                    localStorage.setItem('royal_neon_balance', state.balance.toString());
+                    localStorage.setItem('royal_neon_history', JSON.stringify(state.history));
+                    localStorage.setItem('royal_neon_season_key', state.lastSeasonKey);
+
+                    updateBalanceUI();
+                    renderHistory();
+                    updateAuthUI();
+                    syncScoreToCloud();
+                    
+                    if (!isAutoLogin) {
+                        showToast(`"${nickname}"님 환영합니다! 클라우드 동기화 완료`, 'win');
+                    }
+                    return { success: true, msg: `"${nickname}"님 로그인 성공!` };
+
+                } catch (err) {
+                    console.error("Firebase Login error:", err);
+                    return { success: false, msg: "데이터베이스 연결 중 오류가 발생했습니다." };
+                }
+            } else {
+                // Fallback Local Mode
+                state.currentUser = nickname;
+                state.currentPin = pin;
+                state.currentUid = uid;
+                state.isLoggedIn = true;
+                localStorage.setItem('royal_neon_session_nick', nickname);
+                localStorage.setItem('royal_neon_session_pin', pin);
+                localStorage.setItem('royal_neon_nickname', nickname);
+                localStorage.setItem('royal_neon_uid', uid);
+                updateAuthUI();
+                renderLeaderboard();
+                if (!isAutoLogin) {
+                    showToast(`"${nickname}"님 환영합니다! (로컬 모드)`, 'win');
+                }
+                return { success: true, msg: `"${nickname}"님 로그인되었습니다.` };
+            }
+        }
+
+        function logoutAccount() {
+            state.currentUser = null;
+            state.currentPin = null;
+            state.currentUid = null;
+            state.isLoggedIn = false;
+            localStorage.removeItem('royal_neon_session_nick');
+            localStorage.removeItem('royal_neon_session_pin');
+            updateAuthUI();
+            renderLeaderboard();
+            showToast("로그아웃 되었습니다.", "lose");
+        }
+
+        function updateAuthUI() {
+            const btnLabel = document.getElementById('auth-btn-label');
+            const btnIcon = document.getElementById('auth-btn-icon');
+            const authBtn = document.getElementById('btn-auth-header');
+            const formArea = document.getElementById('auth-form-area');
+            const loggedInArea = document.getElementById('auth-logged-in-area');
+            const loggedNickDisplay = document.getElementById('logged-nick-display');
+            const modalDesc = document.getElementById('auth-modal-desc-text');
+            const modalHeader = document.getElementById('auth-modal-header-text');
+
+            if (state.isLoggedIn && state.currentUser) {
+                if (btnLabel) btnLabel.innerText = state.currentUser;
+                if (btnIcon) btnIcon.innerText = '👤';
+                if (authBtn) authBtn.classList.add('logged-in');
+                if (formArea) formArea.style.display = 'none';
+                if (loggedInArea) loggedInArea.style.display = 'block';
+                if (loggedNickDisplay) loggedNickDisplay.innerText = `👤 ${state.currentUser}`;
+                if (modalHeader) modalHeader.innerText = "내 계정 정보";
+                if (modalDesc) modalDesc.innerText = "현재 클라우드 데이터베이스에 로그인되어 데이터가 실시간 백업 중입니다.";
+            } else {
+                if (btnLabel) btnLabel.innerText = '로그인';
+                if (btnIcon) btnIcon.innerText = '🔑';
+                if (authBtn) authBtn.classList.remove('logged-in');
+                if (formArea) formArea.style.display = 'block';
+                if (loggedInArea) loggedInArea.style.display = 'none';
+                if (modalHeader) modalHeader.innerText = "계정 로그인 / 가입";
+                if (modalDesc) modalDesc.innerHTML = "닉네임과 4자리 비밀번호(PIN)를 입력하세요.<br>처음 입력하는 닉네임은 <strong>자동으로 신규 계정이 생성</strong>됩니다!";
+            }
+        }
+
         function syncScoreToCloud() {
             if (!isFirebaseOnline || !firestoreDb) return;
             const uid = getUserId();
             const nickname = getNickname();
 
+            // 1. Sync User Private State
+            if (state.isLoggedIn) {
+                firestoreDb.collection('casino_users').doc(uid).set({
+                    nickname: nickname,
+                    pin: state.currentPin,
+                    balance: state.balance,
+                    history: state.history,
+                    rechargeCharges: state.rechargeCharges,
+                    lastSeasonKey: state.lastSeasonKey || getCurrentSeasonKey(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).catch(err => {
+                    console.warn('User state cloud sync error:', err);
+                });
+            }
+
+            // 2. Sync Public Leaderboard
             firestoreDb.collection('casino_leaderboard').doc(uid).set({
                 name: nickname,
                 balance: state.balance,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true }).catch(err => {
-                console.warn('Cloud score upload error:', err);
+                console.warn('Leaderboard cloud sync error:', err);
             });
         }
 
@@ -3345,11 +3896,100 @@
             });
         }
 
-        // --- CORE EVENT BINDINGS ---
+        // --- CORE EVENT BINDINGS & AUTH MODAL ---
+        function setupAuthModal() {
+            const modalBackdrop = document.getElementById('auth-modal-backdrop');
+            const btnOpenAuth = document.getElementById('btn-auth-header');
+            const btnCloseAuth = document.getElementById('btn-close-auth-modal');
+            const btnSubmitAuth = document.getElementById('btn-submit-auth');
+            const btnLogout = document.getElementById('btn-logout-account');
+            const btnEditNick = document.getElementById('btn-edit-nick');
+            const inputNick = document.getElementById('input-auth-nick');
+            const inputPin = document.getElementById('input-auth-pin');
+            const statusMsg = document.getElementById('auth-status-msg');
+
+            function openModal() {
+                audio.playClick();
+                updateAuthUI();
+                if (statusMsg) {
+                    statusMsg.className = 'auth-status-msg';
+                    statusMsg.innerText = '';
+                }
+                if (!state.isLoggedIn) {
+                    if (inputNick) inputNick.value = state.currentUser || '';
+                    if (inputPin) inputPin.value = '';
+                }
+                modalBackdrop.classList.add('active');
+            }
+
+            function closeModal() {
+                modalBackdrop.classList.remove('active');
+            }
+
+            if (btnOpenAuth) btnOpenAuth.addEventListener('click', openModal);
+            if (btnEditNick) btnEditNick.addEventListener('click', openModal);
+            if (btnCloseAuth) btnCloseAuth.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', (e) => {
+                if (e.target === modalBackdrop) closeModal();
+            });
+
+            if (btnSubmitAuth) {
+                btnSubmitAuth.addEventListener('click', async () => {
+                    const nick = inputNick.value;
+                    const pin = inputPin.value;
+
+                    if (statusMsg) {
+                        statusMsg.className = 'auth-status-msg';
+                        statusMsg.innerText = '인증 확인 중...';
+                        statusMsg.style.display = 'block';
+                    }
+                    btnSubmitAuth.disabled = true;
+
+                    const res = await loginOrRegister(nick, pin);
+                    btnSubmitAuth.disabled = false;
+
+                    if (res.success) {
+                        if (statusMsg) {
+                            statusMsg.className = 'auth-status-msg success';
+                            statusMsg.innerText = res.msg;
+                        }
+                        audio.playWin();
+                        setTimeout(closeModal, 800);
+                    } else {
+                        if (statusMsg) {
+                            statusMsg.className = 'auth-status-msg error';
+                            statusMsg.innerText = res.msg;
+                        }
+                        audio.playLose();
+                    }
+                });
+            }
+
+            if (btnLogout) {
+                btnLogout.addEventListener('click', () => {
+                    audio.playClick();
+                    logoutAccount();
+                    closeModal();
+                });
+            }
+
+            // Enter key to submit
+            [inputNick, inputPin].forEach(input => {
+                if (input) {
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            btnSubmitAuth.click();
+                        }
+                    });
+                }
+            });
+        }
+
         function initApp() {
             loadState();
             updateBalanceUI();
             renderHistory();
+            updateAuthUI();
             
             // Set initial bet validation
             setBetAmount(state.bet);
@@ -3369,6 +4009,12 @@
             // Sound
             setupSoundToggle();
 
+            // Auth Modal setup
+            setupAuthModal();
+
+            // Weekly Reset Countdown Timer (Every Sunday 12:00 PM)
+            startResetCountdown();
+
             // Reset/Recharge balance click
             document.getElementById('btn-reset-balance').addEventListener('click', () => {
                 if (state.isPlaying) return;
@@ -3382,18 +4028,9 @@
                 showToast("1,000,000원으로 충전되었습니다!", "win");
             });
 
-            // Leaderboard initial render, Firebase Sync & Nickname edit binding
+            // Leaderboard initial render & Firebase Sync
             renderLeaderboard();
             initFirebaseSync();
-            document.getElementById('btn-edit-nick').addEventListener('click', () => {
-                if (state.isPlaying) return;
-                audio.playClick();
-                const current = getNickname();
-                const newName = prompt('카지노 랭킹에 표시될 닉네임을 입력하세요 (최대 12자):', current);
-                if (newName !== null) {
-                    setNickname(newName);
-                }
-            });
 
             // Play trigger button bindings
             document.getElementById('btn-play-oe').addEventListener('click', playOddEven);
