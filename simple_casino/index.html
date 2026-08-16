@@ -1686,15 +1686,15 @@
             <div class="payout-table">
                 <div style="font-weight: 800; margin-bottom: 8px; color: var(--text-main); text-align: center;">🎰 5-심볼 4x4 슬롯 당첨 배당 및 기댓값 (10개 라인 합산)</div>
                 <div style="display:flex; justify-content:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
-                    <span style="background: rgba(5, 179, 117, 0.12); color: var(--glow-neon-green); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(5, 179, 117, 0.3);">📊 당첨 확률: 95.84%</span>
-                    <span style="background: rgba(198, 155, 0, 0.12); color: var(--glow-gold); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(198, 155, 0, 0.3);">💎 기댓값(EV/RTP): 621.60% (평균 6.22배)</span>
+                    <span style="background: rgba(5, 179, 117, 0.12); color: var(--glow-neon-green); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(5, 179, 117, 0.3);">📊 당첨 확률: 31.20%</span>
+                    <span style="background: rgba(198, 155, 0, 0.12); color: var(--glow-gold); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(198, 155, 0, 0.3);">💎 기대 환수율(RTP): 93.28% (평균 0.93배)</span>
                 </div>
                 <div class="payout-table-grid">
-                    <div style="grid-column: span 2; text-align:center; color: #d90062; font-weight:800;">⭐ 조커 (WILD) : <span>모든 심볼 대체 만능 조커! (4개 150배 / 3개 30배)</span></div>
                     <div>🎰 잭팟 : <span>4개 100배 / 3개 20배</span></div>
+                    <div>👑 왕관 : <span>4개 50배 / 3개 12배</span></div>
                     <div>💎 보석 : <span>4개 30배 / 3개 8배</span></div>
                     <div>🔔 황금종 : <span>4개 15배 / 3개 5배</span></div>
-                    <div>🍒 체리 : <span>4개 8배 / 3개 2.5배</span></div>
+                    <div style="grid-column: span 2; text-align:center;">🍒 체리 : <span>4개 8배 / 3개 2.5배</span></div>
                 </div>
             </div>
             
@@ -2673,20 +2673,20 @@
             }, 1500);
         }
 
-        // --- SLOT MACHINE GAME LOGIC (5 SYMBOLS) ---
-        const SLOT_SYMBOLS = ['🍒', '🔔', '💎', '🎰', '⭐'];
+        // --- SLOT MACHINE GAME LOGIC (5 SYMBOLS - NO JOKER) ---
+        const SLOT_SYMBOLS = ['🍒', '🔔', '💎', '👑', '🎰'];
         
         const SLOT_PAYOUTS = {
-            '⭐': { 3: 30, 4: 150 }, // 만능 조커 (WILD)
-            '🎰': { 3: 20, 4: 100 },
-            '💎': { 3: 8, 4: 30 },
-            '🔔': { 3: 5, 4: 15 },
-            '🍒': { 3: 2.5, 4: 8 }
+            '🎰': { 3: 20, 4: 100 }, // 메가 잭팟
+            '👑': { 3: 12, 4: 50 },  // 왕관
+            '💎': { 3: 8, 4: 30 },   // 보석
+            '🔔': { 3: 5, 4: 15 },   // 황금종
+            '🍒': { 3: 2.5, 4: 8 }   // 체리
         };
 
         const PAYLINE_COLORS = {
-            '⭐': '#d90062',
             '🎰': '#ffaa00',
+            '👑': '#d4af37',
             '💎': '#0077cc',
             '🔔': '#b8860b',
             '🍒': '#d90062'
@@ -2902,12 +2902,12 @@
                         grid[line[3]][3]
                     ];
 
-                    const symOrder = ['⭐', '🎰', '💎', '🔔', '🍒'];
+                    const symOrder = ['🎰', '👑', '💎', '🔔', '🍒'];
                     let bestLineMatch = null;
 
-                    // 1. Check 4-match with wildcard support
+                    // 1. Check 4-match (exact matching)
                     for (const target of symOrder) {
-                        if (symbolsOnLine.every(s => s === target || s === '⭐')) {
+                        if (symbolsOnLine.every(s => s === target)) {
                             bestLineMatch = { matchCount: 4, matchSymbol: target, startIndex: 0 };
                             break;
                         }
@@ -2918,7 +2918,7 @@
                         let match0 = null;
                         for (const target of symOrder) {
                             const sub = [symbolsOnLine[0], symbolsOnLine[1], symbolsOnLine[2]];
-                            if (sub.every(s => s === target || s === '⭐')) {
+                            if (sub.every(s => s === target)) {
                                 match0 = { matchCount: 3, matchSymbol: target, startIndex: 0 };
                                 break;
                             }
@@ -2927,7 +2927,7 @@
                         let match1 = null;
                         for (const target of symOrder) {
                             const sub = [symbolsOnLine[1], symbolsOnLine[2], symbolsOnLine[3]];
-                            if (sub.every(s => s === target || s === '⭐')) {
+                            if (sub.every(s => s === target)) {
                                 match1 = { matchCount: 3, matchSymbol: target, startIndex: 1 };
                                 break;
                             }
@@ -2955,7 +2955,7 @@
                                 mult: multiplier
                             });
                             
-                            if ((matchSymbol === '🎰' || matchSymbol === '⭐') && matchCount === 4) {
+                            if (matchSymbol === '🎰' && matchCount === 4) {
                                 jackpotHit = true;
                             }
                             
