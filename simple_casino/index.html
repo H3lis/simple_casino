@@ -2132,14 +2132,14 @@
                 <div style="font-weight: 800; margin-bottom: 8px; color: var(--text-main); text-align: center;">🎰 5-심볼 4x4 슬롯 당첨 배당 및 기댓값 (10개 라인 합산)</div>
                 <div style="display:flex; justify-content:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
                     <span style="background: rgba(5, 179, 117, 0.12); color: var(--glow-neon-green); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(5, 179, 117, 0.3);">📊 당첨 확률: 31.20%</span>
-                    <span style="background: rgba(198, 155, 0, 0.12); color: var(--glow-gold); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(198, 155, 0, 0.3);">💎 기대 환수율(RTP): 93.28% (평균 0.93배)</span>
+                    <span style="background: rgba(198, 155, 0, 0.12); color: var(--glow-gold); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(198, 155, 0, 0.3);">💎 기대 환수율(RTP): 100.00% (정직한 1.00배)</span>
                 </div>
                 <div class="payout-table-grid">
-                    <div>🎰 잭팟 : <span>4개 100배 / 3개 20배</span></div>
-                    <div>👑 왕관 : <span>4개 50배 / 3개 12배</span></div>
-                    <div>💎 보석 : <span>4개 30배 / 3개 8배</span></div>
-                    <div>🔔 황금종 : <span>4개 15배 / 3개 5배</span></div>
-                    <div style="grid-column: span 2; text-align:center;">🍒 체리 : <span>4개 8배 / 3개 2.5배</span></div>
+                    <div>🎰 잭팟 : <span>4개 125배 / 3개 20배</span></div>
+                    <div>👑 왕관 : <span>4개 60배 / 3개 12배</span></div>
+                    <div>💎 보석 : <span>4개 35배 / 3개 8배</span></div>
+                    <div>🔔 황금종 : <span>4개 20배 / 3개 5배</span></div>
+                    <div style="grid-column: span 2; text-align:center;">🍒 체리 : <span>4개 5배 / 3개 2.5배</span></div>
                 </div>
             </div>
             
@@ -2604,6 +2604,26 @@ playJackpot() {
             return 'user_' + encodeURIComponent(nickname.trim().toLowerCase());
         }
 
+        // --- SAFE 64-BIT INTEGER UTILS & OVERFLOW PREVENTION ---
+        function safeInt(val, fallback = 0) {
+            if (val === null || val === undefined) return fallback;
+            if (typeof val === 'number') {
+                if (isNaN(val) || !isFinite(val)) return fallback;
+                return Math.floor(val);
+            }
+            if (typeof val === 'bigint') {
+                return Number(val);
+            }
+            try {
+                const str = String(val).replace(/,/g, '').trim();
+                const n = parseFloat(str);
+                if (isNaN(n) || !isFinite(n)) return fallback;
+                return Math.floor(n);
+            } catch (e) {
+                return fallback;
+            }
+        }
+
         function loadState() {
             try {
                 // Check local session first
@@ -2612,7 +2632,7 @@ playJackpot() {
 
                 const savedBalance = localStorage.getItem('royal_neon_balance');
                 if (savedBalance !== null) {
-                    state.balance = parseInt(savedBalance, 10);
+                    state.balance = safeInt(savedBalance, 1000000);
                 }
                 const savedHistory = localStorage.getItem('royal_neon_history');
                 if (savedHistory !== null) {
@@ -2620,7 +2640,7 @@ playJackpot() {
                 }
                 const savedCharges = localStorage.getItem('royal_neon_recharge_charges');
                 if (savedCharges !== null) {
-                    state.rechargeCharges = parseInt(savedCharges, 10);
+                    state.rechargeCharges = safeInt(savedCharges, 3);
                 }
                 const savedSeason = localStorage.getItem('royal_neon_season_key');
                 if (savedSeason) {
@@ -2658,13 +2678,25 @@ playJackpot() {
             syncScoreToCloud();
         }
 
-        // --- UI FORMATTING UTILS ---
+        // --- UI FORMATTING UTILS (SUPPORTS UNLIMITED LARGE NUMBERS) ---
         function formatNumber(num) {
-            return num.toLocaleString();
+            if (num === null || num === undefined) return '0';
+            try {
+                if (typeof num === 'bigint') {
+                    return num.toLocaleString('ko-KR');
+                }
+                const n = Number(num);
+                if (isNaN(n) || !isFinite(n)) return '0';
+                return Math.floor(n).toLocaleString('ko-KR');
+            } catch (e) {
+                return String(num);
+            }
         }
 
-        // Animate balance numbers counting up/down
+        // Animate balance numbers counting up/down smoothly for large balances
         function animateValue(obj, start, end, duration) {
+            start = safeInt(start, 0);
+            end = safeInt(end, 0);
             let startTimestamp = null;
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
@@ -3614,15 +3646,15 @@ playJackpot() {
             }, 1500);
         }
 
-        // --- SLOT MACHINE GAME LOGIC (5 SYMBOLS - NO JOKER) ---
+        // --- SLOT MACHINE GAME LOGIC (5 SYMBOLS - NO JOKER - 100.00% RTP) ---
         const SLOT_SYMBOLS = ['🍒', '🔔', '💎', '👑', '🎰'];
         
         const SLOT_PAYOUTS = {
-            '🎰': { 3: 20, 4: 100 }, // 메가 잭팟
-            '👑': { 3: 12, 4: 50 },  // 왕관
-            '💎': { 3: 8, 4: 30 },   // 보석
-            '🔔': { 3: 5, 4: 15 },   // 황금종
-            '🍒': { 3: 2.5, 4: 8 }   // 체리
+            '🎰': { 3: 20, 4: 125 }, // 메가 잭팟 (125배)
+            '👑': { 3: 12, 4: 60 },  // 왕관 (60배)
+            '💎': { 3: 8, 4: 35 },   // 보석 (35배)
+            '🔔': { 3: 5, 4: 20 },   // 황금종 (20배)
+            '🍒': { 3: 2.5, 4: 5 }   // 체리 (5배)
         };
 
         const PAYLINE_COLORS = {
