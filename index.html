@@ -1843,6 +1843,133 @@
             font-weight: 800;
         }
 
+        /* --- 1-HOUR 2X HOT TIME EVENT BANNER & BADGES --- */
+        .event-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.12), rgba(255, 215, 0, 0.18));
+            border: 1.5px solid rgba(255, 107, 0, 0.5);
+            border-radius: 18px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(255, 87, 34, 0.18), inset 0 0 15px rgba(255, 215, 0, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: eventGlowPulse 2s ease-in-out infinite alternate;
+            transition: all var(--transition-speed);
+        }
+
+        @keyframes eventGlowPulse {
+            0% {
+                box-shadow: 0 4px 15px rgba(255, 87, 34, 0.2), 0 0 10px rgba(255, 215, 0, 0.15);
+                border-color: rgba(255, 107, 0, 0.5);
+            }
+            100% {
+                box-shadow: 0 6px 25px rgba(255, 87, 34, 0.4), 0 0 20px rgba(255, 215, 0, 0.35);
+                border-color: rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        .event-banner.ended {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: var(--border-color);
+            box-shadow: none;
+            animation: none;
+            opacity: 0.7;
+        }
+
+        .event-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .event-flame-icon {
+            font-size: 1.5rem;
+            animation: flameFlicker 1.2s infinite alternate;
+            flex-shrink: 0;
+        }
+
+        @keyframes flameFlicker {
+            0% { transform: scale(1) rotate(-3deg); }
+            100% { transform: scale(1.15) rotate(3deg); }
+        }
+
+        .event-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .event-title {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #d93800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .event-tag-badge {
+            background: linear-gradient(135deg, #ff4500, #ff8c00);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 900;
+            padding: 2px 7px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(255, 69, 0, 0.3);
+        }
+
+        .event-desc {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+
+        .event-timer-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 69, 0, 0.3);
+            border-radius: 12px;
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #d93800;
+            flex-shrink: 0;
+        }
+
+        .event-timer-val {
+            font-family: 'Outfit', monospace;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #ff3d00;
+            letter-spacing: 1px;
+        }
+
+        .event-boost-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.15), rgba(255, 215, 0, 0.2));
+            border: 1px solid rgba(255, 69, 0, 0.4);
+            color: #d93800;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-size: 0.76rem;
+            animation: pulseBoost 1.8s infinite;
+        }
+
+        @keyframes pulseBoost {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
     </style>
 </head>
 <body>
@@ -1885,6 +2012,24 @@
                 </button>
             </div>
         </header>
+
+        <!-- 1-Hour 2x Multiplier Hot Time Event Banner -->
+        <div class="event-banner" id="event-hot-time-banner">
+            <div class="event-banner-content">
+                <span class="event-flame-icon">🔥</span>
+                <div class="event-title-group">
+                    <div class="event-title">
+                        <span>1시간 핫타임 버프 이벤트</span>
+                        <span class="event-tag-badge">ALL 2X MULTIPLIER</span>
+                    </div>
+                    <div class="event-desc" id="event-desc-text">모든 게임의 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배)</div>
+                </div>
+            </div>
+            <div class="event-timer-badge">
+                <span>남은 시간</span>
+                <span class="event-timer-val" id="event-timer-val">59:59</span>
+            </div>
+        </div>
 
         <!-- Balance display Dashboard -->
         <div class="dashboard-card" id="balance-card">
@@ -2022,7 +2167,7 @@
             <button class="btn-play-action" id="btn-play-oe">
                 배팅 시작
             </button>
-            <div class="payout-tag">당첨 시 <span>2.0배</span> 지급</div>
+            <div class="payout-tag" id="oe-payout-tag">당첨 시 <span>2.0배</span> 지급</div>
             <div class="result-splash-box empty" id="oe-splash">배팅을 선택하고 시작 버튼을 누르세요.</div>
         </div>
 
@@ -2135,11 +2280,11 @@
                     <span style="background: rgba(198, 155, 0, 0.12); color: var(--glow-gold); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(198, 155, 0, 0.3);">💎 기대 환수율(RTP): 100.00% (정직한 1.00배)</span>
                 </div>
                 <div class="payout-table-grid">
-                    <div>🎰 잭팟 : <span>4개 125배 / 3개 20배</span></div>
-                    <div>👑 왕관 : <span>4개 60배 / 3개 12배</span></div>
-                    <div>💎 보석 : <span>4개 35배 / 3개 8배</span></div>
-                    <div>🔔 황금종 : <span>4개 20배 / 3개 5배</span></div>
-                    <div style="grid-column: span 2; text-align:center;">🍒 체리 : <span>4개 5배 / 3개 2.5배</span></div>
+                    <div>🎰 잭팟 : <span id="slot-pay-jackpot">4개 125배 / 3개 20배</span></div>
+                    <div>👑 왕관 : <span id="slot-pay-crown">4개 60배 / 3개 12배</span></div>
+                    <div>💎 보석 : <span id="slot-pay-gem">4개 35배 / 3개 8배</span></div>
+                    <div>🔔 황금종 : <span id="slot-pay-bell">4개 20배 / 3개 5배</span></div>
+                    <div style="grid-column: span 2; text-align:center;">🍒 체리 : <span id="slot-pay-cherry">4개 5배 / 3개 2.5배</span></div>
                 </div>
             </div>
             
@@ -2152,7 +2297,7 @@
                 <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: center; gap: 6px;">
                     <span>🃏</span> 3장의 카드 중 1장을 선택하세요!
                 </div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">
+                <div id="card-game-subtext" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">
                     3장의 카드 중 <strong style="color:var(--glow-neon-green);">2.0배 (대박 2배)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다. (환수율 100%)
                 </div>
             </div>
@@ -2483,6 +2628,106 @@ playJackpot() {
             isLoggedIn: false,
             lastSeasonKey: null      // Season identifier e.g. 'season_2026_08_16'
         };
+
+        // --- 1-HOUR 2X MULTIPLIER HOT TIME EVENT (핫타임 배율 2배 이벤트) ---
+        const EVENT_END_TIME = 1787040600000; // 2026-08-18 17:10:00 KST (배포 후 정확히 1시간 동안 진행)
+
+        function isDoubleEventActive() {
+            return Date.now() < EVENT_END_TIME;
+        }
+
+        function getEventMultiplierBonus() {
+            return isDoubleEventActive() ? 2 : 1;
+        }
+
+        function updateEventUI() {
+            const banner = document.getElementById('event-hot-time-banner');
+            const timerVal = document.getElementById('event-timer-val');
+            const descText = document.getElementById('event-desc-text');
+            const oePayout = document.getElementById('oe-payout-tag');
+            const dicePayout = document.getElementById('dice-payout-info');
+            const diceHlBtn = document.querySelector('.dice-modes .mode-btn[data-mode="high-low"]');
+            const diceExactBtn = document.querySelector('.dice-modes .mode-btn[data-mode="exact"]');
+            
+            const slotJackpot = document.getElementById('slot-pay-jackpot');
+            const slotCrown = document.getElementById('slot-pay-crown');
+            const slotGem = document.getElementById('slot-pay-gem');
+            const slotBell = document.getElementById('slot-pay-bell');
+            const slotCherry = document.getElementById('slot-pay-cherry');
+            
+            const cardIntro = document.getElementById('card-game-subtext');
+
+            const remainingMs = Math.max(0, EVENT_END_TIME - Date.now());
+            const isActive = remainingMs > 0;
+
+            if (timerVal) {
+                if (isActive) {
+                    const totalSec = Math.floor(remainingMs / 1000);
+                    const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
+                    const s = String(totalSec % 60).padStart(2, '0');
+                    timerVal.innerText = `${m}:${s}`;
+                    if (banner) banner.classList.remove('ended');
+                    if (descText) descText.innerText = "모든 게임의 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배)";
+                } else {
+                    timerVal.innerText = "00:00";
+                    if (banner) banner.classList.add('ended');
+                    if (descText) descText.innerText = "핫타임 이벤트가 마감되었습니다. 정상 기본 배율이 적용 중입니다.";
+                }
+            }
+
+            // Odd/Even tag
+            if (oePayout) {
+                if (isActive) {
+                    oePayout.innerHTML = `당첨 시 <span style="color:#ff3d00; font-weight:800;">4.0배</span> <span class="event-boost-pill">🔥2배 EVENT</span> 지급`;
+                } else {
+                    oePayout.innerHTML = `당첨 시 <span>2.0배</span> 지급`;
+                }
+            }
+
+            // Dice tag & Mode Buttons
+            if (dicePayout) {
+                if (state.selectedDiceMode === 'high-low') {
+                    dicePayout.innerHTML = isActive 
+                        ? `당첨 시 <span style="color:#ff3d00; font-weight:800;">4.0배</span> <span class="event-boost-pill">🔥2배 EVENT</span> 지급`
+                        : `당첨 시 <span>2.0배</span> 지급`;
+                } else {
+                    dicePayout.innerHTML = isActive 
+                        ? `당첨 시 <span style="color:#ff3d00; font-weight:800;">12.0배</span> <span class="event-boost-pill">🔥2배 EVENT</span> 지급`
+                        : `당첨 시 <span>6.0배</span> 지급`;
+                }
+            }
+
+            if (diceHlBtn) {
+                diceHlBtn.innerText = isActive ? '하이/로우 (🔥4.0x)' : '하이/로우 (2.0x)';
+            }
+            if (diceExactBtn) {
+                diceExactBtn.innerText = isActive ? '단일 숫자 맞추기 (🔥12.0x)' : '단일 숫자 맞추기 (6.0x)';
+            }
+
+            // Slot paytable
+            if (slotJackpot) {
+                slotJackpot.innerHTML = isActive ? `<b style="color:#ff3d00">4개 250배 / 3개 40배 🔥</b>` : `4개 125배 / 3개 20배`;
+            }
+            if (slotCrown) {
+                slotCrown.innerHTML = isActive ? `<b style="color:#ff3d00">4개 120배 / 3개 24배 🔥</b>` : `4개 60배 / 3개 12배`;
+            }
+            if (slotGem) {
+                slotGem.innerHTML = isActive ? `<b style="color:#ff3d00">4개 70배 / 3개 16배 🔥</b>` : `4개 35배 / 3개 8배`;
+            }
+            if (slotBell) {
+                slotBell.innerHTML = isActive ? `<b style="color:#ff3d00">4개 40배 / 3개 10배 🔥</b>` : `4개 20배 / 3개 5배`;
+            }
+            if (slotCherry) {
+                slotCherry.innerHTML = isActive ? `<b style="color:#ff3d00">4개 10배 / 3개 5배 🔥</b>` : `4개 5배 / 3개 2.5배`;
+            }
+
+            // Card Draw intro subtext
+            if (cardIntro) {
+                cardIntro.innerHTML = isActive
+                    ? `3장의 카드 중 <strong style="color:#ff3d00;">4.0배 (🔥이벤트 2배 버프!)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다.`
+                    : `3장의 카드 중 <strong style="color:var(--glow-neon-green);">2.0배 (대박 2배)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다. (환수율 100%)`;
+            }
+        }
 
         // --- WEEKLY SUNDAY 12:00 PM SEASON RESET SYSTEM ---
         function getNextSundayNoon(now = new Date()) {
@@ -3497,15 +3742,18 @@ playJackpot() {
                 
                 const isWin = state.selectedOe === resultStr;
                 let payout = 0;
+                const multBonus = getEventMultiplierBonus();
+                const winMultiplier = 2 * multBonus;
                 
                 if (isWin) {
-                    payout = currentBet * 2;
+                    payout = currentBet * winMultiplier;
                     state.balance += payout;
                     
+                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트 x${winMultiplier}] ` : '';
                     splash.className = "result-splash-box win";
-                    splash.innerHTML = `성공! 숫자 ${outcomeNum} (${korResult}) 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
+                    splash.innerHTML = `성공! ${eventTagStr}숫자 ${outcomeNum} (${korResult}) 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
                     
-                    showToast(`축하합니다! ₩${formatNumber(payout - currentBet)} 획득!`, "win");
+                    showToast(`축하합니다! ${eventTagStr}+₩${formatNumber(payout - currentBet)} 획득!`, "win");
                     triggerConfetti();
                     audio.playWin();
                 } else {
@@ -3592,6 +3840,7 @@ playJackpot() {
                 let isWin = false;
                 let payout = 0;
                 let detailsLabel = '';
+                const multBonus = getEventMultiplierBonus();
                 
                 if (state.selectedDiceMode === 'high-low') {
                     const isHigh = targetFace >= 4;
@@ -3600,7 +3849,7 @@ playJackpot() {
                     detailsLabel = state.selectedDiceHl === 'Low' ? '로우 (Low)' : '하이 (High)';
                     
                     if (isWin) {
-                        payout = currentBet * 2;
+                        payout = currentBet * (2 * multBonus);
                     }
                 } else {
                     // Exact match
@@ -3608,16 +3857,17 @@ playJackpot() {
                     detailsLabel = `숫자 ${state.selectedDiceNum}`;
                     
                     if (isWin) {
-                        payout = currentBet * 6;
+                        payout = currentBet * (6 * multBonus);
                     }
                 }
                 
                 if (isWin) {
                     state.balance += payout;
+                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
                     splash.className = "result-splash-box win";
-                    splash.innerHTML = `성공! 주사위 눈 [${targetFace}] 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
+                    splash.innerHTML = `성공! ${eventTagStr}주사위 눈 [${targetFace}] 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
                     
-                    showToast(`성공! ₩${formatNumber(payout - currentBet)} 획득!`, "win");
+                    showToast(`성공! ${eventTagStr}+₩${formatNumber(payout - currentBet)} 획득!`, "win");
                     
                     if (state.selectedDiceMode === 'exact') {
                         // Jackpot celebration for 6x wins!
@@ -3919,7 +4169,8 @@ playJackpot() {
                         const { matchCount, matchSymbol, startIndex } = bestLineMatch;
                         const payoutInfo = SLOT_PAYOUTS[matchSymbol];
                         if (payoutInfo) {
-                            const multiplier = payoutInfo[matchCount];
+                            const multBonus = getEventMultiplierBonus();
+                            const multiplier = payoutInfo[matchCount] * multBonus;
                             totalMultiplier += multiplier;
                             winningLinesInfo.push({
                                 lineIdx: lineIdx + 1,
@@ -3943,14 +4194,16 @@ playJackpot() {
                 const totalBetFactor = totalMultiplier / 10;
                 const payout = Math.floor(currentBet * totalBetFactor);
                 const oldBal = state.balance;
+                const multBonus = getEventMultiplierBonus();
 
                 if (isWin) {
                     state.balance += payout;
                     splash.className = "result-splash-box win";
                     
+                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
                     const linesStr = winningLinesInfo.map(w => `${w.lineIdx}번(${w.symbol} x${w.count})`).join(', ');
-                    splash.innerHTML = `승리! [${winningLinesInfo.length}개 라인 당첨] ${linesStr} (+₩${formatNumber(payout)})`;
-                    showToast(`축하합니다! +₩${formatNumber(payout)}`, "win");
+                    splash.innerHTML = `승리! ${eventTagStr}[${winningLinesInfo.length}개 라인 당첨] ${linesStr} (+₩${formatNumber(payout)})`;
+                    showToast(`축하합니다! ${eventTagStr}+₩${formatNumber(payout)}`, "win");
                     
                     if (jackpotHit || totalMultiplier >= 30) {
                         triggerConfetti();
@@ -4030,7 +4283,6 @@ playJackpot() {
             const modeBtns = document.querySelectorAll('.dice-modes .mode-btn');
             const hlPanel = document.getElementById('dice-choice-hl');
             const exactPanel = document.getElementById('dice-choice-exact');
-            const payoutInfo = document.getElementById('dice-payout-info');
 
             modeBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -4046,12 +4298,11 @@ playJackpot() {
                     if (mode === 'high-low') {
                         hlPanel.classList.add('active');
                         exactPanel.classList.remove('active');
-                        payoutInfo.innerHTML = '당첨 시 <span>2.0배</span> 지급';
                     } else {
                         hlPanel.classList.remove('active');
                         exactPanel.classList.add('active');
-                        payoutInfo.innerHTML = '당첨 시 <span>6.0배</span> 지급';
                     }
+                    updateEventUI();
                 });
             });
         }
@@ -4102,8 +4353,10 @@ playJackpot() {
                 setTimeout(() => {
                     if (container) container.classList.remove('shuffling');
                     
-                    // Cryptographically Secure Fisher-Yates Shuffle: 1장 2.0배, 2장 0.5배 (환수율 100%)
-                    const mults = [0.5, 0.5, 2.0];
+                    const multBonus = getEventMultiplierBonus();
+                    const winMult = 2.0 * multBonus;
+                    // Cryptographically Secure Fisher-Yates Shuffle: 1장 2.0x (이벤트 시 4.0x), 2장 0.5x
+                    const mults = [0.5, 0.5, winMult];
                     if (window.crypto && window.crypto.getRandomValues) {
                         const randBuf = new Uint32Array(2);
                         window.crypto.getRandomValues(randBuf);
@@ -4135,8 +4388,8 @@ playJackpot() {
                             label = '환급 (-50%)';
                         } else {
                             multClass = 'mult-20';
-                            valText = '2.0x';
-                            label = '2배 (+100%)';
+                            valText = `${mult.toFixed(1)}x`;
+                            label = multBonus > 1 ? `🔥2배 이벤트 당첨!` : `2배 (+100%)`;
                         }
                         frontFace.classList.add(multClass);
                         frontFace.innerHTML = `
@@ -4170,14 +4423,15 @@ playJackpot() {
                         const chosenMult = mults[selectedIdx];
                         const payout = Math.floor(currentBet * chosenMult);
                         const oldBal = state.balance;
-                        const isWin = chosenMult === 2.0;
+                        const isWin = chosenMult === winMult;
 
                         state.balance += payout;
 
                         if (isWin) {
+                            const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
                             splash.className = "result-splash-box win";
-                            splash.innerHTML = `🎉 대박! 2.0배 카드 당첨! (+₩${formatNumber(payout - currentBet)})`;
-                            showToast(`대박! 2.0배 당첨 (+₩${formatNumber(payout - currentBet)})`, "win");
+                            splash.innerHTML = `🎉 대박! ${eventTagStr}${winMult.toFixed(1)}배 카드 당첨! (+₩${formatNumber(payout - currentBet)})`;
+                            showToast(`대박! ${eventTagStr}${winMult.toFixed(1)}배 당첨 (+₩${formatNumber(payout - currentBet)})`, "win");
                             triggerConfetti();
                             audio.playWin();
                         } else {
@@ -4188,7 +4442,7 @@ playJackpot() {
                             audio.playLose();
                         }
 
-                        const outcomeLabel = isWin ? '2.0배 대박' : '0.5배 환급';
+                        const outcomeLabel = isWin ? `${winMult.toFixed(1)}배 대박` : '0.5배 환급';
                         addHistoryItem('카드 뽑기 (1/3)', `${selectedIdx + 1}번 카드`, outcomeLabel, isWin, currentBet, payout);
                         setInteractiveState(true);
                         updateBalanceUI(oldBal);
@@ -4468,6 +4722,10 @@ playJackpot() {
             document.getElementById('btn-play-slots').addEventListener('click', playSlots);
             document.getElementById('btn-auto-slots').addEventListener('click', toggleAutoSpin);
             document.getElementById('btn-play-card').addEventListener('click', playCardDraw);
+
+            // 1-Hour Hot Time 2x Multiplier Event Loop
+            updateEventUI();
+            setInterval(updateEventUI, 1000);
         }
 
         // Launch on document loaded
