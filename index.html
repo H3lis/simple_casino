@@ -1970,6 +1970,17 @@
             50% { transform: scale(1.05); }
         }
 
+        .btn-reset.disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            filter: grayscale(0.5);
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-secondary);
+            border-color: var(--border-color);
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
     </style>
 </head>
 <body>
@@ -2013,21 +2024,21 @@
             </div>
         </header>
 
-        <!-- 1-Hour 2x Multiplier Hot Time Event Banner -->
-        <div class="event-banner" id="event-hot-time-banner">
+        <!-- Recharge 2x Multiplier Bonus Buff Banner -->
+        <div class="event-banner ended" id="recharge-bonus-banner">
             <div class="event-banner-content">
-                <span class="event-flame-icon">🔥</span>
+                <span class="event-flame-icon" id="bonus-banner-icon">⚡</span>
                 <div class="event-title-group">
                     <div class="event-title">
-                        <span>1시간 핫타임 버프 이벤트</span>
-                        <span class="event-tag-badge">ALL 2X MULTIPLIER</span>
+                        <span id="bonus-banner-title">충전 2배 버프 대기 중</span>
+                        <span class="event-tag-badge" id="bonus-tag-badge">10X RECHARGE BUFF</span>
                     </div>
-                    <div class="event-desc" id="event-desc-text">모든 게임의 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배)</div>
+                    <div class="event-desc" id="bonus-desc-text">보유 자금이 100만 원 이하일 때 [자금 충전]을 누르면 10회 동안 모든 당첨금이 2배로 폭등합니다!</div>
                 </div>
             </div>
-            <div class="event-timer-badge">
-                <span>남은 시간</span>
-                <span class="event-timer-val" id="event-timer-val">59:59</span>
+            <div class="event-timer-badge" id="bonus-count-badge">
+                <span>남은 횟수</span>
+                <span class="event-timer-val" id="bonus-count-val">0 / 10회</span>
             </div>
         </div>
 
@@ -2610,6 +2621,7 @@ playJackpot() {
         let state = {
             balance: 1000000,
             bet: 100000,
+            bonusDoubleCount: 0,     // Remaining rounds of 2x payout from recharge
             history: [],
             selectedOe: 'Odd',       // 'Odd' or 'Even'
             selectedDiceMode: 'high-low', // 'high-low' or 'exact'
@@ -2629,82 +2641,83 @@ playJackpot() {
             lastSeasonKey: null      // Season identifier e.g. 'season_2026_08_16'
         };
 
-        // --- 1-HOUR 2X MULTIPLIER HOT TIME EVENT (핫타임 배율 2배 이벤트) ---
-        const EVENT_END_TIME = 1787040600000; // 2026-08-18 17:10:00 KST (배포 후 정확히 1시간 동안 진행)
-
-        function isDoubleEventActive() {
-            return Date.now() < EVENT_END_TIME;
+        // --- RECHARGE 2X MULTIPLIER BONUS BUFF (자금 충전 10회 2배 버프 시스템) ---
+        function isDoubleBonusActive() {
+            return safeInt(state.bonusDoubleCount, 0) > 0;
         }
 
         function getEventMultiplierBonus() {
-            return isDoubleEventActive() ? 2 : 1;
+            return isDoubleBonusActive() ? 2 : 1;
         }
 
-        function updateEventUI() {
-            const banner = document.getElementById('event-hot-time-banner');
-            const timerVal = document.getElementById('event-timer-val');
-            const descText = document.getElementById('event-desc-text');
-            const oePayout = document.getElementById('oe-payout-tag');
-            const dicePayout = document.getElementById('dice-payout-info');
-            const diceHlBtn = document.querySelector('.dice-modes .mode-btn[data-mode="high-low"]');
-            const diceExactBtn = document.querySelector('.dice-modes .mode-btn[data-mode="exact"]');
+        function updateBonusUI() {
+            const banner = document.getElementById('recharge-bonus-banner');
+            const bannerIcon = document.getElementById('bonus-banner-icon');
+            const bannerTitle = document.getElementById('bonus-banner-title');
+            const tagBadge = document.getElementById('bonus-tag-badge');
+            const descText = document.getElementById('bonus-desc-text');
+            const countVal = document.getElementById('bonus-count-val');
             
-            const slotJackpot = document.getElementById('slot-pay-jackpot');
-            const slotCrown = document.getElementById('slot-pay-crown');
-            const slotGem = document.getElementById('slot-pay-gem');
-            const slotBell = document.getElementById('slot-pay-bell');
-            const slotCherry = document.getElementById('slot-pay-cherry');
-            
-            const cardIntro = document.getElementById('card-game-subtext');
+            const count = safeInt(state.bonusDoubleCount, 0);
+            const isActive = count > 0;
 
-            const remainingMs = Math.max(0, EVENT_END_TIME - Date.now());
-            const isActive = remainingMs > 0;
-
-            if (timerVal) {
+            if (banner) {
                 if (isActive) {
-                    const totalSec = Math.floor(remainingMs / 1000);
-                    const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
-                    const s = String(totalSec % 60).padStart(2, '0');
-                    timerVal.innerText = `${m}:${s}`;
-                    if (banner) banner.classList.remove('ended');
-                    if (descText) descText.innerText = "모든 게임의 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배)";
+                    banner.classList.remove('ended');
+                    if (bannerIcon) bannerIcon.innerText = '🔥';
+                    if (bannerTitle) bannerTitle.innerText = `충전 2배 버프 가동 중!`;
+                    if (tagBadge) tagBadge.innerText = `BUFF ACTIVE (${count}/10)`;
+                    if (descText) descText.innerText = `앞으로 ${count}회 동안 모든 게임의 당첨금이 2배(홀짝 4배, 주사위 12배, 슬롯 250배)로 지급됩니다!`;
+                    if (countVal) countVal.innerText = `${count} / 10회`;
                 } else {
-                    timerVal.innerText = "00:00";
-                    if (banner) banner.classList.add('ended');
-                    if (descText) descText.innerText = "핫타임 이벤트가 마감되었습니다. 정상 기본 배율이 적용 중입니다.";
+                    banner.classList.add('ended');
+                    if (bannerIcon) bannerIcon.innerText = '⚡';
+                    if (bannerTitle) bannerTitle.innerText = `충전 2배 버프 대기 중`;
+                    if (tagBadge) tagBadge.innerText = `10X RECHARGE BUFF`;
+                    if (descText) descText.innerText = `보유 자금이 100만 원 이하일 때 [자금 충전]을 누르면 10회 동안 모든 당첨금이 2배로 폭등합니다!`;
+                    if (countVal) countVal.innerText = `0 / 10회`;
                 }
             }
 
             // Odd/Even tag
+            const oePayout = document.getElementById('oe-payout-tag');
             if (oePayout) {
                 if (isActive) {
-                    oePayout.innerHTML = `당첨 시 <span style="color:#ff3d00; font-weight:800;">4.0배</span> <span class="event-boost-pill">🔥2배 EVENT</span> 지급`;
+                    oePayout.innerHTML = `당첨 시 <span style="color:#ff3d00; font-weight:800;">4.0배</span> <span class="event-boost-pill">🔥충전 2배 버프 (${count}회 남음)</span> 지급`;
                 } else {
                     oePayout.innerHTML = `당첨 시 <span>2.0배</span> 지급`;
                 }
             }
 
             // Dice tag & Mode Buttons
+            const dicePayout = document.getElementById('dice-payout-info');
+            const diceHlBtn = document.querySelector('.dice-modes .mode-btn[data-mode="high-low"]');
+            const diceExactBtn = document.querySelector('.dice-modes .mode-btn[data-mode="exact"]');
             if (dicePayout) {
                 if (state.selectedDiceMode === 'high-low') {
                     dicePayout.innerHTML = isActive 
-                        ? `당첨 시 <span style="color:#ff3d00; font-weight:800;">4.0배</span> <span class="event-boost-pill">🔥2배 EVENT</span> 지급`
+                        ? `당첨 시 <span style="color:#ff3d00; font-weight:800;">4.0배</span> <span class="event-boost-pill">🔥충전 2배 버프 (${count}회 남음)</span> 지급`
                         : `당첨 시 <span>2.0배</span> 지급`;
                 } else {
                     dicePayout.innerHTML = isActive 
-                        ? `당첨 시 <span style="color:#ff3d00; font-weight:800;">12.0배</span> <span class="event-boost-pill">🔥2배 EVENT</span> 지급`
+                        ? `당첨 시 <span style="color:#ff3d00; font-weight:800;">12.0배</span> <span class="event-boost-pill">🔥충전 2배 버프 (${count}회 남음)</span> 지급`
                         : `당첨 시 <span>6.0배</span> 지급`;
                 }
             }
 
             if (diceHlBtn) {
-                diceHlBtn.innerText = isActive ? '하이/로우 (🔥4.0x)' : '하이/로우 (2.0x)';
+                diceHlBtn.innerText = isActive ? `하이/로우 (🔥4.0x - ${count}회)` : '하이/로우 (2.0x)';
             }
             if (diceExactBtn) {
-                diceExactBtn.innerText = isActive ? '단일 숫자 맞추기 (🔥12.0x)' : '단일 숫자 맞추기 (6.0x)';
+                diceExactBtn.innerText = isActive ? `단일 숫자 맞추기 (🔥12.0x - ${count}회)` : '단일 숫자 맞추기 (6.0x)';
             }
 
             // Slot paytable
+            const slotJackpot = document.getElementById('slot-pay-jackpot');
+            const slotCrown = document.getElementById('slot-pay-crown');
+            const slotGem = document.getElementById('slot-pay-gem');
+            const slotBell = document.getElementById('slot-pay-bell');
+            const slotCherry = document.getElementById('slot-pay-cherry');
             if (slotJackpot) {
                 slotJackpot.innerHTML = isActive ? `<b style="color:#ff3d00">4개 250배 / 3개 40배 🔥</b>` : `4개 125배 / 3개 20배`;
             }
@@ -2722,9 +2735,10 @@ playJackpot() {
             }
 
             // Card Draw intro subtext
+            const cardIntro = document.getElementById('card-game-subtext');
             if (cardIntro) {
                 cardIntro.innerHTML = isActive
-                    ? `3장의 카드 중 <strong style="color:#ff3d00;">4.0배 (🔥이벤트 2배 버프!)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다.`
+                    ? `3장의 카드 중 <strong style="color:#ff3d00;">4.0배 (🔥충전 2배 버프: ${count}회 남음)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다.`
                     : `3장의 카드 중 <strong style="color:var(--glow-neon-green);">2.0배 (대박 2배)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다. (환수율 100%)`;
             }
         }
@@ -2879,6 +2893,10 @@ playJackpot() {
                 if (savedBalance !== null) {
                     state.balance = safeInt(savedBalance, 1000000);
                 }
+                const savedBonus = localStorage.getItem('royal_neon_bonus_count');
+                if (savedBonus !== null) {
+                    state.bonusDoubleCount = safeInt(savedBonus, 0);
+                }
                 const savedHistory = localStorage.getItem('royal_neon_history');
                 if (savedHistory !== null) {
                     state.history = JSON.parse(savedHistory);
@@ -2910,6 +2928,7 @@ playJackpot() {
         function saveState() {
             try {
                 localStorage.setItem('royal_neon_balance', state.balance.toString());
+                localStorage.setItem('royal_neon_bonus_count', (state.bonusDoubleCount || 0).toString());
                 localStorage.setItem('royal_neon_history', JSON.stringify(state.history));
                 localStorage.setItem('royal_neon_recharge_charges', state.rechargeCharges.toString());
                 if (state.lastSeasonKey) {
@@ -2965,12 +2984,22 @@ playJackpot() {
                 balanceEl.innerHTML = formatNumber(state.balance);
             }
             
-            // Check if player is broke
+            // Check recharge button state (only active when balance <= 1,000,000)
             const resetBtn = document.getElementById('btn-reset-balance');
-            if (state.balance === 0) {
-                resetBtn.classList.add('glow-gold-pulse');
-            } else {
-                resetBtn.classList.remove('glow-gold-pulse');
+            if (resetBtn) {
+                if (state.balance > 1000000) {
+                    resetBtn.classList.add('disabled');
+                    resetBtn.classList.remove('glow-gold-pulse');
+                    resetBtn.title = "보유 자금이 100만 원 이하일 때만 충전 가능합니다.";
+                } else {
+                    resetBtn.classList.remove('disabled');
+                    resetBtn.title = "100만 원으로 충전 (10회 당첨금 2배 버프 지급)";
+                    if (state.balance === 0) {
+                        resetBtn.classList.add('glow-gold-pulse');
+                    } else {
+                        resetBtn.classList.remove('glow-gold-pulse');
+                    }
+                }
             }
 
             // Ensure bet does not exceed current balance (only when not in the middle of a spin/round)
@@ -3742,14 +3771,19 @@ playJackpot() {
                 
                 const isWin = state.selectedOe === resultStr;
                 let payout = 0;
-                const multBonus = getEventMultiplierBonus();
+                const isBuffActive = state.bonusDoubleCount > 0;
+                const multBonus = isBuffActive ? 2 : 1;
                 const winMultiplier = 2 * multBonus;
+                
+                if (isBuffActive) {
+                    state.bonusDoubleCount--;
+                }
                 
                 if (isWin) {
                     payout = currentBet * winMultiplier;
                     state.balance += payout;
                     
-                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트 x${winMultiplier}] ` : '';
+                    const eventTagStr = isBuffActive ? `[🔥충전 2배 버프 (남은 ${state.bonusDoubleCount}회)] ` : '';
                     splash.className = "result-splash-box win";
                     splash.innerHTML = `성공! ${eventTagStr}숫자 ${outcomeNum} (${korResult}) 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
                     
@@ -3757,8 +3791,9 @@ playJackpot() {
                     triggerConfetti();
                     audio.playWin();
                 } else {
+                    const eventTagStr = isBuffActive ? `[🔥충전 버프 차감 (남은 ${state.bonusDoubleCount}회)] ` : '';
                     splash.className = "result-splash-box lose";
-                    splash.innerHTML = `실패... 숫자 ${outcomeNum} (${korResult}) 이(가) 나왔습니다. (-₩${formatNumber(currentBet)})`;
+                    splash.innerHTML = `실패... ${eventTagStr}숫자 ${outcomeNum} (${korResult}) 이(가) 나왔습니다. (-₩${formatNumber(currentBet)})`;
                     
                     showToast(`실패했습니다. -₩${formatNumber(currentBet)}`, "lose");
                     shakeWindow();
@@ -3768,6 +3803,7 @@ playJackpot() {
                 addHistoryItem('홀짝 게임', state.selectedOe === 'Odd' ? '홀' : '짝', `${outcomeNum} (${korResult})`, isWin, currentBet, payout);
                 setInteractiveState(true);
                 updateBalanceUI(oldBalance);
+                updateBonusUI();
                 saveState();
                 
             }, 1500); // Matches transition duration
@@ -3840,7 +3876,12 @@ playJackpot() {
                 let isWin = false;
                 let payout = 0;
                 let detailsLabel = '';
-                const multBonus = getEventMultiplierBonus();
+                const isBuffActive = state.bonusDoubleCount > 0;
+                const multBonus = isBuffActive ? 2 : 1;
+                
+                if (isBuffActive) {
+                    state.bonusDoubleCount--;
+                }
                 
                 if (state.selectedDiceMode === 'high-low') {
                     const isHigh = targetFace >= 4;
@@ -3863,7 +3904,7 @@ playJackpot() {
                 
                 if (isWin) {
                     state.balance += payout;
-                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
+                    const eventTagStr = isBuffActive ? `[🔥충전 2배 버프 (남은 ${state.bonusDoubleCount}회)] ` : '';
                     splash.className = "result-splash-box win";
                     splash.innerHTML = `성공! ${eventTagStr}주사위 눈 [${targetFace}] 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
                     
@@ -3879,8 +3920,9 @@ playJackpot() {
                         audio.playWin();
                     }
                 } else {
+                    const eventTagStr = isBuffActive ? `[🔥충전 버프 차감 (남은 ${state.bonusDoubleCount}회)] ` : '';
                     splash.className = "result-splash-box lose";
-                    splash.innerHTML = `실패... 주사위 눈 [${targetFace}] 이(가) 나왔습니다. (-₩${formatNumber(currentBet)})`;
+                    splash.innerHTML = `실패... ${eventTagStr}주사위 눈 [${targetFace}] 이(가) 나왔습니다. (-₩${formatNumber(currentBet)})`;
                     
                     showToast(`실패했습니다. -₩${formatNumber(currentBet)}`, "lose");
                     shakeWindow();
@@ -3891,6 +3933,7 @@ playJackpot() {
                 addHistoryItem(gameNameString, detailsLabel, `주사위 ${targetFace}`, isWin, currentBet, payout);
                 setInteractiveState(true);
                 updateBalanceUI(oldBalance);
+                updateBonusUI();
                 saveState();
                 
             }, 1500);
@@ -4169,7 +4212,8 @@ playJackpot() {
                         const { matchCount, matchSymbol, startIndex } = bestLineMatch;
                         const payoutInfo = SLOT_PAYOUTS[matchSymbol];
                         if (payoutInfo) {
-                            const multBonus = getEventMultiplierBonus();
+                            const isBuffActive = state.bonusDoubleCount > 0;
+                            const multBonus = isBuffActive ? 2 : 1;
                             const multiplier = payoutInfo[matchCount] * multBonus;
                             totalMultiplier += multiplier;
                             winningLinesInfo.push({
@@ -4189,18 +4233,22 @@ playJackpot() {
                     }
                 });
 
+                const isBuffActive = state.bonusDoubleCount > 0;
+                if (isBuffActive) {
+                    state.bonusDoubleCount--;
+                }
+
                 const isWin = totalMultiplier > 0;
                 // Bet per line is currentBet / 10
                 const totalBetFactor = totalMultiplier / 10;
                 const payout = Math.floor(currentBet * totalBetFactor);
                 const oldBal = state.balance;
-                const multBonus = getEventMultiplierBonus();
 
                 if (isWin) {
                     state.balance += payout;
                     splash.className = "result-splash-box win";
                     
-                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
+                    const eventTagStr = isBuffActive ? `[🔥충전 2배 버프 (남은 ${state.bonusDoubleCount}회)] ` : '';
                     const linesStr = winningLinesInfo.map(w => `${w.lineIdx}번(${w.symbol} x${w.count})`).join(', ');
                     splash.innerHTML = `승리! ${eventTagStr}[${winningLinesInfo.length}개 라인 당첨] ${linesStr} (+₩${formatNumber(payout)})`;
                     showToast(`축하합니다! ${eventTagStr}+₩${formatNumber(payout)}`, "win");
@@ -4214,8 +4262,9 @@ playJackpot() {
                         audio.playWin();
                     }
                 } else {
+                    const eventTagStr = isBuffActive ? `[🔥충전 버프 차감 (남은 ${state.bonusDoubleCount}회)] ` : '';
                     splash.className = "result-splash-box lose";
-                    splash.innerHTML = `실패... 당첨된 라인이 없습니다. (-₩${formatNumber(currentBet)})`;
+                    splash.innerHTML = `실패... ${eventTagStr}당첨된 라인이 없습니다. (-₩${formatNumber(currentBet)})`;
                     showToast(`실패했습니다. -₩${formatNumber(currentBet)}`, "lose");
                     shakeWindow();
                     audio.playLose();
@@ -4224,6 +4273,7 @@ playJackpot() {
                 const outcomeStr = isWin ? `${winningLinesInfo.length}개 라인 당첨` : '실패';
                 addHistoryItem('슬롯머신 (4x4)', '10개 라인 배팅', outcomeStr, isWin, currentBet, payout);
                 updateBalanceUI(oldBal);
+                updateBonusUI();
                 saveState();
                 setInteractiveState(true);
 
@@ -4302,7 +4352,7 @@ playJackpot() {
                         hlPanel.classList.remove('active');
                         exactPanel.classList.add('active');
                     }
-                    updateEventUI();
+                    updateBonusUI();
                 });
             });
         }
@@ -4353,9 +4403,10 @@ playJackpot() {
                 setTimeout(() => {
                     if (container) container.classList.remove('shuffling');
                     
-                    const multBonus = getEventMultiplierBonus();
+                    const isBuffActive = state.bonusDoubleCount > 0;
+                    const multBonus = isBuffActive ? 2 : 1;
                     const winMult = 2.0 * multBonus;
-                    // Cryptographically Secure Fisher-Yates Shuffle: 1장 2.0x (이벤트 시 4.0x), 2장 0.5x
+                    // Cryptographically Secure Fisher-Yates Shuffle: 1장 2.0x (버프 시 4.0x), 2장 0.5x
                     const mults = [0.5, 0.5, winMult];
                     if (window.crypto && window.crypto.getRandomValues) {
                         const randBuf = new Uint32Array(2);
@@ -4389,7 +4440,7 @@ playJackpot() {
                         } else {
                             multClass = 'mult-20';
                             valText = `${mult.toFixed(1)}x`;
-                            label = multBonus > 1 ? `🔥2배 이벤트 당첨!` : `2배 (+100%)`;
+                            label = isBuffActive ? `🔥충전 2배 당첨!` : `2배 (+100%)`;
                         }
                         frontFace.classList.add(multClass);
                         frontFace.innerHTML = `
@@ -4420,6 +4471,11 @@ playJackpot() {
 
                     // 5. Outcome processing & celebration
                     setTimeout(() => {
+                        const isBuffAtReveal = state.bonusDoubleCount > 0;
+                        if (isBuffAtReveal) {
+                            state.bonusDoubleCount--;
+                        }
+
                         const chosenMult = mults[selectedIdx];
                         const payout = Math.floor(currentBet * chosenMult);
                         const oldBal = state.balance;
@@ -4428,15 +4484,16 @@ playJackpot() {
                         state.balance += payout;
 
                         if (isWin) {
-                            const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
+                            const eventTagStr = isBuffAtReveal ? `[🔥충전 2배 버프 (남은 ${state.bonusDoubleCount}회)] ` : '';
                             splash.className = "result-splash-box win";
                             splash.innerHTML = `🎉 대박! ${eventTagStr}${winMult.toFixed(1)}배 카드 당첨! (+₩${formatNumber(payout - currentBet)})`;
                             showToast(`대박! ${eventTagStr}${winMult.toFixed(1)}배 당첨 (+₩${formatNumber(payout - currentBet)})`, "win");
                             triggerConfetti();
                             audio.playWin();
                         } else {
+                            const eventTagStr = isBuffAtReveal ? `[🔥충전 버프 차감 (남은 ${state.bonusDoubleCount}회)] ` : '';
                             splash.className = "result-splash-box lose";
-                            splash.innerHTML = `😢 아쉽네요! 0.5배 카드로 ₩${formatNumber(payout)}만 환급되었습니다. (-₩${formatNumber(currentBet - payout)})`;
+                            splash.innerHTML = `😢 아쉽네요! ${eventTagStr}0.5배 카드로 ₩${formatNumber(payout)}만 환급되었습니다. (-₩${formatNumber(currentBet - payout)})`;
                             showToast(`0.5배 환급 (-₩${formatNumber(currentBet - payout)})`, "lose");
                             shakeWindow();
                             audio.playLose();
@@ -4446,6 +4503,7 @@ playJackpot() {
                         addHistoryItem('카드 뽑기 (1/3)', `${selectedIdx + 1}번 카드`, outcomeLabel, isWin, currentBet, payout);
                         setInteractiveState(true);
                         updateBalanceUI(oldBal);
+                        updateBonusUI();
                         saveState();
 
                         // 6. After showing results (1.5s delay), smoothly flip cards back to backside & re-enable
@@ -4674,6 +4732,7 @@ playJackpot() {
             updateBalanceUI();
             renderHistory();
             updateAuthUI();
+            updateBonusUI();
             
             // Set initial bet validation
             setBetAmount(state.bet);
@@ -4699,17 +4758,27 @@ playJackpot() {
             // Weekly Reset Countdown Timer (Every Sunday 12:00 PM)
             startResetCountdown();
 
-            // Reset/Recharge balance click
+            // Reset/Recharge balance click (Only allowed when balance <= 1,000,000)
             document.getElementById('btn-reset-balance').addEventListener('click', () => {
                 if (state.isPlaying) return;
+                
+                if (state.balance > 1000000) {
+                    showToast(`보유 자산이 100만 원 이하일 때만 충전할 수 있습니다. (현재: ₩${formatNumber(state.balance)})`, "lose");
+                    shakeWindow();
+                    audio.playLose();
+                    return;
+                }
                 
                 audio.playWin();
                 const oldBal = state.balance;
                 state.balance = 1000000;
+                state.bonusDoubleCount = 10;
                 setBetAmount(100000);
                 updateBalanceUI(oldBal);
+                updateBonusUI();
                 saveState();
-                showToast("1,000,000원으로 충전되었습니다!", "win");
+                triggerConfetti();
+                showToast("1,000,000원으로 충전되었습니다! [🔥 10회 동안 당첨금 2배 버프 지급!]", "win");
             });
 
             // Leaderboard initial render & Firebase Sync
@@ -4722,10 +4791,6 @@ playJackpot() {
             document.getElementById('btn-play-slots').addEventListener('click', playSlots);
             document.getElementById('btn-auto-slots').addEventListener('click', toggleAutoSpin);
             document.getElementById('btn-play-card').addEventListener('click', playCardDraw);
-
-            // 1-Hour Hot Time 2x Multiplier Event Loop
-            updateEventUI();
-            setInterval(updateEventUI, 1000);
         }
 
         // Launch on document loaded
