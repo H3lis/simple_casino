@@ -2292,16 +2292,16 @@
             </div>
         </header>
 
-        <!-- 2x Multiplier Hot Time Event Banner (14:00 ~ 15:00 KST) -->
+        <!-- 2x Multiplier Hot Time Event Banner (17:30 ~ 18:00 KST) -->
         <div class="event-banner" id="event-hot-time-banner">
             <div class="event-banner-content">
                 <span class="event-flame-icon" id="event-flame-icon">🔥</span>
                 <div class="event-title-group">
                     <div class="event-title">
-                        <span id="event-banner-title">핫타임 버프 이벤트 (14:00 ~ 15:00)</span>
+                        <span id="event-banner-title">핫타임 버프 이벤트 (17:30 ~ 18:00)</span>
                         <span class="event-tag-badge" id="event-tag-badge">ALL 2X MULTIPLIER</span>
                     </div>
-                    <div class="event-desc" id="event-desc-text">오후 2시부터 3시까지 모든 게임 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배, 카드 4배)</div>
+                    <div class="event-desc" id="event-desc-text">오후 5시 30분부터 6시까지 모든 게임 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배, 카드 4배)</div>
                 </div>
             </div>
             <div class="event-timer-badge">
@@ -2944,9 +2944,9 @@
         // --- MULTIPLIER EVENT & RECHARGE 2X BUFF SYSTEM ---
         function getEventTimeRange() {
             const now = new Date();
-            // 오늘 14:00:00 KST ~ 15:00:00 KST
-            const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 0, 0, 0).getTime();
-            const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0, 0, 0).getTime();
+            // 오늘 17:30:00 KST ~ 18:00:00 KST (30분간 2배 이벤트)
+            const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 30, 0, 0).getTime();
+            const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0, 0, 0).getTime();
             return { startTime, endTime };
         }
 
@@ -3028,17 +3028,17 @@
 
                 if (eventInfo.status === 'UPCOMING') {
                     if (flameIcon) flameIcon.innerText = "⏳";
-                    if (bannerTitle) bannerTitle.innerText = "핫타임 2배 이벤트 (14:00 ~ 15:00 예정)";
+                    if (bannerTitle) bannerTitle.innerText = "핫타임 2배 이벤트 (17:30 ~ 18:00 예정)";
                     if (tagBadge) tagBadge.innerText = "OPEN SOON";
                     if (timerLabel) timerLabel.innerText = "시작까지";
                     timerVal.innerText = `${m}:${s}`;
                     if (banner) {
                         banner.className = 'event-banner upcoming';
                     }
-                    if (descText) descText.innerText = "잠시 후 오후 2시부터 3시까지 모든 게임 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배, 카드 4배)";
+                    if (descText) descText.innerText = "잠시 후 오후 5시 30분부터 6시까지 모든 게임 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배, 카드 4배)";
                 } else if (eventInfo.status === 'ACTIVE') {
                     if (flameIcon) flameIcon.innerText = "🔥";
-                    if (bannerTitle) bannerTitle.innerText = "🔥 핫타임 버프 진행 중! (14:00 ~ 15:00)";
+                    if (bannerTitle) bannerTitle.innerText = "🔥 핫타임 버프 진행 중! (17:30 ~ 18:00)";
                     if (tagBadge) tagBadge.innerText = "ALL 2X MULTIPLIER";
                     if (timerLabel) timerLabel.innerText = "종료까지";
                     timerVal.innerText = `${m}:${s}`;
