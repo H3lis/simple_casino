@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,10 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700;900&display=swap"
+        rel="stylesheet">
+
     <!-- Firebase SDK for Realtime Online Global Leaderboard -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -36,7 +39,7 @@
 
         body {
             background-color: var(--bg-color);
-            background-image: 
+            background-image:
                 radial-gradient(circle at 10% 20%, rgba(220, 200, 255, 0.4) 0%, transparent 40%),
                 radial-gradient(circle at 90% 80%, rgba(190, 220, 255, 0.4) 0%, transparent 40%),
                 radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.8) 0%, #ece9f5 100%);
@@ -119,10 +122,23 @@
         }
 
         @keyframes spinTimer {
-            0%, 85% { transform: rotate(0deg); }
-            90% { transform: rotate(15deg); }
-            95% { transform: rotate(-15deg); }
-            100% { transform: rotate(0deg); }
+
+            0%,
+            85% {
+                transform: rotate(0deg);
+            }
+
+            90% {
+                transform: rotate(15deg);
+            }
+
+            95% {
+                transform: rotate(-15deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
         }
 
         .reset-countdown-badge .timer-val {
@@ -372,7 +388,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            box-shadow: 0 15px 35px rgba(118, 93, 160, 0.08), 0 5px 15px rgba(0,0,0,0.02);
+            box-shadow: 0 15px 35px rgba(118, 93, 160, 0.08), 0 5px 15px rgba(0, 0, 0, 0.02);
             margin-bottom: 25px;
             position: relative;
             overflow: hidden;
@@ -416,8 +432,13 @@
         }
 
         @keyframes pulse {
-            0% { opacity: 0.4; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 1;
+            }
         }
 
         .balance-value-row {
@@ -478,7 +499,7 @@
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 25px;
-            box-shadow: 0 15px 35px rgba(118, 93, 160, 0.08), 0 5px 15px rgba(0,0,0,0.02);
+            box-shadow: 0 15px 35px rgba(118, 93, 160, 0.08), 0 5px 15px rgba(0, 0, 0, 0.02);
         }
 
         .section-title {
@@ -741,7 +762,7 @@
         .tab-btn.active {
             color: var(--text-main);
             background: #ffffff;
-            box-shadow: 0 4px 15px rgba(118, 93, 160, 0.06), 0 2px 5px rgba(0,0,0,0.01);
+            box-shadow: 0 4px 15px rgba(118, 93, 160, 0.06), 0 2px 5px rgba(0, 0, 0, 0.01);
         }
 
         .tab-btn:hover:not(.active) {
@@ -763,7 +784,7 @@
             border-radius: 24px;
             padding: 30px 24px;
             margin-bottom: 25px;
-            box-shadow: 0 15px 35px rgba(118, 93, 160, 0.08), 0 5px 15px rgba(0,0,0,0.02);
+            box-shadow: 0 15px 35px rgba(118, 93, 160, 0.08), 0 5px 15px rgba(0, 0, 0, 0.02);
             display: none;
         }
 
@@ -773,8 +794,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ODD & EVEN Specific UI */
@@ -889,7 +917,7 @@
         /* DICE Specific UI */
         .dice-modes {
             display: flex;
-            background: rgba(0,0,0,0.03);
+            background: rgba(0, 0, 0, 0.03);
             padding: 3px;
             border-radius: 10px;
             margin-bottom: 20px;
@@ -913,7 +941,7 @@
         .mode-btn.active {
             color: var(--text-main);
             background: #ffffff;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
 
         .dice-choice-panel {
@@ -942,7 +970,7 @@
         }
 
         .btn-number {
-            background: rgba(0,0,0,0.02);
+            background: rgba(0, 0, 0, 0.02);
             border: 1px solid var(--border-color);
             border-radius: 10px;
             color: var(--text-main);
@@ -993,16 +1021,39 @@
             display: grid;
             padding: 10px;
             box-sizing: border-box;
-            box-shadow: inset 0 0 10px rgba(255,255,255,1), 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 1), 0 5px 15px rgba(0, 0, 0, 0.1);
             backface-visibility: visible;
         }
 
-        .dice-face.front  { transform: rotateY(0deg) translateZ(40px); border-color: var(--glow-neon-green); }
-        .dice-face.back   { transform: rotateY(180deg) translateZ(40px); border-color: var(--glow-neon-pink); }
-        .dice-face.right  { transform: rotateY(90deg) translateZ(40px); border-color: var(--glow-neon-blue); }
-        .dice-face.left   { transform: rotateY(-90deg) translateZ(40px); border-color: var(--glow-gold); }
-        .dice-face.top    { transform: rotateX(90deg) translateZ(40px); border-color: #aa55ff; }
-        .dice-face.bottom { transform: rotateX(-90deg) translateZ(40px); border-color: #ff5e00; }
+        .dice-face.front {
+            transform: rotateY(0deg) translateZ(40px);
+            border-color: var(--glow-neon-green);
+        }
+
+        .dice-face.back {
+            transform: rotateY(180deg) translateZ(40px);
+            border-color: var(--glow-neon-pink);
+        }
+
+        .dice-face.right {
+            transform: rotateY(90deg) translateZ(40px);
+            border-color: var(--glow-neon-blue);
+        }
+
+        .dice-face.left {
+            transform: rotateY(-90deg) translateZ(40px);
+            border-color: var(--glow-gold);
+        }
+
+        .dice-face.top {
+            transform: rotateX(90deg) translateZ(40px);
+            border-color: #aa55ff;
+        }
+
+        .dice-face.bottom {
+            transform: rotateX(-90deg) translateZ(40px);
+            border-color: #ff5e00;
+        }
 
         .dice-face {
             grid-template-areas:
@@ -1010,12 +1061,30 @@
                 "c d e"
                 "f . g";
         }
-        .dice-face[data-face="1"] { grid-template-areas: ". . ." ". a ." ". . ."; }
-        .dice-face[data-face="2"] { grid-template-areas: "a . ." ". . ." ". . b"; }
-        .dice-face[data-face="3"] { grid-template-areas: "a . ." ". b ." ". . c"; }
-        .dice-face[data-face="4"] { grid-template-areas: "a . b" ". . ." "c . d"; }
-        .dice-face[data-face="5"] { grid-template-areas: "a . b" ". c ." "d . e"; }
-        .dice-face[data-face="6"] { grid-template-areas: "a . b" "c . d" "e . f"; }
+
+        .dice-face[data-face="1"] {
+            grid-template-areas: ". . ." ". a ." ". . .";
+        }
+
+        .dice-face[data-face="2"] {
+            grid-template-areas: "a . ." ". . ." ". . b";
+        }
+
+        .dice-face[data-face="3"] {
+            grid-template-areas: "a . ." ". b ." ". . c";
+        }
+
+        .dice-face[data-face="4"] {
+            grid-template-areas: "a . b" ". . ." "c . d";
+        }
+
+        .dice-face[data-face="5"] {
+            grid-template-areas: "a . b" ". c ." "d . e";
+        }
+
+        .dice-face[data-face="6"] {
+            grid-template-areas: "a . b" "c . d" "e . f";
+        }
 
         .dot {
             display: block;
@@ -1026,20 +1095,63 @@
             justify-self: center;
         }
 
-        .dice-face.front .dot { background-color: var(--glow-neon-green); box-shadow: 0 0 6px var(--glow-neon-green); }
-        .dice-face.back .dot { background-color: var(--glow-neon-pink); box-shadow: 0 0 6px var(--glow-neon-pink); }
-        .dice-face.right .dot { background-color: var(--glow-neon-blue); box-shadow: 0 0 6px var(--glow-neon-blue); }
-        .dice-face.left .dot { background-color: var(--glow-gold); box-shadow: 0 0 6px var(--glow-gold); }
-        .dice-face.top .dot { background-color: #aa55ff; box-shadow: 0 0 6px #aa55ff; }
-        .dice-face.bottom .dot { background-color: #ff5e00; box-shadow: 0 0 6px #ff5e00; }
+        .dice-face.front .dot {
+            background-color: var(--glow-neon-green);
+            box-shadow: 0 0 6px var(--glow-neon-green);
+        }
 
-        .dice-face .dot:nth-child(1) { grid-area: a; }
-        .dice-face .dot:nth-child(2) { grid-area: b; }
-        .dice-face .dot:nth-child(3) { grid-area: c; }
-        .dice-face .dot:nth-child(4) { grid-area: d; }
-        .dice-face .dot:nth-child(5) { grid-area: e; }
-        .dice-face .dot:nth-child(6) { grid-area: f; }
-        .dice-face .dot:nth-child(7) { grid-area: g; }
+        .dice-face.back .dot {
+            background-color: var(--glow-neon-pink);
+            box-shadow: 0 0 6px var(--glow-neon-pink);
+        }
+
+        .dice-face.right .dot {
+            background-color: var(--glow-neon-blue);
+            box-shadow: 0 0 6px var(--glow-neon-blue);
+        }
+
+        .dice-face.left .dot {
+            background-color: var(--glow-gold);
+            box-shadow: 0 0 6px var(--glow-gold);
+        }
+
+        .dice-face.top .dot {
+            background-color: #aa55ff;
+            box-shadow: 0 0 6px #aa55ff;
+        }
+
+        .dice-face.bottom .dot {
+            background-color: #ff5e00;
+            box-shadow: 0 0 6px #ff5e00;
+        }
+
+        .dice-face .dot:nth-child(1) {
+            grid-area: a;
+        }
+
+        .dice-face .dot:nth-child(2) {
+            grid-area: b;
+        }
+
+        .dice-face .dot:nth-child(3) {
+            grid-area: c;
+        }
+
+        .dice-face .dot:nth-child(4) {
+            grid-area: d;
+        }
+
+        .dice-face .dot:nth-child(5) {
+            grid-area: e;
+        }
+
+        .dice-face .dot:nth-child(6) {
+            grid-area: f;
+        }
+
+        .dice-face .dot:nth-child(7) {
+            grid-area: g;
+        }
 
 
         /* Common Play Button */
@@ -1108,8 +1220,17 @@
         }
 
         @keyframes autoSpinPulse {
-            0%, 100% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.02); filter: brightness(1.15); }
+
+            0%,
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+                filter: brightness(1.15);
+            }
         }
 
         /* 3D Card Draw Mini-game */
@@ -1161,7 +1282,7 @@
             transform-style: preserve-3d;
             transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
         }
 
         .card-wrapper.selected .game-card {
@@ -1174,29 +1295,67 @@
 
         /* Clean Gather & Deal (모으기 & 분배) Animation */
         @keyframes gatherAndDealLeft {
-            0% { transform: translate(0, 0); z-index: 1; }
-            40%, 55% { transform: translate(111px, 0); z-index: 3; }
-            100% { transform: translate(0, 0); z-index: 1; }
+            0% {
+                transform: translate(0, 0);
+                z-index: 1;
+            }
+
+            40%,
+            55% {
+                transform: translate(111px, 0);
+                z-index: 3;
+            }
+
+            100% {
+                transform: translate(0, 0);
+                z-index: 1;
+            }
         }
 
         @keyframes gatherAndDealCenter {
-            0% { transform: translate(0, 0); z-index: 2; }
-            40%, 55% { transform: translate(0, -2px) scale(0.98); z-index: 2; }
-            100% { transform: translate(0, 0); z-index: 2; }
+            0% {
+                transform: translate(0, 0);
+                z-index: 2;
+            }
+
+            40%,
+            55% {
+                transform: translate(0, -2px) scale(0.98);
+                z-index: 2;
+            }
+
+            100% {
+                transform: translate(0, 0);
+                z-index: 2;
+            }
         }
 
         @keyframes gatherAndDealRight {
-            0% { transform: translate(0, 0); z-index: 3; }
-            40%, 55% { transform: translate(-111px, 0); z-index: 1; }
-            100% { transform: translate(0, 0); z-index: 3; }
+            0% {
+                transform: translate(0, 0);
+                z-index: 3;
+            }
+
+            40%,
+            55% {
+                transform: translate(-111px, 0);
+                z-index: 1;
+            }
+
+            100% {
+                transform: translate(0, 0);
+                z-index: 3;
+            }
         }
 
         .cards-container.shuffling .card-wrapper:nth-child(1) {
             animation: gatherAndDealLeft 0.65s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .cards-container.shuffling .card-wrapper:nth-child(2) {
             animation: gatherAndDealCenter 0.65s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .cards-container.shuffling .card-wrapper:nth-child(3) {
             animation: gatherAndDealRight 0.65s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -1374,7 +1533,7 @@
             border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 15px 35px rgba(118, 93, 160, 0.08), 0 5px 15px rgba(0,0,0,0.02);
+            box-shadow: 0 15px 35px rgba(118, 93, 160, 0.08), 0 5px 15px rgba(0, 0, 0, 0.02);
             margin-bottom: 30px;
         }
 
@@ -1390,10 +1549,12 @@
         .history-list::-webkit-scrollbar {
             width: 4px;
         }
+
         .history-list::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.03);
+            background: rgba(0, 0, 0, 0.03);
             border-radius: 4px;
         }
+
         .history-list::-webkit-scrollbar-thumb {
             background: rgba(0, 0, 0, 0.1);
             border-radius: 4px;
@@ -1412,8 +1573,15 @@
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-15px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(-15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .history-info {
@@ -1511,8 +1679,17 @@
         }
 
         @keyframes pulseDot {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.6; }
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 0.6;
+            }
         }
 
         .btn-edit-nick {
@@ -1593,10 +1770,29 @@
             font-size: 0.85rem;
         }
 
-        .rank-1 { color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); font-size: 1.1rem; }
-        .rank-2 { color: #c0c0c0; text-shadow: 0 0 6px rgba(192, 192, 192, 0.4); font-size: 1.05rem; }
-        .rank-3 { color: #cd7f32; text-shadow: 0 0 6px rgba(205, 127, 50, 0.4); font-size: 1.0rem; }
-        .rank-other { color: var(--text-secondary); font-size: 0.82rem; font-weight: 700; }
+        .rank-1 {
+            color: #ffd700;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+            font-size: 1.1rem;
+        }
+
+        .rank-2 {
+            color: #c0c0c0;
+            text-shadow: 0 0 6px rgba(192, 192, 192, 0.4);
+            font-size: 1.05rem;
+        }
+
+        .rank-3 {
+            color: #cd7f32;
+            text-shadow: 0 0 6px rgba(205, 127, 50, 0.4);
+            font-size: 1.0rem;
+        }
+
+        .rank-other {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
 
         .player-tag-me {
             font-size: 0.7rem;
@@ -1627,8 +1823,13 @@
         }
 
         @keyframes goldGlow {
-            from { box-shadow: 0 0 4px rgba(255, 215, 0, 0.2); }
-            to { box-shadow: 0 0 12px rgba(255, 215, 0, 0.5); }
+            from {
+                box-shadow: 0 0 4px rgba(255, 215, 0, 0.2);
+            }
+
+            to {
+                box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+            }
         }
 
         /* Hall of Fame Banner */
@@ -1678,9 +1879,21 @@
         }
 
         @keyframes shakeAnim {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-8px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(8px);
+            }
         }
 
         /* Toast Popup Notifications */
@@ -1693,7 +1906,7 @@
             padding: 14px 20px;
             color: var(--text-main);
             font-weight: 700;
-            box-shadow: 0 10px 30px rgba(118, 93, 160, 0.15), 0 2px 6px rgba(0,0,0,0.03);
+            box-shadow: 0 10px 30px rgba(118, 93, 160, 0.15), 0 2px 6px rgba(0, 0, 0, 0.03);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -1776,7 +1989,7 @@
             border: 2px solid var(--border-color);
             padding: 12px;
             border-radius: 20px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.02);
             position: relative;
         }
 
@@ -1788,7 +2001,7 @@
             border-radius: 14px;
             overflow: hidden;
             position: relative;
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.03);
+            box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.03);
         }
 
         .reel-strip {
@@ -1821,7 +2034,9 @@
         }
 
         @keyframes drawPayline {
-            to { stroke-dashoffset: 0; }
+            to {
+                stroke-dashoffset: 0;
+            }
         }
 
         .payout-table {
@@ -1843,8 +2058,175 @@
             font-weight: 800;
         }
 
+        /* --- 1-HOUR 2X HOT TIME EVENT BANNER & BADGES --- */
+        .event-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.12), rgba(255, 215, 0, 0.18));
+            border: 1.5px solid rgba(255, 107, 0, 0.5);
+            border-radius: 18px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(255, 87, 34, 0.18), inset 0 0 15px rgba(255, 215, 0, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: eventGlowPulse 2s ease-in-out infinite alternate;
+            transition: all var(--transition-speed);
+        }
+
+        @keyframes eventGlowPulse {
+            0% {
+                box-shadow: 0 4px 15px rgba(255, 87, 34, 0.2), 0 0 10px rgba(255, 215, 0, 0.15);
+                border-color: rgba(255, 107, 0, 0.5);
+            }
+
+            100% {
+                box-shadow: 0 6px 25px rgba(255, 87, 34, 0.4), 0 0 20px rgba(255, 215, 0, 0.35);
+                border-color: rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        .event-banner.upcoming {
+            background: linear-gradient(135deg, rgba(0, 119, 204, 0.1), rgba(118, 93, 160, 0.15));
+            border-color: rgba(0, 119, 204, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 119, 204, 0.15);
+            animation: none;
+        }
+
+        .event-banner.upcoming .event-title {
+            color: var(--glow-neon-blue);
+        }
+
+        .event-banner.upcoming .event-tag-badge {
+            background: linear-gradient(135deg, #0077cc, #765da0);
+            box-shadow: 0 2px 6px rgba(0, 119, 204, 0.3);
+        }
+
+        .event-banner.ended {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: var(--border-color);
+            box-shadow: none;
+            animation: none;
+            opacity: 0.7;
+        }
+
+        .event-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .event-flame-icon {
+            font-size: 1.5rem;
+            animation: flameFlicker 1.2s infinite alternate;
+            flex-shrink: 0;
+        }
+
+        @keyframes flameFlicker {
+            0% {
+                transform: scale(1) rotate(-3deg);
+            }
+
+            100% {
+                transform: scale(1.15) rotate(3deg);
+            }
+        }
+
+        .event-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .event-title {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #d93800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .event-tag-badge {
+            background: linear-gradient(135deg, #ff4500, #ff8c00);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 900;
+            padding: 2px 7px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(255, 69, 0, 0.3);
+        }
+
+        .event-desc {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+
+        .event-timer-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 69, 0, 0.3);
+            border-radius: 12px;
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #d93800;
+            flex-shrink: 0;
+        }
+
+        .event-timer-val {
+            font-family: 'Outfit', monospace;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #ff3d00;
+            letter-spacing: 1px;
+        }
+
+        .event-boost-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.15), rgba(255, 215, 0, 0.2));
+            border: 1px solid rgba(255, 69, 0, 0.4);
+            color: #d93800;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-size: 0.76rem;
+            animation: pulseBoost 1.8s infinite;
+        }
+
+        @keyframes pulseBoost {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .btn-reset.disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            filter: grayscale(0.5);
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-secondary);
+            border-color: var(--border-color);
+            transform: none !important;
+            box-shadow: none !important;
+        }
     </style>
 </head>
+
 <body>
 
     <div id="confetti-container"></div>
@@ -1854,7 +2236,8 @@
         <header>
             <div class="logo">
                 <svg viewBox="0 0 24 24">
-                    <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.24 1.58 4.1 3.66 4.67C7.38 14 9.47 15 12 15s4.62-1 5.34-3.33C19.42 11.1 21 9.24 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1zM4 19h16v2H4z"/>
+                    <path
+                        d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.24 1.58 4.1 3.66 4.67C7.38 14 9.47 15 12 15s4.62-1 5.34-3.33C19.42 11.1 21 9.24 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1zM4 19h16v2H4z" />
                 </svg>
                 ROYAL NEON CASINO
             </div>
@@ -1876,15 +2259,35 @@
                 <button class="icon-btn" id="btn-sound" title="소리 켜기/끄기">
                     <!-- Volume High Icon -->
                     <svg id="svg-sound-on" viewBox="0 0 24 24">
-                        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                        <path
+                            d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
                     </svg>
                     <!-- Volume Mute Icon (hidden initially) -->
                     <svg id="svg-sound-off" viewBox="0 0 24 24" style="display:none;">
-                        <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                        <path
+                            d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
                     </svg>
                 </button>
             </div>
         </header>
+
+        <!-- 2x Multiplier Hot Time Event Banner (14:00 ~ 15:00 KST) -->
+        <div class="event-banner" id="event-hot-time-banner">
+            <div class="event-banner-content">
+                <span class="event-flame-icon" id="event-flame-icon">🔥</span>
+                <div class="event-title-group">
+                    <div class="event-title">
+                        <span id="event-banner-title">핫타임 버프 이벤트 (14:00 ~ 15:00)</span>
+                        <span class="event-tag-badge" id="event-tag-badge">ALL 2X MULTIPLIER</span>
+                    </div>
+                    <div class="event-desc" id="event-desc-text">오후 2시부터 3시까지 모든 게임 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배, 카드 4배)</div>
+                </div>
+            </div>
+            <div class="event-timer-badge">
+                <span id="event-timer-label">남은 시간</span>
+                <span class="event-timer-val" id="event-timer-val">계산 중...</span>
+            </div>
+        </div>
 
         <!-- Balance display Dashboard -->
         <div class="dashboard-card" id="balance-card">
@@ -1901,8 +2304,9 @@
                     <span id="player-balance">1,000,000</span>
                 </div>
                 <button class="btn-reset" id="btn-reset-balance">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                     </svg>
                     자금 충전 (100만)
                 </button>
@@ -1914,7 +2318,8 @@
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <svg viewBox="0 0 24 24">
-                        <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                        <path
+                            d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
                     </svg>
                     배팅 설정 (금액 & 자산 비율)
                 </div>
@@ -1934,7 +2339,8 @@
                 </div>
                 <div class="bet-slider-row">
                     <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">1%</span>
-                    <input type="range" id="bet-percent-slider" min="1" max="100" step="1" value="10" class="bet-slider" title="보유 자산 비율 조절">
+                    <input type="range" id="bet-percent-slider" min="1" max="100" step="1" value="10" class="bet-slider"
+                        title="보유 자산 비율 조절">
                     <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">100%</span>
                 </div>
             </div>
@@ -1956,7 +2362,7 @@
                 <button class="btn-quick decrease" data-val="-100000">-10만</button>
                 <button class="btn-quick increase" data-val="100000">+10만</button>
                 <button class="btn-quick increase" data-val="500000">+50만</button>
-                
+
                 <!-- 100만, 1000만 고액 단위 -->
                 <button class="btn-quick decrease" data-val="-10000000">-1000만</button>
                 <button class="btn-quick decrease" data-val="-1000000">-100만</button>
@@ -1969,30 +2375,35 @@
         <div class="game-tabs" id="game-tab-nav">
             <button class="tab-btn active" data-game="odd-even">
                 <svg viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
                 </svg>
                 홀짝 동전 flip
             </button>
             <button class="tab-btn" data-game="dice-game">
                 <svg viewBox="0 0 24 24">
-                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 5c.83 0 1.5-.67 1.5-1.5S12.83 5 12 5s-1.5.67-1.5 1.5S11.17 8 12 8zm-4 4c.83 0 1.5-.67 1.5-1.5S8.83 9 8 9s-1.5.67-1.5 1.5S7.17 12 8 12zm8 0c.83 0 1.5-.67 1.5-1.5S16.83 9 16 9s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5zm-4 4c.83 0 1.5-.67 1.5-1.5S12.83 13 12 13s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5z"/>
+                    <path
+                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 5c.83 0 1.5-.67 1.5-1.5S12.83 5 12 5s-1.5.67-1.5 1.5S11.17 8 12 8zm-4 4c.83 0 1.5-.67 1.5-1.5S8.83 9 8 9s-1.5.67-1.5 1.5S7.17 12 8 12zm8 0c.83 0 1.5-.67 1.5-1.5S16.83 9 16 9s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5zm-4 4c.83 0 1.5-.67 1.5-1.5S12.83 13 12 13s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5z" />
                 </svg>
                 주사위 roll
             </button>
             <button class="tab-btn" data-game="slots-game">
                 <svg viewBox="0 0 24 24">
-                    <rect x="2" y="2" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
-                    <line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" stroke-width="2"/>
-                    <line x1="2" y1="15" x2="22" y2="15" stroke="currentColor" stroke-width="2"/>
-                    <circle cx="7" cy="12" r="1.5" fill="currentColor"/>
-                    <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-                    <circle cx="17" cy="12" r="1.5" fill="currentColor"/>
+                    <rect x="2" y="2" width="20" height="20" rx="3" fill="none" stroke="currentColor"
+                        stroke-width="2" />
+                    <line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" stroke-width="2" />
+                    <line x1="2" y1="15" x2="22" y2="15" stroke="currentColor" stroke-width="2" />
+                    <circle cx="7" cy="12" r="1.5" fill="currentColor" />
+                    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                    <circle cx="17" cy="12" r="1.5" fill="currentColor" />
                 </svg>
                 슬롯머신 spin
             </button>
             <button class="tab-btn" data-game="card-game">
                 <svg viewBox="0 0 24 24">
-                    <path d="M4 4v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2zm8 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 8.5c2.33 0 4.31 1.46 5.12 3.5H6.88c.81-2.04 2.79-3.5 5.12-3.5z" fill="currentColor"/>
+                    <path
+                        d="M4 4v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2zm8 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 8.5c2.33 0 4.31 1.46 5.12 3.5H6.88c.81-2.04 2.79-3.5 5.12-3.5z"
+                        fill="currentColor" />
                 </svg>
                 카드 뽑기 pick
             </button>
@@ -2022,7 +2433,7 @@
             <button class="btn-play-action" id="btn-play-oe">
                 배팅 시작
             </button>
-            <div class="payout-tag">당첨 시 <span>2.0배</span> 지급</div>
+            <div class="payout-tag" id="oe-payout-tag">당첨 시 <span>2.0배</span> 지급</div>
             <div class="result-splash-box empty" id="oe-splash">배팅을 선택하고 시작 버튼을 누르세요.</div>
         </div>
 
@@ -2102,8 +2513,9 @@
             <div class="slot-machine-container">
                 <div class="reels-wrapper" style="position:relative;">
                     <!-- Reels SVG Overlay for winning lines -->
-                    <svg id="paylines-overlay" viewBox="0 0 344 320" style="position:absolute; top:12px; left:12px; width:calc(100% - 24px); height:calc(100% - 24px); pointer-events:none; z-index: 20;"></svg>
-                    
+                    <svg id="paylines-overlay" viewBox="0 0 344 320"
+                        style="position:absolute; top:12px; left:12px; width:calc(100% - 24px); height:calc(100% - 24px); pointer-events:none; z-index: 20;"></svg>
+
                     <div class="reel-window">
                         <div class="reel-strip" id="reel-1"></div>
                     </div>
@@ -2127,33 +2539,41 @@
                     ⚡ 연속 회전 (Auto)
                 </button>
             </div>
-            
+
             <div class="payout-table">
-                <div style="font-weight: 800; margin-bottom: 8px; color: var(--text-main); text-align: center;">🎰 5-심볼 4x4 슬롯 당첨 배당 및 기댓값 (10개 라인 합산)</div>
+                <div style="font-weight: 800; margin-bottom: 8px; color: var(--text-main); text-align: center;">🎰 5-심볼
+                    4x4 슬롯 당첨 배당 및 기댓값 (10개 라인 합산)</div>
                 <div style="display:flex; justify-content:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
-                    <span style="background: rgba(5, 179, 117, 0.12); color: var(--glow-neon-green); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(5, 179, 117, 0.3);">📊 당첨 확률: 31.20%</span>
-                    <span style="background: rgba(198, 155, 0, 0.12); color: var(--glow-gold); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(198, 155, 0, 0.3);">💎 기대 환수율(RTP): 100.00% (정직한 1.00배)</span>
+                    <span
+                        style="background: rgba(5, 179, 117, 0.12); color: var(--glow-neon-green); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(5, 179, 117, 0.3);">📊
+                        당첨 확률: 31.20%</span>
+                    <span
+                        style="background: rgba(198, 155, 0, 0.12); color: var(--glow-gold); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(198, 155, 0, 0.3);">💎
+                        기대 환수율(RTP): 100.00% (정직한 1.00배)</span>
                 </div>
                 <div class="payout-table-grid">
-                    <div>🎰 잭팟 : <span>4개 125배 / 3개 20배</span></div>
-                    <div>👑 왕관 : <span>4개 60배 / 3개 12배</span></div>
-                    <div>💎 보석 : <span>4개 35배 / 3개 8배</span></div>
-                    <div>🔔 황금종 : <span>4개 20배 / 3개 5배</span></div>
-                    <div style="grid-column: span 2; text-align:center;">🍒 체리 : <span>4개 5배 / 3개 2.5배</span></div>
+                    <div>🎰 잭팟 : <span id="slot-pay-jackpot">4개 125배 / 3개 20배</span></div>
+                    <div>👑 왕관 : <span id="slot-pay-crown">4개 60배 / 3개 12배</span></div>
+                    <div>💎 보석 : <span id="slot-pay-gem">4개 35배 / 3개 8배</span></div>
+                    <div>🔔 황금종 : <span id="slot-pay-bell">4개 20배 / 3개 5배</span></div>
+                    <div style="grid-column: span 2; text-align:center;">🍒 체리 : <span id="slot-pay-cherry">4개 5배 / 3개
+                            2.5배</span></div>
                 </div>
             </div>
-            
+
             <div class="result-splash-box empty" id="slots-splash" style="margin-top: 20px;">배팅 설정을 완료하고 레버를 당기세요!</div>
         </div>
 
         <!-- 4. CARD DRAW GAME PANEL -->
         <div class="game-panel" id="panel-card-game">
             <div class="card-game-intro" style="text-align: center; margin-bottom: 15px;">
-                <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <div
+                    style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: center; gap: 6px;">
                     <span>🃏</span> 3장의 카드 중 1장을 선택하세요!
                 </div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">
-                    3장의 카드 중 <strong style="color:var(--glow-neon-green);">2.0배 (대박 2배)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다. (환수율 100%)
+                <div id="card-game-subtext" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">
+                    3장의 카드 중 <strong style="color:var(--glow-neon-green);">2.0배 (대박 2배)</strong> 카드는 단 1장! 나머지 2장은
+                    <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다. (환수율 100%)
                 </div>
             </div>
 
@@ -2202,7 +2622,7 @@
             <button class="btn-play-action" id="btn-play-card" style="margin-top: 25px;">
                 카드 뒤집기 (Open)
             </button>
-            
+
             <div class="payout-tag" id="card-payout-info">
                 선택한 카드의 배당에 따라 배팅금(0.5배 환급 / 2.0배 대박)이 지급됩니다.
             </div>
@@ -2215,7 +2635,8 @@
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <svg viewBox="0 0 24 24">
-                        <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+                        <path
+                            d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
                     </svg>
                     실시간 플레이어 랭킹
                 </div>
@@ -2225,12 +2646,16 @@
                         <span class="status-text">로컬 모드</span>
                     </div>
                     <button class="btn-edit-nick" id="btn-edit-nick">
-                        <svg viewBox="0 0 24 24" style="width: 13px; height: 13px;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/></svg>
+                        <svg viewBox="0 0 24 24" style="width: 13px; height: 13px;">
+                            <path
+                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                                fill="currentColor" />
+                        </svg>
                         닉네임 변경
                     </button>
                 </div>
             </div>
-            
+
             <!-- Hall of Fame / Previous Season Champion Banner -->
             <div class="hall-of-fame-banner" id="hof-banner">
                 <div class="hof-title">
@@ -2243,7 +2668,7 @@
                     <span class="hof-champ-score" id="hof-champ-score">₩5,800,000</span>
                 </div>
             </div>
-            
+
             <div class="leaderboard-table-wrap">
                 <table class="leaderboard-table">
                     <thead>
@@ -2264,7 +2689,8 @@
         <div class="history-card">
             <div class="section-title">
                 <svg viewBox="0 0 24 24">
-                    <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                    <path
+                        d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" />
                 </svg>
                 최근 배팅 기록
             </div>
@@ -2290,11 +2716,13 @@
             <div id="auth-form-area">
                 <div class="auth-input-group">
                     <label for="input-auth-nick">플레이어 닉네임 (2~12자)</label>
-                    <input type="text" class="auth-input-field" id="input-auth-nick" placeholder="예: 잭팟마스터" maxlength="12">
+                    <input type="text" class="auth-input-field" id="input-auth-nick" placeholder="예: 잭팟마스터"
+                        maxlength="12">
                 </div>
                 <div class="auth-input-group">
                     <label for="input-auth-pin">4자리 비밀번호 (숫자 PIN)</label>
-                    <input type="password" class="auth-input-field" id="input-auth-pin" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+                    <input type="password" class="auth-input-field" id="input-auth-pin" placeholder="••••" maxlength="4"
+                        inputmode="numeric" pattern="[0-9]*">
                 </div>
                 <div class="auth-status-msg" id="auth-status-msg"></div>
                 <button class="auth-btn-primary" id="btn-submit-auth">✨ 로그인 및 플레이</button>
@@ -2302,13 +2730,15 @@
 
             <!-- Already Logged-in Account Info View (Hidden by default) -->
             <div id="auth-logged-in-area" style="display:none; text-align:center;">
-                <div style="font-size: 1.1rem; font-weight:800; color:var(--text-main); margin-bottom:6px;" id="logged-nick-display">
+                <div style="font-size: 1.1rem; font-weight:800; color:var(--text-main); margin-bottom:6px;"
+                    id="logged-nick-display">
                     👤 플레이어
                 </div>
                 <div style="font-size: 0.85rem; color:var(--glow-neon-green); font-weight:700; margin-bottom:15px;">
                     🟢 클라우드 DB 실시간 동기화 중
                 </div>
-                <div style="background:rgba(0,0,0,0.03); border:1px solid var(--border-color); border-radius:14px; padding:12px; margin-bottom:15px; font-size:0.88rem; color:var(--text-secondary);">
+                <div
+                    style="background:rgba(0,0,0,0.03); border:1px solid var(--border-color); border-radius:14px; padding:12px; margin-bottom:15px; font-size:0.88rem; color:var(--text-secondary);">
                     매주 일요일 낮 12:00에 주간 랭킹 및 자금이 100만 원으로 자동 리셋됩니다.
                 </div>
                 <button class="auth-btn-secondary" id="btn-logout-account">🚪 다른 계정으로 로그인 / 로그아웃</button>
@@ -2387,7 +2817,7 @@
                 if (this.isMuted) return;
                 this.init();
                 if (this.ctx.state === 'suspended') this.ctx.resume();
-                
+
                 const now = this.ctx.currentTime;
                 // C major triad arpeggio (C4, E4, G4, C5)
                 const freqs = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
@@ -2431,7 +2861,7 @@
                 osc.stop(now + 0.5);
             }
 
-playJackpot() {
+            playJackpot() {
                 if (this.isMuted) return;
                 this.init();
                 if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -2465,6 +2895,7 @@ playJackpot() {
         let state = {
             balance: 1000000,
             bet: 100000,
+            bonusDoubleCount: 0,     // Remaining rounds of 2x payout from recharge
             history: [],
             selectedOe: 'Odd',       // 'Odd' or 'Even'
             selectedDiceMode: 'high-low', // 'high-low' or 'exact'
@@ -2483,6 +2914,151 @@ playJackpot() {
             isLoggedIn: false,
             lastSeasonKey: null      // Season identifier e.g. 'season_2026_08_16'
         };
+
+        // --- 2X MULTIPLIER HOT TIME EVENT (오늘 오후 2시 ~ 3시 배율 2배 이벤트) ---
+        function getEventTimeRange() {
+            const now = new Date();
+            // 오늘 14:00:00 KST ~ 15:00:00 KST
+            const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 0, 0, 0).getTime();
+            const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0, 0, 0).getTime();
+            return { startTime, endTime };
+        }
+
+        function getEventStatus() {
+            const now = Date.now();
+            const { startTime, endTime } = getEventTimeRange();
+            if (now < startTime) {
+                return { status: 'UPCOMING', remainingMs: startTime - now };
+            } else if (now < endTime) {
+                return { status: 'ACTIVE', remainingMs: endTime - now };
+            } else {
+                return { status: 'ENDED', remainingMs: 0 };
+            }
+        }
+
+        function isDoubleEventActive() {
+            return getEventStatus().status === 'ACTIVE';
+        }
+
+        function getEventMultiplierBonus() {
+            return isDoubleEventActive() ? 2 : 1;
+        }
+
+        function updateEventUI() {
+            const banner = document.getElementById('event-hot-time-banner');
+            const timerVal = document.getElementById('event-timer-val');
+            const timerLabel = document.getElementById('event-timer-label');
+            const flameIcon = document.getElementById('event-flame-icon');
+            const bannerTitle = document.getElementById('event-banner-title');
+            const tagBadge = document.getElementById('event-tag-badge');
+            const descText = document.getElementById('event-desc-text');
+            const oePayout = document.getElementById('oe-payout-tag');
+            const dicePayout = document.getElementById('dice-payout-info');
+            const diceHlBtn = document.querySelector('.dice-modes .mode-btn[data-mode="high-low"]');
+            const diceExactBtn = document.querySelector('.dice-modes .mode-btn[data-mode="exact"]');
+
+            const slotJackpot = document.getElementById('slot-pay-jackpot');
+            const slotCrown = document.getElementById('slot-pay-crown');
+            const slotGem = document.getElementById('slot-pay-gem');
+            const slotBell = document.getElementById('slot-pay-bell');
+            const slotCherry = document.getElementById('slot-pay-cherry');
+
+            const cardIntro = document.getElementById('card-game-subtext');
+
+            const eventInfo = getEventStatus();
+            const isActive = eventInfo.status === 'ACTIVE';
+
+            if (timerVal) {
+                const totalSec = Math.floor(eventInfo.remainingMs / 1000);
+                const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
+                const s = String(totalSec % 60).padStart(2, '0');
+
+                if (eventInfo.status === 'UPCOMING') {
+                    if (flameIcon) flameIcon.innerText = "⏳";
+                    if (bannerTitle) bannerTitle.innerText = "핫타임 2배 이벤트 (14:00 ~ 15:00 예정)";
+                    if (tagBadge) tagBadge.innerText = "OPEN SOON";
+                    if (timerLabel) timerLabel.innerText = "시작까지";
+                    timerVal.innerText = `${m}:${s}`;
+                    if (banner) {
+                        banner.className = 'event-banner upcoming';
+                    }
+                    if (descText) descText.innerText = "잠시 후 오후 2시부터 3시까지 모든 게임 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배, 카드 4배)";
+                } else if (eventInfo.status === 'ACTIVE') {
+                    if (flameIcon) flameIcon.innerText = "🔥";
+                    if (bannerTitle) bannerTitle.innerText = "🔥 핫타임 버프 진행 중! (14:00 ~ 15:00)";
+                    if (tagBadge) tagBadge.innerText = "ALL 2X MULTIPLIER";
+                    if (timerLabel) timerLabel.innerText = "종료까지";
+                    timerVal.innerText = `${m}:${s}`;
+                    if (banner) {
+                        banner.className = 'event-banner';
+                    }
+                    if (descText) descText.innerText = "모든 게임의 당첨 배율이 2배로 폭등합니다! (홀짝 4배, 주사위 최대 12배, 슬롯 최대 250배, 카드 4배)";
+                } else {
+                    if (flameIcon) flameIcon.innerText = "✨";
+                    if (bannerTitle) bannerTitle.innerText = "핫타임 이벤트 마감";
+                    if (tagBadge) tagBadge.innerText = "EVENT ENDED";
+                    if (timerLabel) timerLabel.innerText = "이벤트 종료";
+                    timerVal.innerText = "00:00";
+                    if (banner) {
+                        banner.className = 'event-banner ended';
+                    }
+                    if (descText) descText.innerText = "핫타임 이벤트가 마감되었습니다. 정상 기본 배율이 적용 중입니다.";
+                }
+            }
+
+            // Odd/Even tag
+            if (oePayout) {
+                if (isActive) {
+                    oePayout.innerHTML = `당첨 시 <span style="color:#ff3d00; font-weight:800;">4.0배</span> <span class="event-boost-pill">🔥2배 EVENT</span> 지급`;
+                } else {
+                    oePayout.innerHTML = `당첨 시 <span>2.0배</span> 지급`;
+                }
+            }
+
+            // Dice tag & Mode Buttons
+            if (dicePayout) {
+                if (state.selectedDiceMode === 'high-low') {
+                    dicePayout.innerHTML = isActive
+                        ? `당첨 시 <span style="color:#ff3d00; font-weight:800;">4.0배</span> <span class="event-boost-pill">🔥2배 EVENT</span> 지급`
+                        : `당첨 시 <span>2.0배</span> 지급`;
+                } else {
+                    dicePayout.innerHTML = isActive
+                        ? `당첨 시 <span style="color:#ff3d00; font-weight:800;">12.0배</span> <span class="event-boost-pill">🔥2배 EVENT</span> 지급`
+                        : `당첨 시 <span>6.0배</span> 지급`;
+                }
+            }
+
+            if (diceHlBtn) {
+                diceHlBtn.innerText = isActive ? '하이/로우 (🔥4.0x)' : '하이/로우 (2.0x)';
+            }
+            if (diceExactBtn) {
+                diceExactBtn.innerText = isActive ? '단일 숫자 맞추기 (🔥12.0x)' : '단일 숫자 맞추기 (6.0x)';
+            }
+
+            // Slot paytable
+            if (slotJackpot) {
+                slotJackpot.innerHTML = isActive ? `<b style="color:#ff3d00">4개 250배 / 3개 40배 🔥</b>` : `4개 125배 / 3개 20배`;
+            }
+            if (slotCrown) {
+                slotCrown.innerHTML = isActive ? `<b style="color:#ff3d00">4개 120배 / 3개 24배 🔥</b>` : `4개 60배 / 3개 12배`;
+            }
+            if (slotGem) {
+                slotGem.innerHTML = isActive ? `<b style="color:#ff3d00">4개 70배 / 3개 16배 🔥</b>` : `4개 35배 / 3개 8배`;
+            }
+            if (slotBell) {
+                slotBell.innerHTML = isActive ? `<b style="color:#ff3d00">4개 40배 / 3개 10배 🔥</b>` : `4개 20배 / 3개 5배`;
+            }
+            if (slotCherry) {
+                slotCherry.innerHTML = isActive ? `<b style="color:#ff3d00">4개 10배 / 3개 5배 🔥</b>` : `4개 5배 / 3개 2.5배`;
+            }
+
+            // Card Draw intro subtext
+            if (cardIntro) {
+                cardIntro.innerHTML = isActive
+                    ? `3장의 카드 중 <strong style="color:#ff3d00;">4.0배 (🔥이벤트 2배 버프!)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다.`
+                    : `3장의 카드 중 <strong style="color:var(--glow-neon-green);">2.0배 (대박 2배)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다. (환수율 100%)`;
+            }
+        }
 
         // --- WEEKLY SUNDAY 12:00 PM SEASON RESET SYSTEM ---
         function getNextSundayNoon(now = new Date()) {
@@ -2516,12 +3092,12 @@ playJackpot() {
         let countdownInterval = null;
         function startResetCountdown() {
             if (countdownInterval) clearInterval(countdownInterval);
-            
+
             function update() {
                 const now = new Date();
                 const nextSunday = getNextSundayNoon(now);
                 const diffMs = nextSunday.getTime() - now.getTime();
-                
+
                 if (diffMs <= 0) {
                     checkAndPerformWeeklyReset(true);
                     return;
@@ -2545,7 +3121,7 @@ playJackpot() {
                     }
                 }
             }
-            
+
             update();
             countdownInterval = setInterval(update, 1000);
         }
@@ -2562,7 +3138,7 @@ playJackpot() {
                             .orderBy('balance', 'desc')
                             .limit(1)
                             .get();
-                        
+
                         if (!prevBoardSnap.empty) {
                             const champDoc = prevBoardSnap.docs[0];
                             const champData = champDoc.data();
@@ -2587,7 +3163,7 @@ playJackpot() {
                 updateBalanceUI(oldBal);
                 renderHistory();
                 saveState();
-                
+
                 // Re-attach leaderboard listener to the new season collection
                 attachSeasonLeaderboardListener();
 
@@ -2634,6 +3210,10 @@ playJackpot() {
                 if (savedBalance !== null) {
                     state.balance = safeInt(savedBalance, 1000000);
                 }
+                const savedBonus = localStorage.getItem('royal_neon_bonus_count');
+                if (savedBonus !== null) {
+                    state.bonusDoubleCount = safeInt(savedBonus, 0);
+                }
                 const savedHistory = localStorage.getItem('royal_neon_history');
                 if (savedHistory !== null) {
                     state.history = JSON.parse(savedHistory);
@@ -2665,6 +3245,7 @@ playJackpot() {
         function saveState() {
             try {
                 localStorage.setItem('royal_neon_balance', state.balance.toString());
+                localStorage.setItem('royal_neon_bonus_count', (state.bonusDoubleCount || 0).toString());
                 localStorage.setItem('royal_neon_history', JSON.stringify(state.history));
                 localStorage.setItem('royal_neon_recharge_charges', state.rechargeCharges.toString());
                 if (state.lastSeasonKey) {
@@ -2719,13 +3300,23 @@ playJackpot() {
             } else {
                 balanceEl.innerHTML = formatNumber(state.balance);
             }
-            
-            // Check if player is broke
+
+            // Check recharge button state (only active when balance <= 1,000,000)
             const resetBtn = document.getElementById('btn-reset-balance');
-            if (state.balance === 0) {
-                resetBtn.classList.add('glow-gold-pulse');
-            } else {
-                resetBtn.classList.remove('glow-gold-pulse');
+            if (resetBtn) {
+                if (state.balance > 1000000) {
+                    resetBtn.classList.add('disabled');
+                    resetBtn.classList.remove('glow-gold-pulse');
+                    resetBtn.title = "보유 자금이 100만 원 이하일 때만 충전 가능합니다.";
+                } else {
+                    resetBtn.classList.remove('disabled');
+                    resetBtn.title = "100만 원으로 충전 (10회 당첨금 2배 버프 지급)";
+                    if (state.balance === 0) {
+                        resetBtn.classList.add('glow-gold-pulse');
+                    } else {
+                        resetBtn.classList.remove('glow-gold-pulse');
+                    }
+                }
             }
 
             // Ensure bet does not exceed current balance (only when not in the middle of a spin/round)
@@ -2748,15 +3339,15 @@ playJackpot() {
             const toast = document.getElementById('game-toast');
             toast.className = 'toast';
             toast.classList.add(type === 'win' ? 'toast-win' : 'toast-lose');
-            
+
             // Inner icon
-            const iconSvg = type === 'win' 
+            const iconSvg = type === 'win'
                 ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:var(--glow-neon-green)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
                 : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:var(--glow-neon-pink)"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
-            
+
             toast.innerHTML = `${iconSvg} <span>${message}</span>`;
             toast.classList.add('show');
-            
+
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
@@ -2773,14 +3364,14 @@ playJackpot() {
                 '#aa55ff', // Purple
                 '#ffffff'  // White
             ];
-            
+
             for (let i = 0; i < 70; i++) {
                 const piece = document.createElement('div');
                 piece.classList.add('confetti-piece');
                 piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
                 piece.style.left = Math.random() * 100 + '%';
                 piece.style.top = '-20px';
-                
+
                 // Randomize sizes
                 const width = Math.random() * 8 + 5;
                 const height = Math.random() * 12 + 6;
@@ -2790,7 +3381,7 @@ playJackpot() {
                 piece.style.animationDelay = Math.random() * 0.4 + 's';
                 container.appendChild(piece);
             }
-            
+
             setTimeout(() => {
                 container.innerHTML = '';
             }, 4000);
@@ -2850,13 +3441,13 @@ playJackpot() {
             }
 
             amount = Math.max(100000, Math.floor(amount / 100000) * 100000); // minimum 100,000 & multiples of 100,000
-            
+
             // Check if player has enough money, limit to balance if not
             if (amount > state.balance) {
                 amount = Math.floor(state.balance / 100000) * 100000;
                 if (amount === 0 && state.balance > 0) amount = state.balance;
             }
-            
+
             state.bet = amount;
             updateBetDisplay();
         }
@@ -2866,7 +3457,7 @@ playJackpot() {
                 setBetAmount(0);
                 return;
             }
-            
+
             percent = Math.max(1, Math.min(100, percent));
             let target = 0;
             if (percent === 100) {
@@ -2890,7 +3481,7 @@ playJackpot() {
                 setBetAmount(0);
                 return;
             }
-            
+
             let newBet = state.bet + delta;
             setBetAmount(newBet);
         }
@@ -2906,14 +3497,14 @@ playJackpot() {
                 betVal,
                 payoutVal
             };
-            
+
             state.history.unshift(item); // insert at the top
-            
+
             // Limit history size to 10
             if (state.history.length > 10) {
                 state.history.pop();
             }
-            
+
             saveState();
             renderHistory();
         }
@@ -2925,13 +3516,13 @@ playJackpot() {
                 listContainer.innerHTML = `<div class="history-empty">아직 기록된 게임이 없습니다.</div>`;
                 return;
             }
-            
+
             listContainer.innerHTML = state.history.map(item => {
                 const statusClass = item.isWin ? 'win' : 'lose';
                 const statusText = item.isWin ? 'WIN' : 'LOSE';
                 const sign = item.isWin ? '+' : '-';
                 const moneyChange = item.isWin ? item.payoutVal - item.betVal : item.betVal;
-                
+
                 return `
                     <div class="history-item">
                         <div class="history-info">
@@ -3012,7 +3603,7 @@ playJackpot() {
         // Initialize Firebase Firestore Realtime Listener
         function initFirebaseSync() {
             const statusEl = document.getElementById('firebase-status');
-            
+
             if (firebaseConfig.apiKey && firebaseConfig.projectId && typeof firebase !== 'undefined') {
                 try {
                     if (!firebase.apps.length) {
@@ -3083,7 +3674,7 @@ playJackpot() {
                 .onSnapshot((snapshot) => {
                     const cloudList = [];
                     const myUid = getUserId();
-                    
+
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         cloudList.push({
@@ -3124,7 +3715,7 @@ playJackpot() {
                         if (data.pin !== pin) {
                             return { success: false, msg: "비밀번호(PIN 4자리)가 일치하지 않습니다." };
                         }
-                        
+
                         // Existing user login
                         state.currentUser = data.nickname || nickname;
                         state.currentPin = pin;
@@ -3180,7 +3771,7 @@ playJackpot() {
                     renderHistory();
                     updateAuthUI();
                     syncScoreToCloud();
-                    
+
                     if (!isAutoLogin) {
                         showToast(`"${nickname}"님 환영합니다! 클라우드 동기화 완료`, 'win');
                     }
@@ -3240,13 +3831,13 @@ playJackpot() {
                 if (formArea) formArea.style.display = 'none';
                 if (loggedInArea) loggedInArea.style.display = 'block';
                 if (loggedNickDisplay) {
-                    loggedNickDisplay.innerHTML = isMeChamp 
-                        ? `👑 ${state.currentUser} <span class="champion-badge">전 시즌 챔피언</span>` 
+                    loggedNickDisplay.innerHTML = isMeChamp
+                        ? `👑 ${state.currentUser} <span class="champion-badge">전 시즌 챔피언</span>`
                         : `👤 ${state.currentUser}`;
                 }
                 if (modalHeader) modalHeader.innerText = "내 계정 정보";
-                if (modalDesc) modalDesc.innerText = isMeChamp 
-                    ? "축하합니다! 회원님은 지난 시즌 1등 챔피언 명예 칭호를 보유하고 계십니다!" 
+                if (modalDesc) modalDesc.innerText = isMeChamp
+                    ? "축하합니다! 회원님은 지난 시즌 1등 챔피언 명예 칭호를 보유하고 계십니다!"
                     : "현재 클라우드 데이터베이스에 로그인되어 데이터가 실시간 백업 중입니다.";
             } else {
                 if (btnLabel) btnLabel.innerText = '로그인';
@@ -3360,7 +3951,7 @@ playJackpot() {
         // Disable/Enable control elements during animations
         function setInteractiveState(interactive) {
             state.isPlaying = !interactive;
-            
+
             const actionSection = document.getElementById('betting-controls');
             const navTabs = document.getElementById('game-tab-nav');
             const playOeBtn = document.getElementById('btn-play-oe');
@@ -3394,7 +3985,7 @@ playJackpot() {
                 resetBtn.disabled = false;
                 coinBtn.forEach(b => b.classList.remove('disabled-element'));
                 diceBtn.forEach(b => b.classList.remove('disabled-element'));
-                
+
                 playOeBtn.innerHTML = "배팅 시작";
                 playDiceBtn.innerHTML = "배팅 시작";
                 if (playSlotsBtn) playSlotsBtn.innerHTML = "레버 당기기 (Spin)";
@@ -3407,7 +3998,7 @@ playJackpot() {
                 if (playSlotsBtn) playSlotsBtn.disabled = true;
                 if (playCardBtn) playCardBtn.disabled = true;
                 cardWrappers.forEach(cw => cw.classList.add('disabled-element'));
-                
+
                 // When in auto-spin mode, the stop button must remain interactive
                 if (autoSlotsBtn) {
                     if (state.isAutoSpin) {
@@ -3418,11 +4009,11 @@ playJackpot() {
                         autoSlotsBtn.disabled = true;
                     }
                 }
-                
+
                 resetBtn.disabled = true;
                 coinBtn.forEach(b => b.classList.add('disabled-element'));
                 diceBtn.forEach(b => b.classList.add('disabled-element'));
-                
+
                 playOeBtn.innerHTML = "배팅 진행 중...";
                 playDiceBtn.innerHTML = "배팅 진행 중...";
                 if (playSlotsBtn) playSlotsBtn.innerHTML = "릴 회전 중...";
@@ -3439,10 +4030,10 @@ playJackpot() {
 
         // --- GAME 1: ODD & EVEN (홀짝) IMPLEMENTATION ---
         let oeFlipCount = 0;
-        
+
         function playOddEven() {
             if (state.isPlaying) return;
-            
+
             // Check balance limits
             if (state.balance <= 0) {
                 showToast("보유 자금이 부족합니다! 충전해 주세요.", "lose");
@@ -3460,77 +4051,80 @@ playJackpot() {
 
             const currentBet = state.bet;
             setInteractiveState(false);
-            
+
             const splash = document.getElementById('oe-splash');
             splash.className = "result-splash-box empty";
             splash.innerHTML = "동전 던지는 중...";
-            
+
             // Audio ticking interval simulation during rolling
             audio.playClick();
             let clickTimer = setInterval(() => {
                 audio.playRoll();
             }, 150);
-            
+
             // RNG (Honest Probability)
             // Draw a number between 1 and 99
             const outcomeNum = Math.floor(Math.random() * 99) + 1;
             const isOutcomeOdd = outcomeNum % 2 !== 0;
             const resultStr = isOutcomeOdd ? 'Odd' : 'Even';
             const korResult = isOutcomeOdd ? '홀' : '짝';
-            
+
             // Run Coin animation
             oeFlipCount++;
             const coin = document.getElementById('coin');
             // 0deg matches Front (홀 - Odd), 180deg matches Back (짝 - Even)
             const targetRotation = (resultStr === 'Odd') ? 0 : 180;
             const totalRotation = (oeFlipCount * 1800) + targetRotation; // 5 spins + alignment
-            
+
             coin.style.transform = `rotateY(${totalRotation}deg)`;
-            
+
             // Deduct bet amount immediately
             const oldBalance = state.balance;
             state.balance -= currentBet;
             updateBalanceUI();
-            
+
             setTimeout(() => {
                 clearInterval(clickTimer);
-                
+
                 const isWin = state.selectedOe === resultStr;
                 let payout = 0;
-                
+                const multBonus = getEventMultiplierBonus();
+                const winMultiplier = 2 * multBonus;
+
                 if (isWin) {
-                    payout = currentBet * 2;
+                    payout = currentBet * winMultiplier;
                     state.balance += payout;
-                    
+
+                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트 x${winMultiplier}] ` : '';
                     splash.className = "result-splash-box win";
-                    splash.innerHTML = `성공! 숫자 ${outcomeNum} (${korResult}) 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
-                    
-                    showToast(`축하합니다! ₩${formatNumber(payout - currentBet)} 획득!`, "win");
+                    splash.innerHTML = `성공! ${eventTagStr}숫자 ${outcomeNum} (${korResult}) 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
+
+                    showToast(`축하합니다! ${eventTagStr}+₩${formatNumber(payout - currentBet)} 획득!`, "win");
                     triggerConfetti();
                     audio.playWin();
                 } else {
                     splash.className = "result-splash-box lose";
                     splash.innerHTML = `실패... 숫자 ${outcomeNum} (${korResult}) 이(가) 나왔습니다. (-₩${formatNumber(currentBet)})`;
-                    
+
                     showToast(`실패했습니다. -₩${formatNumber(currentBet)}`, "lose");
                     shakeWindow();
                     audio.playLose();
                 }
-                
+
                 addHistoryItem('홀짝 게임', state.selectedOe === 'Odd' ? '홀' : '짝', `${outcomeNum} (${korResult})`, isWin, currentBet, payout);
                 setInteractiveState(true);
                 updateBalanceUI(oldBalance);
                 saveState();
-                
+
             }, 1500); // Matches transition duration
         }
 
         // --- GAME 2: DICE ROLL (주사위) IMPLEMENTATION ---
         let diceRollCount = 0;
-        
+
         function playDice() {
             if (state.isPlaying) return;
-            
+
             // Check balance limits
             if (state.balance <= 0) {
                 showToast("보유 자금이 부족합니다! 충전해 주세요.", "lose");
@@ -3548,19 +4142,19 @@ playJackpot() {
 
             const currentBet = state.bet;
             setInteractiveState(false);
-            
+
             const splash = document.getElementById('dice-splash');
             splash.className = "result-splash-box empty";
             splash.innerHTML = "주사위 굴리는 중...";
-            
+
             // Audio ticking interval simulation
             let clickTimer = setInterval(() => {
                 audio.playRoll();
             }, 120);
-            
+
             // RNG (Honest Probability: 1/6 for each face)
             const targetFace = Math.floor(Math.random() * 6) + 1; // 1 to 6
-            
+
             // Rotate matching angles
             const targetAngles = {
                 1: { x: 0, y: 0 },
@@ -3570,55 +4164,57 @@ playJackpot() {
                 2: { x: -90, y: 0 },
                 5: { x: 90, y: 0 }
             };
-            
+
             diceRollCount++;
             const dice = document.getElementById('dice');
             const angle = targetAngles[targetFace];
-            
+
             // Tumbling spins + final face alignment
             const rotX = (diceRollCount * 1440) + angle.x;
             const rotY = (diceRollCount * 1440) + angle.y;
-            
+
             dice.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-            
+
             // Deduct bet amount immediately
             const oldBalance = state.balance;
             state.balance -= currentBet;
             updateBalanceUI();
-            
+
             setTimeout(() => {
                 clearInterval(clickTimer);
-                
+
                 let isWin = false;
                 let payout = 0;
                 let detailsLabel = '';
-                
+                const multBonus = getEventMultiplierBonus();
+
                 if (state.selectedDiceMode === 'high-low') {
                     const isHigh = targetFace >= 4;
                     const rollResultStr = isHigh ? 'High' : 'Low';
                     isWin = state.selectedDiceHl === rollResultStr;
                     detailsLabel = state.selectedDiceHl === 'Low' ? '로우 (Low)' : '하이 (High)';
-                    
+
                     if (isWin) {
-                        payout = currentBet * 2;
+                        payout = currentBet * (2 * multBonus);
                     }
                 } else {
                     // Exact match
                     isWin = parseInt(state.selectedDiceNum, 10) === targetFace;
                     detailsLabel = `숫자 ${state.selectedDiceNum}`;
-                    
+
                     if (isWin) {
-                        payout = currentBet * 6;
+                        payout = currentBet * (6 * multBonus);
                     }
                 }
-                
+
                 if (isWin) {
                     state.balance += payout;
+                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
                     splash.className = "result-splash-box win";
-                    splash.innerHTML = `성공! 주사위 눈 [${targetFace}] 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
-                    
-                    showToast(`성공! ₩${formatNumber(payout - currentBet)} 획득!`, "win");
-                    
+                    splash.innerHTML = `성공! ${eventTagStr}주사위 눈 [${targetFace}] 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
+
+                    showToast(`성공! ${eventTagStr}+₩${formatNumber(payout - currentBet)} 획득!`, "win");
+
                     if (state.selectedDiceMode === 'exact') {
                         // Jackpot celebration for 6x wins!
                         triggerConfetti();
@@ -3631,24 +4227,24 @@ playJackpot() {
                 } else {
                     splash.className = "result-splash-box lose";
                     splash.innerHTML = `실패... 주사위 눈 [${targetFace}] 이(가) 나왔습니다. (-₩${formatNumber(currentBet)})`;
-                    
+
                     showToast(`실패했습니다. -₩${formatNumber(currentBet)}`, "lose");
                     shakeWindow();
                     audio.playLose();
                 }
-                
+
                 const gameNameString = state.selectedDiceMode === 'high-low' ? '주사위 (하이로우)' : '주사위 (단일선택)';
                 addHistoryItem(gameNameString, detailsLabel, `주사위 ${targetFace}`, isWin, currentBet, payout);
                 setInteractiveState(true);
                 updateBalanceUI(oldBalance);
                 saveState();
-                
+
             }, 1500);
         }
 
         // --- SLOT MACHINE GAME LOGIC (5 SYMBOLS - NO JOKER - 100.00% RTP) ---
         const SLOT_SYMBOLS = ['🍒', '🔔', '💎', '👑', '🎰'];
-        
+
         const SLOT_PAYOUTS = {
             '🎰': { 3: 20, 4: 125 }, // 메가 잭팟 (125배)
             '👑': { 3: 12, 4: 60 },  // 왕관 (60배)
@@ -3699,7 +4295,7 @@ playJackpot() {
                 strip.style.transform = `translateY(-${initialIdx * 80}px)`;
                 strip.dataset.currentIdx = initialIdx;
             }
-            
+
             // Clear SVG overlay initial state
             const overlay = document.getElementById('paylines-overlay');
             if (overlay) overlay.innerHTML = '';
@@ -3708,21 +4304,21 @@ playJackpot() {
         function drawPayline(lineIdx, matchCount, symbol, startIndex = 0) {
             const overlay = document.getElementById('paylines-overlay');
             if (!overlay) return;
-            
+
             const line = PAYLINES[lineIdx];
             const color = PAYLINE_COLORS[symbol] || '#c69b00';
-            
+
             // X coordinates for the 4 reels center inside the viewBox (0 to 344)
             // Column widths: 80px. Gap: 8px.
             // Center X of column c is c * 88 + 40
             const xCoords = [40, 128, 216, 304];
-            
+
             // Generate path string starting from startIndex
             let d = `M ${xCoords[startIndex]} ${line[startIndex] * 80 + 40}`;
             for (let i = startIndex + 1; i < startIndex + matchCount; i++) {
                 d += ` L ${xCoords[i]} ${line[i] * 80 + 40}`;
             }
-            
+
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             path.setAttribute('d', d);
             path.setAttribute('stroke', color);
@@ -3732,7 +4328,7 @@ playJackpot() {
             path.setAttribute('stroke-linejoin', 'round');
             path.setAttribute('class', 'payline-path');
             path.style.filter = `drop-shadow(0 0 5px ${color})`;
-            
+
             overlay.appendChild(path);
         }
 
@@ -3788,11 +4384,11 @@ playJackpot() {
 
             const currentBet = state.bet;
             setInteractiveState(false);
-            
+
             // Clear previous payline highlights
             const overlay = document.getElementById('paylines-overlay');
             if (overlay) overlay.innerHTML = '';
-            
+
             // Deduct balance
             const oldBalance = state.balance;
             state.balance -= currentBet;
@@ -3815,15 +4411,15 @@ playJackpot() {
             for (let i = 1; i <= 4; i++) {
                 const strip = document.getElementById(`reel-${i}`);
                 const finalIdx = finalIndices[i - 1];
-                
+
                 // Spin distance: 15 symbols (3 full 5-symbol cycles) plus final index
                 const spinCount = 15 + finalIdx;
                 const duration = 0.45 + (i - 1) * 0.15;
-                
+
                 strip.style.transition = `transform ${duration}s cubic-bezier(0.12, 0.82, 0.165, 1)`;
                 strip.style.transform = `translateY(-${spinCount * 80}px)`;
                 strip.style.filter = 'blur(2px)';
-                
+
                 strip.dataset.currentIdx = finalIdx;
             }
 
@@ -3856,7 +4452,7 @@ playJackpot() {
                     [null, null, null, null],
                     [null, null, null, null]
                 ];
-                
+
                 for (let r = 0; r < 4; r++) {
                     for (let c = 0; c < 4; c++) {
                         grid[r][c] = SLOT_SYMBOLS[(finalIndices[c] + r) % SLOT_SYMBOLS.length];
@@ -3919,7 +4515,8 @@ playJackpot() {
                         const { matchCount, matchSymbol, startIndex } = bestLineMatch;
                         const payoutInfo = SLOT_PAYOUTS[matchSymbol];
                         if (payoutInfo) {
-                            const multiplier = payoutInfo[matchCount];
+                            const multBonus = getEventMultiplierBonus();
+                            const multiplier = payoutInfo[matchCount] * multBonus;
                             totalMultiplier += multiplier;
                             winningLinesInfo.push({
                                 lineIdx: lineIdx + 1,
@@ -3927,11 +4524,11 @@ playJackpot() {
                                 count: matchCount,
                                 mult: multiplier
                             });
-                            
+
                             if (matchSymbol === '🎰' && matchCount === 4) {
                                 jackpotHit = true;
                             }
-                            
+
                             // Draw winning payline vector
                             drawPayline(lineIdx, matchCount, matchSymbol, startIndex);
                         }
@@ -3943,15 +4540,17 @@ playJackpot() {
                 const totalBetFactor = totalMultiplier / 10;
                 const payout = Math.floor(currentBet * totalBetFactor);
                 const oldBal = state.balance;
+                const multBonus = getEventMultiplierBonus();
 
                 if (isWin) {
                     state.balance += payout;
                     splash.className = "result-splash-box win";
-                    
+
+                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
                     const linesStr = winningLinesInfo.map(w => `${w.lineIdx}번(${w.symbol} x${w.count})`).join(', ');
-                    splash.innerHTML = `승리! [${winningLinesInfo.length}개 라인 당첨] ${linesStr} (+₩${formatNumber(payout)})`;
-                    showToast(`축하합니다! +₩${formatNumber(payout)}`, "win");
-                    
+                    splash.innerHTML = `승리! ${eventTagStr}[${winningLinesInfo.length}개 라인 당첨] ${linesStr} (+₩${formatNumber(payout)})`;
+                    showToast(`축하합니다! ${eventTagStr}+₩${formatNumber(payout)}`, "win");
+
                     if (jackpotHit || totalMultiplier >= 30) {
                         triggerConfetti();
                         setTimeout(triggerConfetti, 300);
@@ -3998,22 +4597,22 @@ playJackpot() {
             const dicePanel = document.getElementById('panel-dice-game');
             const slotsPanel = document.getElementById('panel-slots-game');
             const cardPanel = document.getElementById('panel-card-game');
-            
+
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     if (state.isPlaying) return;
                     stopAutoSpin();
                     audio.playClick();
-                    
+
                     tabs.forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
-                    
+
                     const selectedGame = tab.getAttribute('data-game');
                     oePanel.classList.remove('active');
                     dicePanel.classList.remove('active');
                     slotsPanel.classList.remove('active');
                     if (cardPanel) cardPanel.classList.remove('active');
-                    
+
                     if (selectedGame === 'odd-even') {
                         oePanel.classList.add('active');
                     } else if (selectedGame === 'dice-game') {
@@ -4030,7 +4629,6 @@ playJackpot() {
             const modeBtns = document.querySelectorAll('.dice-modes .mode-btn');
             const hlPanel = document.getElementById('dice-choice-hl');
             const exactPanel = document.getElementById('dice-choice-exact');
-            const payoutInfo = document.getElementById('dice-payout-info');
 
             modeBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -4046,12 +4644,11 @@ playJackpot() {
                     if (mode === 'high-low') {
                         hlPanel.classList.add('active');
                         exactPanel.classList.remove('active');
-                        payoutInfo.innerHTML = '당첨 시 <span>2.0배</span> 지급';
                     } else {
                         hlPanel.classList.remove('active');
                         exactPanel.classList.add('active');
-                        payoutInfo.innerHTML = '당첨 시 <span>6.0배</span> 지급';
                     }
+                    updateEventUI();
                 });
             });
         }
@@ -4093,7 +4690,7 @@ playJackpot() {
             setTimeout(() => {
                 if (container) container.classList.add('shuffling');
                 audio.playClick();
-                
+
                 setTimeout(() => {
                     audio.playRoll();
                 }, 300);
@@ -4101,9 +4698,11 @@ playJackpot() {
                 // 3. Deal completes -> Assign randomized hidden multipliers
                 setTimeout(() => {
                     if (container) container.classList.remove('shuffling');
-                    
-                    // Cryptographically Secure Fisher-Yates Shuffle: 1장 2.0배, 2장 0.5배 (환수율 100%)
-                    const mults = [0.5, 0.5, 2.0];
+
+                    const multBonus = getEventMultiplierBonus();
+                    const winMult = 2.0 * multBonus;
+                    // Cryptographically Secure Fisher-Yates Shuffle: 1장 2.0x (이벤트 시 4.0x), 2장 0.5x
+                    const mults = [0.5, 0.5, winMult];
                     if (window.crypto && window.crypto.getRandomValues) {
                         const randBuf = new Uint32Array(2);
                         window.crypto.getRandomValues(randBuf);
@@ -4124,7 +4723,7 @@ playJackpot() {
                         if (!cardEl) continue;
                         const frontFace = cardEl.querySelector('.card-front');
                         const mult = mults[i];
-                        
+
                         frontFace.className = 'card-face card-front';
                         let valText = '';
                         let label = '';
@@ -4135,8 +4734,8 @@ playJackpot() {
                             label = '환급 (-50%)';
                         } else {
                             multClass = 'mult-20';
-                            valText = '2.0x';
-                            label = '2배 (+100%)';
+                            valText = `${mult.toFixed(1)}x`;
+                            label = multBonus > 1 ? `🔥2배 이벤트 당첨!` : `2배 (+100%)`;
                         }
                         frontFace.classList.add(multClass);
                         frontFace.innerHTML = `
@@ -4151,7 +4750,7 @@ playJackpot() {
                     // 4. Staggered reveal: selected card opens first, then remaining 2
                     const selectedIdx = state.selectedCardIdx;
                     const cardEls = [0, 1, 2].map(i => document.getElementById(`card-${i}`));
-                    
+
                     setTimeout(() => {
                         if (cardEls[selectedIdx]) cardEls[selectedIdx].classList.add('flipped');
                         audio.playClick();
@@ -4170,14 +4769,15 @@ playJackpot() {
                         const chosenMult = mults[selectedIdx];
                         const payout = Math.floor(currentBet * chosenMult);
                         const oldBal = state.balance;
-                        const isWin = chosenMult === 2.0;
+                        const isWin = chosenMult === winMult;
 
                         state.balance += payout;
 
                         if (isWin) {
+                            const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
                             splash.className = "result-splash-box win";
-                            splash.innerHTML = `🎉 대박! 2.0배 카드 당첨! (+₩${formatNumber(payout - currentBet)})`;
-                            showToast(`대박! 2.0배 당첨 (+₩${formatNumber(payout - currentBet)})`, "win");
+                            splash.innerHTML = `🎉 대박! ${eventTagStr}${winMult.toFixed(1)}배 카드 당첨! (+₩${formatNumber(payout - currentBet)})`;
+                            showToast(`대박! ${eventTagStr}${winMult.toFixed(1)}배 당첨 (+₩${formatNumber(payout - currentBet)})`, "win");
                             triggerConfetti();
                             audio.playWin();
                         } else {
@@ -4188,7 +4788,7 @@ playJackpot() {
                             audio.playLose();
                         }
 
-                        const outcomeLabel = isWin ? '2.0배 대박' : '0.5배 환급';
+                        const outcomeLabel = isWin ? `${winMult.toFixed(1)}배 대박` : '0.5배 환급';
                         addHistoryItem('카드 뽑기 (1/3)', `${selectedIdx + 1}번 카드`, outcomeLabel, isWin, currentBet, payout);
                         setInteractiveState(true);
                         updateBalanceUI(oldBal);
@@ -4200,7 +4800,7 @@ playJackpot() {
                                 if (cardEls[i]) cardEls[i].classList.remove('flipped');
                             }
                             audio.playClick();
-                            
+
                             // Re-enable controls for the next round
                             setInteractiveState(true);
                         }, 1500);
@@ -4220,10 +4820,10 @@ playJackpot() {
                 btn.addEventListener('click', () => {
                     if (state.isPlaying) return;
                     audio.playClick();
-                    
+
                     oeBtns.forEach(b => b.classList.remove('selected'));
                     btn.classList.add('selected');
-                    
+
                     state.selectedOe = btn.getAttribute('data-choice');
                 });
             });
@@ -4420,7 +5020,7 @@ playJackpot() {
             updateBalanceUI();
             renderHistory();
             updateAuthUI();
-            
+
             // Set initial bet validation
             setBetAmount(state.bet);
 
@@ -4429,10 +5029,10 @@ playJackpot() {
 
             // Tab nav
             setupNavigation();
-            
+
             // Selections
             setupChoices();
-            
+
             // Quick betting
             setupQuickBets();
 
@@ -4445,16 +5045,24 @@ playJackpot() {
             // Weekly Reset Countdown Timer (Every Sunday 12:00 PM)
             startResetCountdown();
 
-            // Reset/Recharge balance click
+            // Reset/Recharge balance click (Only allowed when balance <= 1,000,000)
             document.getElementById('btn-reset-balance').addEventListener('click', () => {
                 if (state.isPlaying) return;
-                
+
+                if (state.balance > 1000000) {
+                    showToast(`보유 자산이 100만 원 이하일 때만 충전할 수 있습니다. (현재: ₩${formatNumber(state.balance)})`, "lose");
+                    shakeWindow();
+                    audio.playLose();
+                    return;
+                }
+
                 audio.playWin();
                 const oldBal = state.balance;
                 state.balance = 1000000;
                 setBetAmount(100000);
                 updateBalanceUI(oldBal);
                 saveState();
+                triggerConfetti();
                 showToast("1,000,000원으로 충전되었습니다!", "win");
             });
 
@@ -4468,10 +5076,15 @@ playJackpot() {
             document.getElementById('btn-play-slots').addEventListener('click', playSlots);
             document.getElementById('btn-auto-slots').addEventListener('click', toggleAutoSpin);
             document.getElementById('btn-play-card').addEventListener('click', playCardDraw);
+
+            // 10-Minute Hot Time 2x Multiplier Event Loop
+            updateEventUI();
+            setInterval(updateEventUI, 1000);
         }
 
         // Launch on document loaded
         window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
+
 </html>
