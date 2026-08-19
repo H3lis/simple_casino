@@ -2224,6 +2224,27 @@
             transform: none !important;
             box-shadow: none !important;
         }
+
+        .bonus-buff-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 5px 12px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.2));
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #d97706;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.15);
+            animation: pulseGlow 1.5s infinite alternate;
+        }
+
+        .bonus-buff-row strong {
+            color: #ff3d00;
+            font-weight: 900;
+        }
     </style>
 </head>
 
@@ -2310,6 +2331,11 @@
                     </svg>
                     자금 충전 (100만)
                 </button>
+            </div>
+            <!-- Bonus 2x Buff Badge for Recharge -->
+            <div class="bonus-buff-row" id="bonus-buff-badge" style="display:none;">
+                <span class="bonus-icon">⚡</span>
+                <span class="bonus-text">충전 2배 버프 적용 중: <strong id="bonus-count-val">10</strong>회 남음</span>
             </div>
         </div>
 
@@ -2915,7 +2941,7 @@
             lastSeasonKey: null      // Season identifier e.g. 'season_2026_08_16'
         };
 
-        // --- 2X MULTIPLIER HOT TIME EVENT (오늘 오후 2시 ~ 3시 배율 2배 이벤트) ---
+        // --- MULTIPLIER EVENT & RECHARGE 2X BUFF SYSTEM ---
         function getEventTimeRange() {
             const now = new Date();
             // 오늘 14:00:00 KST ~ 15:00:00 KST
@@ -2940,8 +2966,35 @@
             return getEventStatus().status === 'ACTIVE';
         }
 
+        function getRechargeMultiplierBonus() {
+            return (state.bonusDoubleCount && state.bonusDoubleCount > 0) ? 2 : 1;
+        }
+
         function getEventMultiplierBonus() {
-            return isDoubleEventActive() ? 2 : 1;
+            const hotTimeBonus = isDoubleEventActive() ? 2 : 1;
+            const rechargeBonus = getRechargeMultiplierBonus();
+            return hotTimeBonus * rechargeBonus;
+        }
+
+        function consumeRechargeBonusRound() {
+            if (state.bonusDoubleCount > 0) {
+                state.bonusDoubleCount--;
+                updateBonusBuffUI();
+                saveState();
+            }
+        }
+
+        function updateBonusBuffUI() {
+            const badge = document.getElementById('bonus-buff-badge');
+            const countVal = document.getElementById('bonus-count-val');
+            if (badge && countVal) {
+                if (state.bonusDoubleCount > 0) {
+                    badge.style.display = 'inline-flex';
+                    countVal.innerText = state.bonusDoubleCount;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
         }
 
         function updateEventUI() {
@@ -3158,9 +3211,11 @@
                 state.lastSeasonKey = currentSeasonKey;
                 const oldBal = state.balance;
                 state.balance = 1000000;
+                state.bonusDoubleCount = 10;
                 state.history = [];
                 state.rechargeCharges = 3;
                 updateBalanceUI(oldBal);
+                updateBonusBuffUI();
                 renderHistory();
                 saveState();
 
@@ -3212,7 +3267,9 @@
                 }
                 const savedBonus = localStorage.getItem('royal_neon_bonus_count');
                 if (savedBonus !== null) {
-                    state.bonusDoubleCount = safeInt(savedBonus, 0);
+                    state.bonusDoubleCount = safeInt(savedBonus, 10);
+                } else {
+                    state.bonusDoubleCount = 10; // First time default
                 }
                 const savedHistory = localStorage.getItem('royal_neon_history');
                 if (savedHistory !== null) {
@@ -4112,6 +4169,7 @@
                 }
 
                 addHistoryItem('홀짝 게임', state.selectedOe === 'Odd' ? '홀' : '짝', `${outcomeNum} (${korResult})`, isWin, currentBet, payout);
+                consumeRechargeBonusRound();
                 setInteractiveState(true);
                 updateBalanceUI(oldBalance);
                 saveState();
@@ -4235,6 +4293,7 @@
 
                 const gameNameString = state.selectedDiceMode === 'high-low' ? '주사위 (하이로우)' : '주사위 (단일선택)';
                 addHistoryItem(gameNameString, detailsLabel, `주사위 ${targetFace}`, isWin, currentBet, payout);
+                consumeRechargeBonusRound();
                 setInteractiveState(true);
                 updateBalanceUI(oldBalance);
                 saveState();
@@ -4569,6 +4628,7 @@
 
                 const outcomeStr = isWin ? `${winningLinesInfo.length}개 라인 당첨` : '실패';
                 addHistoryItem('슬롯머신 (4x4)', '10개 라인 배팅', outcomeStr, isWin, currentBet, payout);
+                consumeRechargeBonusRound();
                 updateBalanceUI(oldBal);
                 saveState();
                 setInteractiveState(true);
@@ -4790,6 +4850,7 @@
 
                         const outcomeLabel = isWin ? `${winMult.toFixed(1)}배 대박` : '0.5배 환급';
                         addHistoryItem('카드 뽑기 (1/3)', `${selectedIdx + 1}번 카드`, outcomeLabel, isWin, currentBet, payout);
+                        consumeRechargeBonusRound();
                         setInteractiveState(true);
                         updateBalanceUI(oldBal);
                         saveState();
@@ -5018,6 +5079,7 @@
         function initApp() {
             loadState();
             updateBalanceUI();
+            updateBonusBuffUI();
             renderHistory();
             updateAuthUI();
 
@@ -5059,11 +5121,13 @@
                 audio.playWin();
                 const oldBal = state.balance;
                 state.balance = 1000000;
+                state.bonusDoubleCount = 10; // 10회 동안 2배 버프 부여
                 setBetAmount(100000);
                 updateBalanceUI(oldBal);
+                updateBonusBuffUI();
                 saveState();
                 triggerConfetti();
-                showToast("1,000,000원으로 충전되었습니다!", "win");
+                showToast("1,000,000원 충전 완료! (10회 동안 당첨금 2배 버프 적용)", "win");
             });
 
             // Leaderboard initial render & Firebase Sync
