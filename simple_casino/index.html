@@ -2819,10 +2819,12 @@
     </div>
 
     <!-- ADMIN Flash Event Control Modal -->
-    <div class="auth-modal-backdrop" id="admin-modal-backdrop">
+    <div class="modal-backdrop" id="admin-modal-backdrop">
         <div class="auth-modal-card" style="max-width: 440px;">
-            <button class="auth-modal-close" id="btn-close-admin-modal">✕</button>
-            <div class="auth-modal-header" style="color: #ff3d00;">👑 ADMIN 깜짝 핫타임 컨트롤러</div>
+            <button class="modal-close-btn" id="btn-close-admin-modal">&times;</button>
+            <div class="auth-modal-title" style="color: #ff3d00;">
+                <span>👑</span> <span>ADMIN 깜짝 핫타임 컨트롤러</span>
+            </div>
             <div class="auth-modal-desc">
                 이벤트를 발동하면 <strong>접속 중인 모든 플레이어</strong>의 화면에 실시간으로 깜짝 배너가 뜨며 배율이 즉시 폭등합니다!
             </div>
@@ -5222,6 +5224,7 @@
                     await stopAdminFlashEvent();
                     closeAdminModal();
                 });
+            }
         }
 
         // --- CORE EVENT BINDINGS & AUTH MODAL ---
