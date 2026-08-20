@@ -2886,6 +2886,56 @@
     </footer>
 
     <script>
+        // --- CLIENT-SIDE ANTI-TAMPER & SECURITY GUARDS ---
+        (function enforceSecurity() {
+            // 1. Block Context Menu (Right Click)
+            document.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                return false;
+            }, { passive: false });
+
+            // 2. Block Inspect & View Source Shortcuts (F12, Ctrl+U, Ctrl+Shift+I/J/C/K, Ctrl+S)
+            document.addEventListener('keydown', e => {
+                const isCtrl = e.ctrlKey || e.metaKey;
+                const isShift = e.shiftKey;
+                const key = e.key ? e.key.toLowerCase() : '';
+                const code = e.keyCode || 0;
+
+                // F12
+                if (e.key === 'F12' || code === 123) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                // Ctrl + Shift + I / J / C / K (Devtools)
+                if (isCtrl && isShift && (key === 'i' || key === 'j' || key === 'c' || key === 'k' || code === 73 || code === 74 || code === 67 || code === 75)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                // Ctrl + U (View Source) & Ctrl + S (Save Page)
+                if (isCtrl && (key === 'u' || key === 's' || code === 85 || code === 83)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, { passive: false, capture: true });
+
+            // 3. Anti-Debugging Dynamic Loop (Freezes execution if DevTools is opened)
+            setInterval(function() {
+                try {
+                    (function antiDebug(i) {
+                        if (('' + i / i).length !== 1 || i === 0) {
+                            (function() {}).constructor('debugger')();
+                        } else {
+                            (function() {}).constructor('debugger')();
+                        }
+                        antiDebug(++i);
+                    })(0);
+                } catch (e) {}
+            }, 800);
+        })();
+
         // --- SOUND EFFECTS (Web Audio API Synthesizer) ---
         class CasinoAudio {
             constructor() {
@@ -3048,7 +3098,11 @@
         };
 
         // --- ADMIN FLASH EVENT & MULTIPLIER BUFF SYSTEM ---
-        const ADMIN_MASTER_PIN = '5181';
+        const ADMIN_MASTER_PIN = (function() {
+            // Obfuscated character array decoding (5181)
+            const _c = [0x35, 0x31, 0x38, 0x31];
+            return _c.map(b => String.fromCharCode(b)).join('');
+        })();
 
         let flashEventData = {
             active: false,
