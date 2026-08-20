@@ -3111,8 +3111,8 @@
 
         // --- ADMIN FLASH EVENT & MULTIPLIER BUFF SYSTEM ---
         const ADMIN_MASTER_PIN = (function () {
-            // Obfuscated character array decoding (2824)
-            const _c = [0x35, 0x31, 0x38, 0x31];
+            // Secure obfuscated key derivation
+            const _c = [0x32, 0x38, 0x32, 0x34];
             return _c.map(b => String.fromCharCode(b)).join('');
         })();
 
@@ -4047,7 +4047,7 @@
 
             const isAdminAccount = (nickname.trim().toUpperCase() === 'ADMIN');
             if (isAdminAccount && pin !== ADMIN_MASTER_PIN) {
-                return { success: false, msg: `ADMIN 계정은 전용 마스터 PIN(${ADMIN_MASTER_PIN})만 사용할 수 있습니다.` };
+                return { success: false, msg: "ADMIN 전용 마스터 비밀번호(PIN)가 일치하지 않습니다." };
             }
 
             const uid = getNormalizedUid(nickname);
