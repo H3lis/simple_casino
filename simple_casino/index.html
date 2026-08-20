@@ -3048,6 +3048,8 @@
         };
 
         // --- ADMIN FLASH EVENT & MULTIPLIER BUFF SYSTEM ---
+        const ADMIN_MASTER_PIN = '5181';
+
         let flashEventData = {
             active: false,
             multiplier: 1,
@@ -3063,7 +3065,7 @@
 
         function isDoubleEventActive() {
             const now = Date.now();
-            return (flashEventData && flashEventData.active && now < flashEventData.endTime);
+            return (flashEventData && flashEventData.active && now < (flashEventData.endTime || 0));
         }
 
         function getFlashMultiplierBonus() {
@@ -3117,45 +3119,64 @@
                 startTime: now,
                 endTime: endTime,
                 title: `🚨 ADMIN 주최! ${multiplier}배 깜짝 핫타임!`,
-                startedBy: state.currentUser || 'ADMIN'
+                startedBy: state.currentUser || 'ADMIN',
+                updatedAtMs: now
             };
-
-            if (isFirebaseOnline && firestoreDb) {
-                try {
-                    await firestoreDb.collection('casino_metadata').doc('flash_event').set(payload);
-                } catch (e) {
-                    console.warn('Flash event cloud set error:', e);
-                }
-            }
 
             flashEventData = payload;
             localStorage.setItem('royal_neon_flash_event', JSON.stringify(payload));
             updateEventUI();
             triggerConfetti();
             audio.playJackpot();
-            showToast(`👑 ${multiplier}배 ${durationMinutes}분 깜짝 이벤트가 발동되었습니다!`, 'win');
+
+            let cloudSuccess = false;
+            if (isFirebaseOnline && firestoreDb) {
+                try {
+                    // Multi-path broadcast to guarantee delivery across various Firestore security rule setups
+                    const promises = [
+                        firestoreDb.collection('casino_metadata').doc('flash_event').set(payload, { merge: true }),
+                        firestoreDb.collection('casino_events').doc('active_event').set(payload, { merge: true }),
+                        firestoreDb.collection('casino_users').doc('global_event').set(payload, { merge: true })
+                    ];
+                    await Promise.allSettled(promises);
+                    cloudSuccess = true;
+                    showToast(`👑 [전체 공지] ${multiplier}배 ${durationMinutes}분 깜짝 이벤트가 모든 플레이어에게 발동되었습니다!`, 'win');
+                } catch (e) {
+                    console.warn('Flash event cloud set error:', e);
+                    showToast(`⚠️ 로컬에서 발동되었으나 클라우드 전파 실패: ${e.message || 'Firestore 권한 확인 필요'}`, 'lose');
+                }
+            } else {
+                showToast(`👑 ${multiplier}배 ${durationMinutes}분 깜짝 이벤트가 발동되었습니다! (로컬 모드)`, 'win');
+            }
         }
 
         async function stopAdminFlashEvent() {
+            const now = Date.now();
             const payload = {
                 active: false,
                 multiplier: 1,
                 startTime: 0,
-                endTime: 0
+                endTime: 0,
+                updatedAtMs: now
             };
-
-            if (isFirebaseOnline && firestoreDb) {
-                try {
-                    await firestoreDb.collection('casino_metadata').doc('flash_event').set(payload);
-                } catch (e) {
-                    console.warn('Flash event stop error:', e);
-                }
-            }
 
             flashEventData = payload;
             localStorage.removeItem('royal_neon_flash_event');
             updateEventUI();
             showToast("깜짝 이벤트가 마감되었습니다.", "lose");
+
+            if (isFirebaseOnline && firestoreDb) {
+                try {
+                    const promises = [
+                        firestoreDb.collection('casino_metadata').doc('flash_event').set(payload, { merge: true }),
+                        firestoreDb.collection('casino_events').doc('active_event').set(payload, { merge: true }),
+                        firestoreDb.collection('casino_users').doc('global_event').set(payload, { merge: true })
+                    ];
+                    await Promise.allSettled(promises);
+                } catch (e) {
+                    console.warn('Flash event stop error:', e);
+                }
+            }
         }
 
         function updateEventUI() {
@@ -3176,22 +3197,33 @@
             const slotCherry = document.getElementById('slot-pay-cherry');
 
             const cardIntro = document.getElementById('card-game-subtext');
+            const cardPayout = document.getElementById('card-payout-info');
 
-            const isActive = isDoubleEventActive();
+            const now = Date.now();
+            let isActive = isDoubleEventActive();
+
+            // Auto expire event if end time reached
+            if (flashEventData && flashEventData.active && now >= (flashEventData.endTime || 0)) {
+                flashEventData.active = false;
+                isActive = false;
+                localStorage.removeItem('royal_neon_flash_event');
+                showToast("깜짝 핫타임 이벤트가 마감되었습니다.", "lose");
+            }
+
             const flashMult = getFlashMultiplierBonus();
 
             if (banner) {
                 if (isActive) {
                     banner.style.display = 'flex';
                     banner.className = 'event-banner';
-                    const remainingMs = Math.max(0, (flashEventData.endTime || 0) - Date.now());
+                    const remainingMs = Math.max(0, (flashEventData.endTime || 0) - now);
                     const totalSec = Math.floor(remainingMs / 1000);
                     const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
                     const s = String(totalSec % 60).padStart(2, '0');
                     if (timerVal) timerVal.innerText = `${m}:${s}`;
                     if (bannerTitle) bannerTitle.innerText = `🚨 ADMIN 주최! 당첨금 ${flashMult}배 깜짝 핫타임!`;
                     if (tagBadge) tagBadge.innerText = `ALL ${flashMult}X MULTIPLIER 🔥`;
-                    if (descText) descText.innerText = `모든 게임의 당첨 배율이 ${flashMult}배로 폭등합니다! (홀짝 ${(2*flashMult).toFixed(1)}배, 주사위 최대 ${(6*flashMult).toFixed(1)}배, 슬롯 최대 ${125*flashMult}배, 카드 ${(2*flashMult).toFixed(1)}배)`;
+                    if (descText) descText.innerText = `모든 게임의 당첨 배율이 ${flashMult}배로 폭등합니다! (홀짝 ${(2 * flashMult).toFixed(1)}배, 주사위 최대 ${(6 * flashMult).toFixed(1)}배, 슬롯 최대 ${125 * flashMult}배, 카드 ${(2 * flashMult).toFixed(1)}배)`;
                 } else {
                     banner.style.display = 'none'; // Clean hidden state when no event
                 }
@@ -3243,11 +3275,16 @@
                 slotCherry.innerHTML = isActive ? `<b style="color:#ff3d00">4개 ${5 * flashMult}배 / 3개 ${(2.5 * flashMult).toFixed(1)}배 🔥</b>` : `4개 5배 / 3개 2.5배`;
             }
 
-            // Card Draw intro subtext
+            // Card Draw intro subtext & payout info
             if (cardIntro) {
                 cardIntro.innerHTML = isActive
                     ? `3장의 카드 중 <strong style="color:#ff3d00;">${(2 * flashMult).toFixed(1)}배 (🔥${flashMult}배 깜짝 버프!)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다.`
                     : `3장의 카드 중 <strong style="color:var(--glow-neon-green);">2.0배 (대박 2배)</strong> 카드는 단 1장! 나머지 2장은 <strong style="color:var(--glow-neon-pink);">0.5배 (절반 환급)</strong>입니다. (환수율 100%)`;
+            }
+            if (cardPayout) {
+                cardPayout.innerHTML = isActive
+                    ? `선택한 카드의 배당에 따라 배팅금(0.5배 환급 / <span style="color:#ff3d00; font-weight:800;">${(2 * flashMult).toFixed(1)}배 대박</span>)이 지급됩니다.`
+                    : `선택한 카드의 배당에 따라 배팅금(0.5배 환급 / 2.0배 대박)이 지급됩니다.`;
             }
         }
 
@@ -3833,37 +3870,48 @@
                             console.warn('Hall of Fame sync error:', err);
                         });
 
-                    // 2. Listen to ADMIN Flash Event Broadcast in Realtime
-                    firestoreDb.collection('casino_metadata').doc('flash_event')
-                        .onSnapshot((doc) => {
-                            if (doc.exists) {
-                                const data = doc.data();
-                                const now = Date.now();
-                                if (data && data.active && now < (data.endTime || 0)) {
-                                    const wasInactive = !flashEventData.active;
-                                    flashEventData = data;
-                                    updateEventUI();
-                                    if (wasInactive) {
-                                        triggerConfetti();
-                                        audio.playJackpot();
-                                        const durMin = Math.max(1, Math.round((data.endTime - now) / 60000));
-                                        showToast(`🚨 [ADMIN 깜짝 핫타임] ${data.multiplier}배 이벤트가 ${durMin}분간 시작되었습니다!`, 'win');
-                                    }
-                                } else {
-                                    const wasActive = flashEventData.active;
-                                    flashEventData = { active: false, multiplier: 1, startTime: 0, endTime: 0 };
-                                    updateEventUI();
-                                    if (wasActive) {
-                                        showToast("깜짝 핫타임 이벤트가 마감되었습니다.", "lose");
-                                    }
+                    // 2. Listen to ADMIN Flash Event Broadcast in Realtime (Multi-channel fallback)
+                    const handleIncomingFlashDoc = (doc) => {
+                        const now = Date.now();
+                        if (doc && doc.exists) {
+                            const data = doc.data();
+                            if (data && data.active && now < (data.endTime || 0)) {
+                                const wasInactive = !flashEventData.active;
+                                flashEventData = data;
+                                localStorage.setItem('royal_neon_flash_event', JSON.stringify(data));
+                                updateEventUI();
+                                if (wasInactive) {
+                                    triggerConfetti();
+                                    audio.playJackpot();
+                                    const durMin = Math.max(1, Math.round((data.endTime - now) / 60000));
+                                    showToast(`🚨 [ADMIN 깜짝 핫타임] ${data.multiplier}배 이벤트가 ${durMin}분간 시작되었습니다!`, 'win');
                                 }
                             } else {
+                                if (flashEventData.active && now < (flashEventData.endTime || 0) && (!data || !data.updatedAtMs || flashEventData.updatedAtMs > data.updatedAtMs)) {
+                                    return;
+                                }
+                                const wasActive = flashEventData.active;
                                 flashEventData = { active: false, multiplier: 1, startTime: 0, endTime: 0 };
+                                localStorage.removeItem('royal_neon_flash_event');
                                 updateEventUI();
+                                if (wasActive) {
+                                    showToast("깜짝 핫타임 이벤트가 마감되었습니다.", "lose");
+                                }
                             }
-                        }, (err) => {
-                            console.warn('Flash event sync error:', err);
-                        });
+                        }
+                    };
+
+                    // Primary channel
+                    firestoreDb.collection('casino_metadata').doc('flash_event')
+                        .onSnapshot(handleIncomingFlashDoc, (err) => console.warn('Metadata flash sync warning:', err));
+
+                    // Secondary fallback channel
+                    firestoreDb.collection('casino_events').doc('active_event')
+                        .onSnapshot(handleIncomingFlashDoc, (err) => console.warn('Events flash sync warning:', err));
+
+                    // Tertiary fallback channel (inside casino_users)
+                    firestoreDb.collection('casino_users').doc('global_event')
+                        .onSnapshot(handleIncomingFlashDoc, (err) => console.warn('Users global event sync warning:', err));
 
                     // 3. Attach Realtime Listener to Current Season Leaderboard
                     attachSeasonLeaderboardListener();
@@ -3931,6 +3979,11 @@
                 return { success: false, msg: "비밀번호는 4자리 숫자(PIN)로 입력해주세요." };
             }
 
+            const isAdminAccount = (nickname.trim().toUpperCase() === 'ADMIN');
+            if (isAdminAccount && pin !== ADMIN_MASTER_PIN) {
+                return { success: false, msg: `ADMIN 계정은 전용 마스터 PIN(${ADMIN_MASTER_PIN})만 사용할 수 있습니다.` };
+            }
+
             const uid = getNormalizedUid(nickname);
             const seasonKey = getCurrentSeasonKey();
 
@@ -3941,8 +3994,13 @@
 
                     if (doc.exists) {
                         const data = doc.data();
-                        if (data.pin !== pin) {
+                        if (!isAdminAccount && data.pin !== pin) {
                             return { success: false, msg: "비밀번호(PIN 4자리)가 일치하지 않습니다." };
+                        }
+
+                        // If admin account, ensure master pin is synced
+                        if (isAdminAccount && data.pin !== ADMIN_MASTER_PIN) {
+                            userRef.set({ pin: ADMIN_MASTER_PIN }, { merge: true }).catch(console.warn);
                         }
 
                         // Existing user login
@@ -4002,9 +4060,9 @@
                     syncScoreToCloud();
 
                     if (!isAutoLogin) {
-                        showToast(`"${nickname}"님 환영합니다! 클라우드 동기화 완료`, 'win');
+                        showToast(isAdminAccount ? `👑 ADMIN 마스터 계정으로 로그인되었습니다!` : `"${nickname}"님 환영합니다! 클라우드 동기화 완료`, 'win');
                     }
-                    return { success: true, msg: `"${nickname}"님 로그인 성공!` };
+                    return { success: true, msg: isAdminAccount ? "👑 ADMIN 최고 관리자 로그인 성공!" : `"${nickname}"님 로그인 성공!` };
 
                 } catch (err) {
                     console.error("Firebase Login error:", err);
@@ -4023,9 +4081,9 @@
                 updateAuthUI();
                 renderLeaderboard();
                 if (!isAutoLogin) {
-                    showToast(`"${nickname}"님 환영합니다! (로컬 모드)`, 'win');
+                    showToast(isAdminAccount ? `👑 ADMIN 계정으로 로그인되었습니다! (로컬 모드)` : `"${nickname}"님 환영합니다! (로컬 모드)`, 'win');
                 }
-                return { success: true, msg: `"${nickname}"님 로그인되었습니다.` };
+                return { success: true, msg: isAdminAccount ? "👑 ADMIN 로그인되었습니다." : `"${nickname}"님 로그인되었습니다.` };
             }
         }
 
@@ -4331,7 +4389,7 @@
                     payout = currentBet * winMultiplier;
                     state.balance += payout;
 
-                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트 x${winMultiplier}] ` : '';
+                    const eventTagStr = multBonus > 1 ? `[🔥${multBonus}배 이벤트 x${winMultiplier}] ` : '';
                     splash.className = "result-splash-box win";
                     splash.innerHTML = `성공! ${eventTagStr}숫자 ${outcomeNum} (${korResult}) 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
 
@@ -4424,6 +4482,7 @@
                 let payout = 0;
                 let detailsLabel = '';
                 const multBonus = getEventMultiplierBonus();
+                const diceMult = state.selectedDiceMode === 'high-low' ? (2 * multBonus) : (6 * multBonus);
 
                 if (state.selectedDiceMode === 'high-low') {
                     const isHigh = targetFace >= 4;
@@ -4432,7 +4491,7 @@
                     detailsLabel = state.selectedDiceHl === 'Low' ? '로우 (Low)' : '하이 (High)';
 
                     if (isWin) {
-                        payout = currentBet * (2 * multBonus);
+                        payout = currentBet * diceMult;
                     }
                 } else {
                     // Exact match
@@ -4440,13 +4499,13 @@
                     detailsLabel = `숫자 ${state.selectedDiceNum}`;
 
                     if (isWin) {
-                        payout = currentBet * (6 * multBonus);
+                        payout = currentBet * diceMult;
                     }
                 }
 
                 if (isWin) {
                     state.balance += payout;
-                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
+                    const eventTagStr = multBonus > 1 ? `[🔥${multBonus}배 이벤트 x${diceMult}] ` : '';
                     splash.className = "result-splash-box win";
                     splash.innerHTML = `성공! ${eventTagStr}주사위 눈 [${targetFace}] 이(가) 나왔습니다! (+₩${formatNumber(payout - currentBet)})`;
 
@@ -4784,7 +4843,7 @@
                     state.balance += payout;
                     splash.className = "result-splash-box win";
 
-                    const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
+                    const eventTagStr = multBonus > 1 ? `[🔥${multBonus}배 이벤트] ` : '';
                     const linesStr = winningLinesInfo.map(w => `${w.lineIdx}번(${w.symbol} x${w.count})`).join(', ');
                     splash.innerHTML = `승리! ${eventTagStr}[${winningLinesInfo.length}개 라인 당첨] ${linesStr} (+₩${formatNumber(payout)})`;
                     showToast(`축하합니다! ${eventTagStr}+₩${formatNumber(payout)}`, "win");
@@ -4974,7 +5033,7 @@
                         } else {
                             multClass = 'mult-20';
                             valText = `${mult.toFixed(1)}x`;
-                            label = multBonus > 1 ? `🔥2배 이벤트 당첨!` : `2배 (+100%)`;
+                            label = multBonus > 1 ? `🔥${winMult.toFixed(1)}배 이벤트 당첨!` : `2배 (+100%)`;
                         }
                         frontFace.classList.add(multClass);
                         frontFace.innerHTML = `
@@ -5013,7 +5072,7 @@
                         state.balance += payout;
 
                         if (isWin) {
-                            const eventTagStr = multBonus > 1 ? `[🔥2배 이벤트] ` : '';
+                            const eventTagStr = multBonus > 1 ? `[🔥${multBonus}배 이벤트] ` : '';
                             splash.className = "result-splash-box win";
                             splash.innerHTML = `🎉 대박! ${eventTagStr}${winMult.toFixed(1)}배 카드 당첨! (+₩${formatNumber(payout - currentBet)})`;
                             showToast(`대박! ${eventTagStr}${winMult.toFixed(1)}배 당첨 (+₩${formatNumber(payout - currentBet)})`, "win");
