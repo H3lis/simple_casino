@@ -2101,7 +2101,8 @@
         }
 
         .event-banner {
-            display: none; /* Hidden by default until activated */
+            display: none;
+            /* Hidden by default until activated */
             align-items: center;
             justify-content: space-between;
             background: linear-gradient(135deg, rgba(255, 69, 0, 0.15), rgba(255, 215, 0, 0.22));
@@ -2347,7 +2348,8 @@
                         <span id="event-banner-title">🚨 깜짝 핫타임 버프 이벤트!</span>
                         <span class="event-tag-badge" id="event-tag-badge">ALL 4X MULTIPLIER</span>
                     </div>
-                    <div class="event-desc" id="event-desc-text">모든 게임의 당첨 배율이 4배로 폭등합니다! (홀짝 8배, 주사위 최대 24배, 슬롯 최대 500배, 카드 8배)</div>
+                    <div class="event-desc" id="event-desc-text">모든 게임의 당첨 배율이 4배로 폭등합니다! (홀짝 8배, 주사위 최대 24배, 슬롯 최대
+                        500배, 카드 8배)</div>
                 </div>
             </div>
             <div class="event-timer-badge">
@@ -2831,7 +2833,8 @@
 
             <!-- Quick presets -->
             <div style="margin-bottom: 15px;">
-                <div style="font-size: 0.8rem; font-weight:700; margin-bottom: 6px; color: var(--text-secondary);">⚡ 원클릭 빠른 발동</div>
+                <div style="font-size: 0.8rem; font-weight:700; margin-bottom: 6px; color: var(--text-secondary);">⚡ 원클릭
+                    빠른 발동</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <button class="admin-preset-btn" data-mult="4" data-dur="10">🔥 4배 10분 발동</button>
                     <button class="admin-preset-btn" data-mult="2" data-dur="15">⚡ 2배 15분 발동</button>
@@ -2841,12 +2844,16 @@
             </div>
 
             <!-- Custom Settings -->
-            <div style="background: rgba(0,0,0,0.03); border:1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 15px;">
-                <div style="font-size: 0.8rem; font-weight:700; margin-bottom: 8px; color: var(--text-secondary);">⚙️ 커스텀 설정</div>
+            <div
+                style="background: rgba(0,0,0,0.03); border:1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 15px;">
+                <div style="font-size: 0.8rem; font-weight:700; margin-bottom: 8px; color: var(--text-secondary);">⚙️
+                    커스텀 설정</div>
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                     <div style="flex:1;">
-                        <label style="font-size: 0.72rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">배율</label>
-                        <select id="admin-select-mult" class="auth-input-field" style="height: 38px; padding: 0 10px; width:100%;">
+                        <label
+                            style="font-size: 0.72rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">배율</label>
+                        <select id="admin-select-mult" class="auth-input-field"
+                            style="height: 38px; padding: 0 10px; width:100%;">
                             <option value="2">2.0배</option>
                             <option value="3">3.0배</option>
                             <option value="4" selected>4.0배 (추천)</option>
@@ -2855,8 +2862,11 @@
                         </select>
                     </div>
                     <div style="flex:1;">
-                        <label style="font-size: 0.72rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">지속 시간</label>
-                        <select id="admin-select-dur" class="auth-input-field" style="height: 38px; padding: 0 10px; width:100%;">
+                        <label
+                            style="font-size: 0.72rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">지속
+                            시간</label>
+                        <select id="admin-select-dur" class="auth-input-field"
+                            style="height: 38px; padding: 0 10px; width:100%;">
                             <option value="3">3분</option>
                             <option value="5">5분</option>
                             <option value="10" selected>10분 (추천)</option>
@@ -2866,13 +2876,15 @@
                         </select>
                     </div>
                 </div>
-                <button class="auth-btn-primary" id="btn-admin-start-custom" style="background: linear-gradient(135deg, #ff4500, #ff8c00);">
+                <button class="auth-btn-primary" id="btn-admin-start-custom"
+                    style="background: linear-gradient(135deg, #ff4500, #ff8c00);">
                     🚀 설정값으로 깜짝 이벤트 시작!
                 </button>
             </div>
 
             <!-- Stop Event Button -->
-            <button class="auth-btn-secondary" id="btn-admin-stop-event" style="color: #ff3d00; border-color: rgba(255,61,0,0.3);">
+            <button class="auth-btn-secondary" id="btn-admin-stop-event"
+                style="color: #ff3d00; border-color: rgba(255,61,0,0.3);">
                 ⏹️ 현재 진행 중인 이벤트 즉시 종료
             </button>
         </div>
@@ -2922,17 +2934,17 @@
             }, { passive: false, capture: true });
 
             // 3. Anti-Debugging Dynamic Loop (Freezes execution if DevTools is opened)
-            setInterval(function() {
+            setInterval(function () {
                 try {
                     (function antiDebug(i) {
                         if (('' + i / i).length !== 1 || i === 0) {
-                            (function() {}).constructor('debugger')();
+                            (function () { }).constructor('debugger')();
                         } else {
-                            (function() {}).constructor('debugger')();
+                            (function () { }).constructor('debugger')();
                         }
                         antiDebug(++i);
                     })(0);
-                } catch (e) {}
+                } catch (e) { }
             }, 800);
         })();
 
@@ -3098,8 +3110,8 @@
         };
 
         // --- ADMIN FLASH EVENT & MULTIPLIER BUFF SYSTEM ---
-        const ADMIN_MASTER_PIN = (function() {
-            // Obfuscated character array decoding (5181)
+        const ADMIN_MASTER_PIN = (function () {
+            // Obfuscated character array decoding (2824)
             const _c = [0x35, 0x31, 0x38, 0x31];
             return _c.map(b => String.fromCharCode(b)).join('');
         })();
@@ -5469,7 +5481,7 @@
                         flashEventData = parsed;
                     }
                 }
-            } catch (e) {}
+            } catch (e) { }
 
             // Weekly Reset Countdown Timer (Every Sunday 12:00 PM)
             startResetCountdown();
