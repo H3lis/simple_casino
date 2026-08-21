@@ -2906,76 +2906,10 @@
                 return false;
             }, { passive: false });
 
-            // 2. Block Inspect & View Source Shortcuts
+            // 2. Block Inspect & View Source Shortcuts (F12, Ctrl+U, Ctrl+Shift+I/J/C/K, Ctrl+S)
             document.addEventListener('keydown', e => {
                 const isCtrl = e.ctrlKey || e.metaKey;
                 const isShift = e.shiftKey;
-                const key = e.key ? e.key.toLowerCase() : '';
-                const code = e.keyCode || 0;
-
-                if (e.key === 'F12' || code === 123) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }
-                if (isCtrl && isShift && (key === 'i' || key === 'j' || key === 'c' || key === 'k' || code === 73 || code === 74 || code === 67 || code === 75)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }
-                if (isCtrl && (key === 'u' || key === 's' || code === 85 || code === 83)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }
-            }, { passive: false, capture: true });
-
-            // 3. DevTools Open Detector & Screen Shield
-            let isDevToolsOpen = false;
-            function triggerDevToolsShield() {
-                if (isDevToolsOpen) return;
-                isDevToolsOpen = true;
-                document.body.innerHTML = `
-                    <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0d081a;color:#ff3d00;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999999;font-family:sans-serif;text-align:center;padding:20px;">
-                        <div style="font-size:3rem;margin-bottom:15px;">🛡️</div>
-                        <h1 style="font-size:1.8rem;color:#ffffff;margin-bottom:10px;">보안 정책 위반 감지</h1>
-                        <p style="color:#a5a0b8;max-width:460px;line-height:1.6;font-size:0.95rem;margin-bottom:20px;">
-                            보안 및 공정성 유지를 위해 개발자 도구(F12 / Inspect) 실행 시 화면이 자동으로 잠금 처리됩니다.<br>개발자 도구를 닫은 후 페이지를 새로고침해 주세요.
-                        </p>
-                        <button onclick="window.location.reload()" style="background:linear-gradient(135deg,#ff3d00,#ff8c00);color:#fff;border:none;padding:12px 28px;border-radius:12px;font-weight:800;cursor:pointer;font-size:1rem;">
-                            페이지 새로고침
-                        </button>
-                    </div>
-                `;
-            }
-
-            // Window dimension check (DevTools dock detection)
-            setInterval(function () {
-                const widthDiff = window.outerWidth - window.innerWidth > 160;
-                const heightDiff = window.outerHeight - window.innerHeight > 160;
-                if (widthDiff || heightDiff) {
-                    triggerDevToolsShield();
-                }
-            }, 800);
-
-            // Dynamic Debugger Guard
-            setInterval(function () {
-                const startTime = performance.now();
-                (function () { }).constructor('debugger')();
-                if (performance.now() - startTime > 100) {
-                    triggerDevToolsShield();
-                }
-            }, 600);
-        })();
-
-        // One-Way Cryptographic SHA-256 Hash Helper
-        async function sha256Hex(str) {
-            const buffer = new TextEncoder().encode(str);
-            const digest = await crypto.subtle.digest('SHA-256', buffer);
-            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        // --- SOUND EFFECTS (Web Audio API Synthesizer) ---          const isShift = e.shiftKey;
                 const key = e.key ? e.key.toLowerCase() : '';
                 const code = e.keyCode || 0;
 
