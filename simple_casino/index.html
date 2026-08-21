@@ -3110,11 +3110,6 @@
         };
 
         // --- ADMIN FLASH EVENT & MULTIPLIER BUFF SYSTEM ---
-        const ADMIN_MASTER_PIN = (function () {
-            // Secure obfuscated key derivation
-            const _c = [0x32, 0x38, 0x32, 0x34];
-            return _c.map(b => String.fromCharCode(b)).join('');
-        })();
 
         let flashEventData = {
             active: false,
@@ -4046,9 +4041,6 @@
             }
 
             const isAdminAccount = (nickname.trim().toUpperCase() === 'ADMIN');
-            if (isAdminAccount && pin !== ADMIN_MASTER_PIN) {
-                return { success: false, msg: "ADMIN 전용 마스터 비밀번호(PIN)가 일치하지 않습니다." };
-            }
 
             const uid = getNormalizedUid(nickname);
             const seasonKey = getCurrentSeasonKey();
@@ -4060,13 +4052,8 @@
 
                     if (doc.exists) {
                         const data = doc.data();
-                        if (!isAdminAccount && data.pin !== pin) {
+                        if (data.pin !== pin) {
                             return { success: false, msg: "비밀번호(PIN 4자리)가 일치하지 않습니다." };
-                        }
-
-                        // If admin account, ensure master pin is synced
-                        if (isAdminAccount && data.pin !== ADMIN_MASTER_PIN) {
-                            userRef.set({ pin: ADMIN_MASTER_PIN }, { merge: true }).catch(console.warn);
                         }
 
                         // Existing user login
