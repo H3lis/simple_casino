@@ -1841,7 +1841,7 @@
             border: 1px solid rgba(212, 175, 55, 0.45);
             border-radius: 16px;
             padding: 10px 16px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-size: 0.84rem;
             color: #6e5200;
             box-shadow: 0 4px 12px rgba(198, 155, 0, 0.08);
@@ -1865,6 +1865,118 @@
             font-family: monospace;
             font-weight: 800;
             color: var(--glow-neon-green);
+        }
+
+        /* Current Season #1 Spotlight Podium Banner */
+        .current-leader-spotlight {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 248, 220, 0.9));
+            border: 1.5px solid rgba(255, 193, 7, 0.7);
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.18);
+            position: relative;
+            overflow: hidden;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .current-leader-spotlight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+            animation: shimmerLight 4s infinite linear;
+        }
+
+        @keyframes shimmerLight {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .spotlight-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1;
+        }
+
+        .spotlight-trophy {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.7));
+            animation: floatTrophy 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatTrophy {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-3px);
+            }
+        }
+
+        .spotlight-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .spotlight-tag {
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: #996e00;
+            letter-spacing: 0.5px;
+        }
+
+        .spotlight-player-name {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .spotlight-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            z-index: 1;
+        }
+
+        .spotlight-balance-label {
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        .spotlight-balance-val {
+            font-family: monospace;
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--glow-neon-green);
+            text-shadow: 0 0 8px rgba(5, 179, 117, 0.3);
+        }
+
+        .leaderboard-row.rank-first-row {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.12), transparent);
+            border-left: 3px solid #ffd700;
+            font-weight: 800;
         }
 
         .player-balance-val {
@@ -2734,12 +2846,27 @@
             <div class="hall-of-fame-banner" id="hof-banner">
                 <div class="hof-title">
                     <span>👑</span>
-                    <span>지난 시즌 챔피언 :</span>
+                    <span>지난 시즌 우승 챔피언 :</span>
                     <span class="hof-champ-name" id="hof-champ-name">강남타짜</span>
                 </div>
                 <div>
                     <span style="font-size: 0.78rem; opacity: 0.85;">최종 자산: </span>
                     <span class="hof-champ-score" id="hof-champ-score">₩5,800,000</span>
+                </div>
+            </div>
+
+            <!-- Current Season #1 Leader Spotlight Podium -->
+            <div class="current-leader-spotlight" id="current-leader-spotlight">
+                <div class="spotlight-left">
+                    <div class="spotlight-trophy">🥇</div>
+                    <div class="spotlight-text-group">
+                        <div class="spotlight-tag">현재 시즌 실시간 1위 (CURRENT #1)</div>
+                        <div class="spotlight-player-name" id="spotlight-champ-name">플레이어 대기 중</div>
+                    </div>
+                </div>
+                <div class="spotlight-right">
+                    <span class="spotlight-balance-label">보유 자산</span>
+                    <span class="spotlight-balance-val" id="spotlight-champ-balance">₩1,000,000</span>
                 </div>
             </div>
 
@@ -3862,13 +3989,12 @@
         };
 
         const DEFAULT_SIMULATED_LEADERBOARD = [
-            { name: '강남타짜', balance: 5800000, uid: 'user_champ' },
-            { name: '로얄마스터', balance: 3500000 },
-            { name: '잭팟헌터', balance: 2200000 },
-            { name: '네온고니', balance: 1600000 },
-            { name: '올인러버', balance: 1200000 },
-            { name: '행운의별', balance: 800000 },
-            { name: '다이스킹', balance: 500000 },
+            { name: '로얄마스터', balance: 1450000 },
+            { name: '잭팟헌터', balance: 1300000 },
+            { name: '네온고니', balance: 1150000 },
+            { name: '올인러버', balance: 1000000 },
+            { name: '행운의별', balance: 900000 },
+            { name: '다이스킹', balance: 750000 },
         ];
 
         function isChampion(nickname, uid) {
@@ -3912,9 +4038,10 @@
                         statusEl.querySelector('.status-text').innerText = '온라인 실시간 연동됨';
                     }
 
-                    // 1. Listen to Hall of Fame (Previous Season Champion)
+                    // 1. Listen to Hall of Fame (Previous Season Champion) & Auto-Crown if needed
                     firestoreDb.collection('casino_metadata').doc('hall_of_fame')
-                        .onSnapshot((doc) => {
+                        .onSnapshot(async (doc) => {
+                            const prevSeasonKey = getPrevSeasonKey();
                             if (doc.exists) {
                                 const data = doc.data();
                                 if (data && data.championName) {
@@ -3925,7 +4052,38 @@
                                     };
                                     renderLeaderboard();
                                     updateAuthUI();
+                                    return;
                                 }
+                            }
+
+                            // Fallback: If hall_of_fame document is not set, find previous season's #1 player
+                            try {
+                                const prevBoardSnap = await firestoreDb.collection(`casino_leaderboard_${prevSeasonKey}`)
+                                    .orderBy('balance', 'desc')
+                                    .limit(1)
+                                    .get();
+
+                                if (!prevBoardSnap.empty) {
+                                    const champDoc = prevBoardSnap.docs[0];
+                                    const champData = champDoc.data();
+                                    const crownedInfo = {
+                                        seasonKey: prevSeasonKey,
+                                        championName: champData.name || '무명 타짜',
+                                        championUid: champDoc.id,
+                                        finalBalance: champData.balance || 1000000,
+                                        crownedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                    };
+                                    await firestoreDb.collection('casino_metadata').doc('hall_of_fame').set(crownedInfo, { merge: true });
+                                    lastChampionInfo = {
+                                        name: crownedInfo.championName,
+                                        balance: crownedInfo.finalBalance,
+                                        uid: crownedInfo.championUid
+                                    };
+                                    renderLeaderboard();
+                                    updateAuthUI();
+                                }
+                            } catch (errPrev) {
+                                console.warn('Previous season champion resolution warning:', errPrev);
                             }
                         }, (err) => {
                             console.warn('Hall of Fame sync error:', err);
@@ -4018,7 +4176,7 @@
                         cloudList.push({
                             uid: doc.id,
                             name: data.name || '익명',
-                            balance: data.balance || 0,
+                            balance: typeof data.balance === 'number' ? data.balance : 0,
                             isMe: (doc.id === myUid)
                         });
                     });
@@ -4180,12 +4338,12 @@
                 if (loggedNickDisplay) {
                     loggedNickDisplay.innerHTML = isUserAdmin
                         ? `👑 <strong style="color:#ff3d00;">ADMIN (최고 관리자)</strong> <span class="champion-badge" style="background:#ff3d00; color:#fff;">ADMIN</span>`
-                        : (isMeChamp ? `👑 ${state.currentUser} <span class="champion-badge">전 시즌 챔피언</span>` : `👤 ${state.currentUser}`);
+                        : (isMeChamp ? `👑 ${state.currentUser} <span class="champion-badge">👑 전 시즌 1위</span>` : `👤 ${state.currentUser}`);
                 }
                 if (modalHeader) modalHeader.innerText = isUserAdmin ? "관리자 계정 정보" : "내 계정 정보";
                 if (modalDesc) modalDesc.innerText = isUserAdmin
                     ? "ADMIN 계정으로 로그인되었습니다. 상단의 [👑 ADMIN 이벤트 제어] 버튼으로 깜짝 핫타임을 발동할 수 있습니다."
-                    : (isMeChamp ? "축하합니다! 회원님은 지난 시즌 1등 챔피언 명예 칭호를 보유하고 계십니다!" : "현재 클라우드 데이터베이스에 로그인되어 데이터가 실시간 백업 중입니다.");
+                    : (isMeChamp ? "축하합니다! 회원님은 지난 시즌 1위를 달성한 명예 챔피언이십니다!" : "현재 클라우드 데이터베이스에 로그인되어 데이터가 실시간 백업 중입니다.");
             } else {
                 if (btnLabel) btnLabel.innerText = '로그인';
                 if (btnIcon) btnIcon.innerText = '🔑';
@@ -4232,7 +4390,7 @@
             const tbody = document.getElementById('leaderboard-tbody');
             if (!tbody) return;
 
-            // Update Hall of Fame Champion Banner
+            // 1. Update Hall of Fame Champion Banner (Previous Season Winner)
             const hofNameEl = document.getElementById('hof-champ-name');
             const hofScoreEl = document.getElementById('hof-champ-score');
             if (hofNameEl && lastChampionInfo) {
@@ -4246,19 +4404,19 @@
             const myUid = getUserId();
             let allPlayers = [];
 
-            if (isFirebaseOnline && cloudLeaderboardData && cloudLeaderboardData.length > 0) {
+            if (isFirebaseOnline && Array.isArray(cloudLeaderboardData)) {
                 allPlayers = [...cloudLeaderboardData];
                 // Ensure current user is in list if not in top 10
-                const hasMe = allPlayers.some(p => p.isMe);
-                if (!hasMe) {
+                const hasMe = allPlayers.some(p => p.isMe || p.uid === myUid);
+                if (!hasMe && state.currentUser) {
                     allPlayers.push({
                         uid: myUid,
                         name: myNick,
                         balance: state.balance,
                         isMe: true
                     });
-                    allPlayers.sort((a, b) => b.balance - a.balance);
                 }
+                allPlayers.sort((a, b) => b.balance - a.balance);
             } else {
                 allPlayers = [
                     ...DEFAULT_SIMULATED_LEADERBOARD,
@@ -4267,20 +4425,59 @@
                 allPlayers.sort((a, b) => b.balance - a.balance);
             }
 
+            // 2. Update Current Season #1 Spotlight Podium
+            const spotNameEl = document.getElementById('spotlight-champ-name');
+            const spotBalEl = document.getElementById('spotlight-champ-balance');
+            if (allPlayers.length > 0) {
+                const top1 = allPlayers[0];
+                if (spotNameEl) {
+                    const champTag = isChampion(top1.name, top1.uid) ? '<span class="champion-badge">👑 전 시즌 1위</span>' : '';
+                    const meTag = (top1.isMe || top1.uid === myUid) ? '<span class="player-tag-me">ME</span>' : '';
+                    spotNameEl.innerHTML = `<span>${top1.name}</span>${champTag}${meTag}`;
+                }
+                if (spotBalEl) {
+                    spotBalEl.innerText = `₩${formatNumber(top1.balance)}`;
+                }
+            } else {
+                if (spotNameEl) spotNameEl.innerText = '플레이어 대기 중';
+                if (spotBalEl) spotBalEl.innerText = `₩1,000,000`;
+            }
+
+            // 3. Render Leaderboard Table Rows
+            if (allPlayers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 24px; color: var(--text-secondary);">
+                            ✨ 새로운 시즌이 시작되었습니다! 게임을 플레이하여 1위에 도전하세요!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
             tbody.innerHTML = allPlayers.map((player, idx) => {
                 const rankNum = idx + 1;
                 let rankIcon = '';
-                if (rankNum === 1) rankIcon = '<span class="rank-badge rank-1">🥇 1</span>';
-                else if (rankNum === 2) rankIcon = '<span class="rank-badge rank-2">🥈 2</span>';
-                else if (rankNum === 3) rankIcon = '<span class="rank-badge rank-3">🥉 3</span>';
-                else rankIcon = `<span class="rank-badge rank-other">${rankNum}</span>`;
+                let rankRowClass = '';
 
-                const isMeClass = player.isMe ? 'is-me' : '';
-                const meTag = player.isMe ? '<span class="player-tag-me">ME</span>' : '';
+                if (rankNum === 1) {
+                    rankIcon = '<span class="rank-badge rank-1">🥇 1</span>';
+                    rankRowClass = 'rank-first-row';
+                } else if (rankNum === 2) {
+                    rankIcon = '<span class="rank-badge rank-2">🥈 2</span>';
+                } else if (rankNum === 3) {
+                    rankIcon = '<span class="rank-badge rank-3">🥉 3</span>';
+                } else {
+                    rankIcon = `<span class="rank-badge rank-other">${rankNum}</span>`;
+                }
+
+                const isMe = (player.isMe || player.uid === myUid);
+                const isMeClass = isMe ? 'is-me' : '';
+                const meTag = isMe ? '<span class="player-tag-me">ME</span>' : '';
                 const champBadge = isChampion(player.name, player.uid) ? '<span class="champion-badge">👑 전 시즌 1위</span>' : '';
 
                 return `
-                    <tr class="leaderboard-row ${isMeClass}">
+                    <tr class="leaderboard-row ${isMeClass} ${rankRowClass}">
                         <td style="text-align: center;">${rankIcon}</td>
                         <td>
                             <span>${player.name}</span>
