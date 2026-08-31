@@ -3550,9 +3550,10 @@
 
             if (!state.lastSeasonKey || state.lastSeasonKey !== currentSeasonKey) {
                 // If switching seasons and connected to Firebase, determine last season's top 1 player
-                if (isFirebaseOnline && firestoreDb && state.lastSeasonKey) {
+                if (isFirebaseOnline && firestoreDb) {
                     try {
-                        const prevBoardSnap = await firestoreDb.collection(`casino_leaderboard_${state.lastSeasonKey}`)
+                        const targetPrevKey = state.lastSeasonKey || prevSeasonKey;
+                        const prevBoardSnap = await firestoreDb.collection(`casino_leaderboard_${targetPrevKey}`)
                             .orderBy('balance', 'desc')
                             .limit(1)
                             .get();
@@ -3561,7 +3562,7 @@
                             const champDoc = prevBoardSnap.docs[0];
                             const champData = champDoc.data();
                             await firestoreDb.collection('casino_metadata').doc('hall_of_fame').set({
-                                seasonKey: state.lastSeasonKey,
+                                seasonKey: targetPrevKey,
                                 championName: champData.name || '무명 타짜',
                                 championUid: champDoc.id,
                                 finalBalance: champData.balance || 1000000,
@@ -3983,9 +3984,9 @@
 
         // Previous Season Champion / Hall of Fame
         let lastChampionInfo = {
-            name: '강남타짜',
-            balance: 5800000,
-            uid: 'user_champ'
+            name: '기록 없음',
+            balance: 0,
+            uid: ''
         };
 
         const DEFAULT_SIMULATED_LEADERBOARD = [
@@ -3998,7 +3999,7 @@
         ];
 
         function isChampion(nickname, uid) {
-            if (!lastChampionInfo || !lastChampionInfo.name) return false;
+            if (!lastChampionInfo || !lastChampionInfo.name || lastChampionInfo.name === '기록 없음' || !lastChampionInfo.uid) return false;
             return (lastChampionInfo.name === nickname || (uid && lastChampionInfo.uid === uid));
         }
 
@@ -4044,7 +4045,7 @@
                             const prevSeasonKey = getPrevSeasonKey();
                             if (doc.exists) {
                                 const data = doc.data();
-                                if (data && data.championName) {
+                                if (data && data.championName && data.seasonKey === prevSeasonKey) {
                                     lastChampionInfo = {
                                         name: data.championName,
                                         balance: data.finalBalance || 0,
@@ -4056,7 +4057,7 @@
                                 }
                             }
 
-                            // Fallback: If hall_of_fame document is not set, find previous season's #1 player
+                            // Fallback or Season Changed: Find actual previous season's #1 player
                             try {
                                 const prevBoardSnap = await firestoreDb.collection(`casino_leaderboard_${prevSeasonKey}`)
                                     .orderBy('balance', 'desc')
@@ -4078,6 +4079,15 @@
                                         name: crownedInfo.championName,
                                         balance: crownedInfo.finalBalance,
                                         uid: crownedInfo.championUid
+                                    };
+                                    renderLeaderboard();
+                                    updateAuthUI();
+                                } else {
+                                    // Previous season had no records
+                                    lastChampionInfo = {
+                                        name: '기록 없음',
+                                        balance: 0,
+                                        uid: ''
                                     };
                                     renderLeaderboard();
                                     updateAuthUI();
@@ -4394,10 +4404,12 @@
             const hofNameEl = document.getElementById('hof-champ-name');
             const hofScoreEl = document.getElementById('hof-champ-score');
             if (hofNameEl && lastChampionInfo) {
-                hofNameEl.innerText = lastChampionInfo.name || '챔피언 없음';
+                hofNameEl.innerText = lastChampionInfo.name || '기록 없음';
             }
             if (hofScoreEl && lastChampionInfo) {
-                hofScoreEl.innerText = `₩${formatNumber(lastChampionInfo.balance || 0)}`;
+                hofScoreEl.innerText = (lastChampionInfo.name && lastChampionInfo.name !== '기록 없음' && lastChampionInfo.balance > 0)
+                    ? `₩${formatNumber(lastChampionInfo.balance)}`
+                    : '-';
             }
 
             const myNick = getNickname();
