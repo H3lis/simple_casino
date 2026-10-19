@@ -669,107 +669,189 @@
         const CHARACTERS = [
             {
                 level: 0,
-                name: "포셰트 가방",
+                name: "치이카부",
                 radius: 20,
-                color: "#ffc2d1",
+                color: "#d4a373",
                 score: 2,
-                voice: "pochette",
-                desc: "갑옷아저씨의 포셰트",
+                voice: "chiikabu",
+                desc: "작은 딱정벌레 요정",
                 draw(ctx, r) {
-                    // 도토리/핑크 포셰트 가방 모양
                     ctx.save();
-                    // 본체 가방
-                    ctx.fillStyle = "#ff97b7";
+                    // 앙증맞은 딱정벌레 뿔 (Y자 뿔)
+                    ctx.strokeStyle = "#8b5a2b";
+                    ctx.lineWidth = 2.5;
                     ctx.beginPath();
-                    ctx.arc(0, 2, r * 0.78, 0, Math.PI * 2);
+                    ctx.moveTo(0, -r * 0.6);
+                    ctx.lineTo(0, -r * 1.05);
+                    ctx.lineTo(-4, -r * 1.25);
+                    ctx.moveTo(0, -r * 1.05);
+                    ctx.lineTo(4, -r * 1.25);
+                    ctx.stroke();
+
+                    // 갈색/황갈색 몸체
+                    ctx.fillStyle = "#e9c46a";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.strokeStyle = "#c2416b";
+                    ctx.strokeStyle = "#8b5a2b";
                     ctx.lineWidth = 2.5;
                     ctx.stroke();
 
-                    // 가방 덮개
-                    ctx.fillStyle = "#ffb3c6";
+                    // 등딱지 라인
+                    ctx.strokeStyle = "rgba(139, 90, 43, 0.4)";
+                    ctx.lineWidth = 1.8;
                     ctx.beginPath();
-                    ctx.ellipse(0, -r * 0.2, r * 0.65, r * 0.35, 0, 0, Math.PI);
-                    ctx.fill();
+                    ctx.moveTo(0, -r * 0.4);
+                    ctx.lineTo(0, r * 0.85);
                     ctx.stroke();
 
-                    // 가방 단추/리본
-                    ctx.fillStyle = "#ffe066";
+                    // 앙증맞은 눈
+                    ctx.fillStyle = "#2c1d11";
                     ctx.beginPath();
-                    ctx.arc(0, -r * 0.1, r * 0.18, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.28, -r * 0.05, 2.4, 0, Math.PI * 2);
+                    ctx.arc(r * 0.28, -r * 0.05, 2.4, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.strokeStyle = "#b58900";
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
 
-                    // 끈
-                    ctx.strokeStyle = "#804000";
-                    ctx.lineWidth = 2;
+                    // 홍조
+                    ctx.fillStyle = "rgba(235, 130, 60, 0.55)";
                     ctx.beginPath();
-                    ctx.arc(0, -r * 0.2, r * 0.7, Math.PI * 1.1, Math.PI * 1.9);
-                    ctx.stroke();
+                    ctx.arc(-r * 0.45, r * 0.1, 3.5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.45, r * 0.1, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
                     ctx.restore();
                 }
             },
             {
                 level: 1,
-                name: "시사",
+                name: "파자마파티즈",
                 radius: 27,
-                color: "#ffe066",
+                color: "#ffb4d6",
                 score: 4,
-                voice: "shisa",
-                desc: "우레시이! 시사",
+                voice: "pajama",
+                desc: "우-와와와~ 파자마송!",
                 draw(ctx, r) {
                     ctx.save();
-                    // 몸체
-                    ctx.fillStyle = "#ffd43b";
+                    // 파자마 후드 꼬깔 방울
+                    ctx.fillStyle = "#ffffff";
+                    ctx.strokeStyle = "#ff70a6";
+                    ctx.lineWidth = 2;
                     ctx.beginPath();
-                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.arc(0, -r * 1.1, r * 0.22, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.strokeStyle = "#e67700";
+                    ctx.stroke();
+
+                    // 파자마 핑크 후드 모자
+                    ctx.fillStyle = "#ff70a6";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.95, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 얼굴 드러난 구멍
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.ellipse(0, r * 0.08, r * 0.65, r * 0.55, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#d6336c";
                     ctx.lineWidth = 2.5;
                     ctx.stroke();
 
-                    // 꼬불꼬불 붉은/주황 갈기 털
-                    ctx.fillStyle = "#ff6b6b";
-                    [-0.5, 0, 0.5].forEach(ang => {
-                        ctx.beginPath();
-                        ctx.arc(Math.sin(ang) * r * 0.75, -r * 0.78 + Math.cos(ang) * 4, r * 0.22, 0, Math.PI * 2);
-                        ctx.fill();
-                    });
-
-                    // 눈 & 깜찍한 입
-                    ctx.fillStyle = "#49260a";
+                    // 초롱한 눈
+                    ctx.fillStyle = "#222";
                     ctx.beginPath();
-                    ctx.arc(-r * 0.3, -r * 0.05, 2.5, 0, Math.PI * 2);
-                    ctx.arc(r * 0.3, -r * 0.05, 2.5, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.25, r * 0.05, 2.8, 0, Math.PI * 2);
+                    ctx.arc(r * 0.25, r * 0.05, 2.8, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // 미소 입
-                    ctx.strokeStyle = "#49260a";
-                    ctx.lineWidth = 2;
+                    // 노래 부르는 오므린 입
+                    ctx.fillStyle = "#ff4d6d";
                     ctx.beginPath();
-                    ctx.arc(0, r * 0.2, r * 0.25, 0.1, Math.PI - 0.1);
-                    ctx.stroke();
+                    ctx.arc(0, r * 0.25, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
 
-                    // 홍조
-                    ctx.fillStyle = "rgba(255, 107, 107, 0.55)";
+                    // 핑크 볼
+                    ctx.fillStyle = "rgba(255, 105, 180, 0.6)";
                     ctx.beginPath();
-                    ctx.arc(-r * 0.45, r * 0.1, 4, 0, Math.PI * 2);
-                    ctx.arc(r * 0.45, r * 0.1, 4, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.42, r * 0.18, 4.5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.42, r * 0.18, 4.5, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 }
             },
             {
                 level: 2,
-                name: "쿠리만쥬",
+                name: "모몽가",
                 radius: 36,
-                color: "#e8b87d",
+                color: "#70d6ff",
                 score: 8,
+                voice: "momonga",
+                desc: "호메로! 칭찬해라!",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 하늘빛 귀
+                    ctx.fillStyle = "#70d6ff";
+                    ctx.strokeStyle = "#008ac7";
+                    ctx.lineWidth = 2.8;
+                    [-0.55, 0.55].forEach(x => {
+                        ctx.beginPath();
+                        ctx.ellipse(x * r, -r * 0.72, r * 0.28, r * 0.4, x * 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                        // 귀 안쪽
+                        ctx.fillStyle = "#ffb3c6";
+                        ctx.beginPath();
+                        ctx.ellipse(x * r, -r * 0.7, r * 0.14, r * 0.24, x * 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#70d6ff";
+                    });
+
+                    // 얼굴 본체
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#008ac7";
+                    ctx.lineWidth = 2.8;
+                    ctx.stroke();
+
+                    // 큰 눈
+                    ctx.fillStyle = "#006699";
+                    [-0.32, 0.32].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.05, 4.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#ffffff";
+                        ctx.beginPath();
+                        ctx.arc(x * r - 1.5, -r * 0.05 - 1.5, 1.8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#006699";
+                    });
+
+                    // 세모 입
+                    ctx.strokeStyle = "#222";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(-3.5, r * 0.18);
+                    ctx.lineTo(0, r * 0.12);
+                    ctx.lineTo(3.5, r * 0.18);
+                    ctx.stroke();
+
+                    // 볼터치
+                    ctx.fillStyle = "rgba(255, 105, 180, 0.45)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.5, r * 0.15, 5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.5, r * 0.15, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 3,
+                name: "쿠리만쥬",
+                radius: 46,
+                color: "#e8b87d",
+                score: 16,
                 voice: "kurimanju",
-                desc: "하아아~ 선배",
+                desc: "하아아~ 주정뱅이 선배",
                 draw(ctx, r) {
                     ctx.save();
                     // 얼굴
@@ -778,7 +860,7 @@
                     ctx.arc(0, 0, r * 0.9, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.strokeStyle = "#8b5a2b";
-                    ctx.lineWidth = 2.8;
+                    ctx.lineWidth = 3;
                     ctx.stroke();
 
                     // 밤색 머리 정수리
@@ -800,105 +882,104 @@
                     // 똘망한 눈
                     ctx.fillStyle = "#2c1d11";
                     ctx.beginPath();
-                    ctx.arc(-r * 0.28, r * 0.05, 3.2, 0, Math.PI * 2);
-                    ctx.arc(r * 0.28, r * 0.05, 3.2, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.28, r * 0.05, 3.8, 0, Math.PI * 2);
+                    ctx.arc(r * 0.28, r * 0.05, 3.8, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // 시원하게 한잔 마신 "하아~" 세모 입
+                    // 시원한 "하아~" 세모 입
                     ctx.fillStyle = "#c94a29";
                     ctx.beginPath();
-                    ctx.arc(0, r * 0.32, r * 0.18, 0, Math.PI);
+                    ctx.arc(0, r * 0.32, r * 0.2, 0, Math.PI);
                     ctx.closePath();
                     ctx.fill();
                     ctx.strokeStyle = "#2c1d11";
-                    ctx.lineWidth = 1.8;
+                    ctx.lineWidth = 2;
                     ctx.stroke();
 
                     // 홍조
-                    ctx.fillStyle = "rgba(235, 87, 87, 0.5)";
+                    ctx.fillStyle = "rgba(235, 87, 87, 0.55)";
                     ctx.beginPath();
-                    ctx.arc(-r * 0.48, r * 0.18, 5, 0, Math.PI * 2);
-                    ctx.arc(r * 0.48, r * 0.18, 5, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                }
-            },
-            {
-                level: 3,
-                name: "모몽가",
-                radius: 46,
-                color: "#a0e8ff",
-                score: 16,
-                voice: "momonga",
-                desc: "호메로! 모몽가",
-                draw(ctx, r) {
-                    ctx.save();
-                    // 풍성한 하늘빛 귀
-                    ctx.fillStyle = "#70d6ff";
-                    ctx.strokeStyle = "#008ac7";
-                    ctx.lineWidth = 3;
-                    [-0.55, 0.55].forEach(x => {
-                        ctx.beginPath();
-                        ctx.ellipse(x * r, -r * 0.72, r * 0.3, r * 0.42, x * 0.3, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.stroke();
-                    });
-
-                    // 귀 안쪽
-                    ctx.fillStyle = "#ffb3c6";
-                    [-0.55, 0.55].forEach(x => {
-                        ctx.beginPath();
-                        ctx.ellipse(x * r, -r * 0.7, r * 0.16, r * 0.26, x * 0.3, 0, Math.PI * 2);
-                        ctx.fill();
-                    });
-
-                    // 얼굴 몸통
-                    ctx.fillStyle = "#ffffff";
-                    ctx.beginPath();
-                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = "#008ac7";
-                    ctx.lineWidth = 3;
-                    ctx.stroke();
-
-                    // 모몽가 특유의 초롱초롱한 큰 눈
-                    ctx.fillStyle = "#006699";
-                    [-0.32, 0.32].forEach(x => {
-                        ctx.beginPath();
-                        ctx.arc(x * r, -r * 0.05, 5, 0, Math.PI * 2);
-                        ctx.fill();
-                        // 눈망울 하이라이트
-                        ctx.fillStyle = "#ffffff";
-                        ctx.beginPath();
-                        ctx.arc(x * r - 1.5, -r * 0.05 - 1.5, 2, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = "#006699";
-                    });
-
-                    // 칭찬해라! 앙칼진 세모 입
-                    ctx.strokeStyle = "#222";
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.moveTo(-4, r * 0.2);
-                    ctx.lineTo(0, r * 0.14);
-                    ctx.lineTo(4, r * 0.2);
-                    ctx.stroke();
-
-                    // 볼터치
-                    ctx.fillStyle = "rgba(255, 105, 180, 0.45)";
-                    ctx.beginPath();
-                    ctx.arc(-r * 0.5, r * 0.15, 6, 0, Math.PI * 2);
-                    ctx.arc(r * 0.5, r * 0.15, 6, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.5, r * 0.18, 6, 0, Math.PI * 2);
+                    ctx.arc(r * 0.5, r * 0.18, 6, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 }
             },
             {
                 level: 4,
-                name: "랏코 선생",
+                name: "치이카와",
                 radius: 58,
-                color: "#e6c280",
+                color: "#ffffff",
                 score: 32,
+                voice: "chiikawa",
+                desc: "와! 후에에~ 치이카와",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 둥근 귀
+                    ctx.fillStyle = "#ffffff";
+                    ctx.strokeStyle = "#e87b99";
+                    ctx.lineWidth = 3.2;
+                    [-0.55, 0.55].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r * 0.9, -r * 0.65, r * 0.25, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                        // 핑크 귀 안쪽
+                        ctx.fillStyle = "#ffccd5";
+                        ctx.beginPath();
+                        ctx.arc(x * r * 0.9, -r * 0.65, r * 0.14, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#ffffff";
+                    });
+
+                    // 뽀얀 둥근 얼굴
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#e87b99";
+                    ctx.lineWidth = 3.2;
+                    ctx.stroke();
+
+                    // 큰 눈망울
+                    ctx.fillStyle = "#222222";
+                    [-0.32, 0.32].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.05, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#ffffff";
+                        ctx.beginPath();
+                        ctx.arc(x * r - 1.8, -r * 0.05 - 1.8, 2.2, 0, Math.PI * 2);
+                        ctx.arc(x * r + 1.8, -r * 0.05 + 1.8, 1.2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#222222";
+                    });
+
+                    // "와!" 오므린 입
+                    ctx.fillStyle = "#ff6b81";
+                    ctx.beginPath();
+                    ctx.ellipse(0, r * 0.22, 4, 6, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#222";
+                    ctx.lineWidth = 1.8;
+                    ctx.stroke();
+
+                    // 핑크 볼터치
+                    ctx.fillStyle = "rgba(255, 143, 171, 0.7)";
+                    [-0.55, 0.55].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, r * 0.16, 8, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    ctx.restore();
+                }
+            },
+            {
+                level: 5,
+                name: "랏코",
+                radius: 72,
+                color: "#e6c280",
+                score: 64,
                 voice: "rakko",
                 desc: "늠름한 검사 선배",
                 draw(ctx, r) {
@@ -909,7 +990,7 @@
                     ctx.arc(0, 0, r * 0.9, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.strokeStyle = "#8b572a";
-                    ctx.lineWidth = 3.2;
+                    ctx.lineWidth = 3.5;
                     ctx.stroke();
 
                     // 둥근 작은 귀
@@ -923,10 +1004,10 @@
 
                     // 이마의 늠름한 십자 흉터
                     ctx.strokeStyle = "#c0392b";
-                    ctx.lineWidth = 2.5;
+                    ctx.lineWidth = 2.8;
                     ctx.beginPath();
-                    ctx.moveTo(-6, -r * 0.45);
-                    ctx.lineTo(6, -r * 0.45);
+                    ctx.moveTo(-7, -r * 0.45);
+                    ctx.lineTo(7, -r * 0.45);
                     ctx.moveTo(0, -r * 0.55);
                     ctx.lineTo(0, -r * 0.35);
                     ctx.stroke();
@@ -934,8 +1015,8 @@
                     // 다부진 눈
                     ctx.fillStyle = "#1e130c";
                     ctx.beginPath();
-                    ctx.arc(-r * 0.3, -r * 0.05, 4.5, 0, Math.PI * 2);
-                    ctx.arc(r * 0.3, -r * 0.05, 4.5, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.3, -r * 0.05, 5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.3, -r * 0.05, 5, 0, Math.PI * 2);
                     ctx.fill();
 
                     // 코 & 하얀 주둥이
@@ -944,22 +1025,147 @@
                     ctx.ellipse(0, r * 0.2, r * 0.35, r * 0.25, 0, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.strokeStyle = "#8b572a";
-                    ctx.lineWidth = 2;
+                    ctx.lineWidth = 2.2;
                     ctx.stroke();
 
                     ctx.fillStyle = "#1e130c";
                     ctx.beginPath();
-                    ctx.arc(0, r * 0.12, 4, 0, Math.PI * 2);
+                    ctx.arc(0, r * 0.12, 4.5, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 }
             },
             {
-                level: 5,
+                level: 6,
+                name: "카니",
+                radius: 88,
+                color: "#ffc9c9",
+                score: 128,
+                voice: "kani",
+                desc: "카니카니! 후루츠짱",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 분홍 게 모자 (집게발)
+                    ctx.fillStyle = "#ff6b81";
+                    ctx.strokeStyle = "#c92a2a";
+                    ctx.lineWidth = 3.5;
+                    [-0.6, 0.6].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r * 0.95, -r * 0.85, r * 0.24, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    // 게 모자 껍질
+                    ctx.fillStyle = "#ff8787";
+                    ctx.beginPath();
+                    ctx.ellipse(0, -r * 0.6, r * 0.65, r * 0.35, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // 게 모자 눈
+                    ctx.fillStyle = "#ffffff";
+                    [-0.2, 0.2].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.8, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#000";
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.8, 2.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#fff";
+                    });
+
+                    // 얼굴 본체
+                    ctx.fillStyle = "#fff0f3";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#ff6b81";
+                    ctx.lineWidth = 3.8;
+                    ctx.stroke();
+
+                    // 천사 미소 눈
+                    ctx.strokeStyle = "#495057";
+                    ctx.lineWidth = 3;
+                    [-0.32, 0.32].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, 0, 7, Math.PI * 1.1, Math.PI * 1.9);
+                        ctx.stroke();
+                    });
+
+                    // 방긋 입
+                    ctx.fillStyle = "#ff8787";
+                    ctx.beginPath();
+                    ctx.arc(0, r * 0.25, 8, 0, Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // 홍조
+                    ctx.fillStyle = "rgba(255, 107, 129, 0.65)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.55, r * 0.2, 11, 0, Math.PI * 2);
+                    ctx.arc(r * 0.55, r * 0.2, 11, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 7,
+                name: "시사",
+                radius: 106,
+                color: "#ffe066",
+                score: 256,
+                voice: "shisa",
+                desc: "우레시이! 시사",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 몸체
+                    ctx.fillStyle = "#ffd43b";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#e67700";
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+
+                    // 주황/붉은 갈기 털
+                    ctx.fillStyle = "#ff6b6b";
+                    [-0.55, -0.25, 0, 0.25, 0.55].forEach(ang => {
+                        ctx.beginPath();
+                        ctx.arc(Math.sin(ang) * r * 0.78, -r * 0.75 + Math.abs(ang) * 6, r * 0.18, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    // 똘망한 눈
+                    ctx.fillStyle = "#49260a";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.3, -r * 0.05, 6, 0, Math.PI * 2);
+                    ctx.arc(r * 0.3, -r * 0.05, 6, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 함박 미소 입
+                    ctx.strokeStyle = "#49260a";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(0, r * 0.2, r * 0.25, 0.1, Math.PI - 0.1);
+                    ctx.stroke();
+
+                    // 홍조
+                    ctx.fillStyle = "rgba(255, 107, 107, 0.6)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.5, r * 0.15, 10, 0, Math.PI * 2);
+                    ctx.arc(r * 0.5, r * 0.15, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 8,
                 name: "하치와레",
-                radius: 72,
+                radius: 126,
                 color: "#64b5f6",
-                score: 64,
+                score: 512,
                 voice: "hachiware",
                 desc: "난또까 나레~!",
                 draw(ctx, r) {
@@ -967,7 +1173,7 @@
                     // 파란 고양이 귀
                     ctx.fillStyle = "#42a5f5";
                     ctx.strokeStyle = "#1976d2";
-                    ctx.lineWidth = 3.5;
+                    ctx.lineWidth = 4.5;
                     [-0.55, 0.55].forEach(x => {
                         ctx.beginPath();
                         ctx.moveTo(x * r * 0.4, -r * 0.7);
@@ -978,13 +1184,13 @@
                         ctx.stroke();
                     });
 
-                    // 둥근 흰 얼굴
+                    // 둥근 얼굴
                     ctx.fillStyle = "#ffffff";
                     ctx.beginPath();
                     ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.strokeStyle = "#1976d2";
-                    ctx.lineWidth = 3.5;
+                    ctx.lineWidth = 4.5;
                     ctx.stroke();
 
                     // 파란 팔(八)자 이마 머리
@@ -997,129 +1203,57 @@
                     ctx.closePath();
                     ctx.fill();
 
-                    // 눈 (긍정적인 눈빛)
+                    // 눈
                     ctx.fillStyle = "#1e1e1e";
                     ctx.beginPath();
-                    ctx.arc(-r * 0.32, -r * 0.02, 5.5, 0, Math.PI * 2);
-                    ctx.arc(r * 0.32, -r * 0.02, 5.5, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.32, -r * 0.02, 7.5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.32, -r * 0.02, 7.5, 0, Math.PI * 2);
                     ctx.fill();
-                    // 눈망울 하이라이트
                     ctx.fillStyle = "#ffffff";
                     ctx.beginPath();
-                    ctx.arc(-r * 0.32 - 1.8, -r * 0.02 - 1.8, 2, 0, Math.PI * 2);
-                    ctx.arc(r * 0.32 - 1.8, -r * 0.02 - 1.8, 2, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.32 - 2.5, -r * 0.02 - 2.5, 2.8, 0, Math.PI * 2);
+                    ctx.arc(r * 0.32 - 2.5, -r * 0.02 - 2.5, 2.8, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // 하치와레 특유의 ㅅ자 입 & 작은 송곳니
+                    // ㅅ자 입
                     ctx.strokeStyle = "#1e1e1e";
-                    ctx.lineWidth = 2.5;
+                    ctx.lineWidth = 3.5;
                     ctx.beginPath();
-                    ctx.arc(-5, r * 0.18, 5, 0, Math.PI);
+                    ctx.arc(-6, r * 0.18, 6, 0, Math.PI);
                     ctx.stroke();
                     ctx.beginPath();
-                    ctx.arc(5, r * 0.18, 5, 0, Math.PI);
+                    ctx.arc(6, r * 0.18, 6, 0, Math.PI);
                     ctx.stroke();
 
-                    // 핑크 볼터치
-                    ctx.fillStyle = "rgba(255, 133, 162, 0.55)";
+                    // 볼터치
+                    ctx.fillStyle = "rgba(255, 133, 162, 0.6)";
                     ctx.beginPath();
-                    ctx.arc(-r * 0.55, r * 0.15, 8, 0, Math.PI * 2);
-                    ctx.arc(r * 0.55, r * 0.15, 8, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.55, r * 0.15, 12, 0, Math.PI * 2);
+                    ctx.arc(r * 0.55, r * 0.15, 12, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 }
             },
             {
-                level: 6,
-                name: "치이카와",
-                radius: 88,
-                color: "#ffffff",
-                score: 128,
-                voice: "chiikawa",
-                desc: "와! 후에에~ 치이카와",
-                draw(ctx, r) {
-                    ctx.save();
-                    // 작고 둥근 귀
-                    ctx.fillStyle = "#ffffff";
-                    ctx.strokeStyle = "#e87b99";
-                    ctx.lineWidth = 4;
-                    [-0.55, 0.55].forEach(x => {
-                        ctx.beginPath();
-                        ctx.arc(x * r * 0.9, -r * 0.65, r * 0.25, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.stroke();
-                        // 귀 안쪽 핑크
-                        ctx.fillStyle = "#ffccd5";
-                        ctx.beginPath();
-                        ctx.arc(x * r * 0.9, -r * 0.65, r * 0.14, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = "#ffffff";
-                    });
-
-                    // 하얀 둥근 얼굴
-                    ctx.fillStyle = "#ffffff";
-                    ctx.beginPath();
-                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = "#e87b99";
-                    ctx.lineWidth = 4;
-                    ctx.stroke();
-
-                    // 치이카와 눈 (살짝 겁먹거나 감격한 큰 눈)
-                    ctx.fillStyle = "#222222";
-                    [-0.32, 0.32].forEach(x => {
-                        ctx.beginPath();
-                        ctx.arc(x * r, -r * 0.05, 6.5, 0, Math.PI * 2);
-                        ctx.fill();
-                        // 눈망울 2개
-                        ctx.fillStyle = "#ffffff";
-                        ctx.beginPath();
-                        ctx.arc(x * r - 2, -r * 0.05 - 2, 2.8, 0, Math.PI * 2);
-                        ctx.arc(x * r + 2, -r * 0.05 + 2, 1.4, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = "#222222";
-                    });
-
-                    // 귀여운 오므린 입 ("와!" 입)
-                    ctx.fillStyle = "#ff6b81";
-                    ctx.beginPath();
-                    ctx.ellipse(0, r * 0.22, 5, 7, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = "#222";
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-
-                    // 사랑스러운 핑크 볼터치 (사선 줄무늬 디테일)
-                    ctx.fillStyle = "rgba(255, 143, 171, 0.7)";
-                    [-0.55, 0.55].forEach(x => {
-                        ctx.beginPath();
-                        ctx.arc(x * r, r * 0.16, 11, 0, Math.PI * 2);
-                        ctx.fill();
-                    });
-                    ctx.restore();
-                }
-            },
-            {
-                level: 7,
+                level: 9,
                 name: "우사기",
-                radius: 106,
+                radius: 148,
                 color: "#fff3bf",
-                score: 256,
+                score: 1024,
                 voice: "usagi",
                 desc: "우라~ 야하-! 우사기",
                 draw(ctx, r) {
                     ctx.save();
-                    // 길쭉한 토끼 귀 (좌우로 쫑긋)
+                    // 길쭉한 토끼 귀
                     ctx.fillStyle = "#fff3bf";
                     ctx.strokeStyle = "#fab005";
-                    ctx.lineWidth = 4.5;
+                    ctx.lineWidth = 5;
                     [-0.45, 0.45].forEach((x, i) => {
                         ctx.beginPath();
                         ctx.ellipse(x * r * 0.9, -r * 0.9, r * 0.22, r * 0.55, (i === 0 ? -0.25 : 0.25), 0, Math.PI * 2);
                         ctx.fill();
                         ctx.stroke();
-
-                        // 귀 안쪽
+                        // 안쪽
                         ctx.fillStyle = "#ffc9c9";
                         ctx.beginPath();
                         ctx.ellipse(x * r * 0.9, -r * 0.9, r * 0.1, r * 0.35, (i === 0 ? -0.25 : 0.25), 0, Math.PI * 2);
@@ -1127,214 +1261,55 @@
                         ctx.fillStyle = "#fff3bf";
                     });
 
-                    // 둥근 노란 얼굴
+                    // 얼굴 본체
                     ctx.fillStyle = "#fff3bf";
                     ctx.beginPath();
                     ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.strokeStyle = "#fab005";
-                    ctx.lineWidth = 4.5;
+                    ctx.lineWidth = 5;
                     ctx.stroke();
 
-                    // 광기의 초롱한 눈
+                    // 초롱한 눈
                     ctx.fillStyle = "#212529";
                     [-0.32, 0.32].forEach(x => {
                         ctx.beginPath();
-                        ctx.arc(x * r, -r * 0.08, 7, 0, Math.PI * 2);
+                        ctx.arc(x * r, -r * 0.08, 9, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.fillStyle = "#ffffff";
                         ctx.beginPath();
-                        ctx.arc(x * r - 2, -r * 0.08 - 2, 3, 0, Math.PI * 2);
+                        ctx.arc(x * r - 3, -r * 0.08 - 3, 3.8, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.fillStyle = "#212529";
                     });
 
-                    // 광기 어린 "야하~!" 벌린 입
+                    // 벌린 입
                     ctx.fillStyle = "#e03131";
                     ctx.beginPath();
                     ctx.arc(0, r * 0.2, r * 0.28, 0, Math.PI);
                     ctx.closePath();
                     ctx.fill();
                     ctx.strokeStyle = "#212529";
-                    ctx.lineWidth = 2.8;
+                    ctx.lineWidth = 3.5;
                     ctx.stroke();
 
                     // 핑크 볼
-                    ctx.fillStyle = "rgba(255, 107, 107, 0.6)";
+                    ctx.fillStyle = "rgba(255, 107, 107, 0.65)";
                     ctx.beginPath();
-                    ctx.arc(-r * 0.58, r * 0.18, 12, 0, Math.PI * 2);
-                    ctx.arc(r * 0.58, r * 0.18, 12, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                }
-            },
-            {
-                level: 8,
-                name: "카니",
-                radius: 126,
-                color: "#ffc9c9",
-                score: 512,
-                voice: "kani",
-                desc: "카니카니! 후루츠짱",
-                draw(ctx, r) {
-                    ctx.save();
-                    // 머리 위의 귀여운 분홍 게 모자 (집게발)
-                    ctx.fillStyle = "#ff6b81";
-                    ctx.strokeStyle = "#c92a2a";
-                    ctx.lineWidth = 4;
-                    // 좌우 집게발
-                    [-0.6, 0.6].forEach(x => {
-                        ctx.beginPath();
-                        ctx.arc(x * r * 0.95, -r * 0.85, r * 0.24, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.stroke();
-                    });
-
-                    // 게 등껍질 모자
-                    ctx.fillStyle = "#ff8787";
-                    ctx.beginPath();
-                    ctx.ellipse(0, -r * 0.6, r * 0.65, r * 0.35, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    // 게 모자의 작은 눈 2개
-                    ctx.fillStyle = "#ffffff";
-                    [-0.2, 0.2].forEach(x => {
-                        ctx.beginPath();
-                        ctx.arc(x * r, -r * 0.8, 6, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = "#000";
-                        ctx.beginPath();
-                        ctx.arc(x * r, -r * 0.8, 3, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = "#fff";
-                    });
-
-                    // 얼굴 본체
-                    ctx.fillStyle = "#fff0f3";
-                    ctx.beginPath();
-                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = "#ff6b81";
-                    ctx.lineWidth = 4.5;
-                    ctx.stroke();
-
-                    // 카니의 천사 같은 미소 눈
-                    ctx.strokeStyle = "#495057";
-                    ctx.lineWidth = 3.5;
-                    [-0.32, 0.32].forEach(x => {
-                        ctx.beginPath();
-                        ctx.arc(x * r, 0, 8, Math.PI * 1.1, Math.PI * 1.9);
-                        ctx.stroke();
-                    });
-
-                    // 방긋 웃는 입
-                    ctx.fillStyle = "#ff8787";
-                    ctx.beginPath();
-                    ctx.arc(0, r * 0.25, 10, 0, Math.PI);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    // 홍조
-                    ctx.fillStyle = "rgba(255, 107, 129, 0.65)";
-                    ctx.beginPath();
-                    ctx.arc(-r * 0.55, r * 0.2, 14, 0, Math.PI * 2);
-                    ctx.arc(r * 0.55, r * 0.2, 14, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                }
-            },
-            {
-                level: 9,
-                name: "슈퍼 우사기",
-                radius: 148,
-                color: "#ffe066",
-                score: 1024,
-                voice: "super_usagi",
-                desc: "푸루루루~ 폭주 모드",
-                draw(ctx, r) {
-                    ctx.save();
-                    // 황금 오라 (Aura glow)
-                    ctx.strokeStyle = "rgba(255, 212, 59, 0.8)";
-                    ctx.lineWidth = 8;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, r * 0.95, 0, Math.PI * 2);
-                    ctx.stroke();
-
-                    // 번개 스파크 효과
-                    ctx.strokeStyle = "#ffd43b";
-                    ctx.lineWidth = 4;
-                    for (let i = 0; i < 6; i++) {
-                        const ang = (i / 6) * Math.PI * 2;
-                        const x1 = Math.cos(ang) * r * 0.95;
-                        const y1 = Math.sin(ang) * r * 0.95;
-                        const x2 = Math.cos(ang) * (r * 1.15);
-                        const y2 = Math.sin(ang) * (r * 1.15);
-                        ctx.beginPath();
-                        ctx.moveTo(x1, y1);
-                        ctx.lineTo(x2, y2);
-                        ctx.stroke();
-                    }
-
-                    // 쫑긋 귀
-                    ctx.fillStyle = "#ffe066";
-                    ctx.strokeStyle = "#f59f00";
-                    ctx.lineWidth = 5;
-                    [-0.5, 0.5].forEach((x, i) => {
-                        ctx.beginPath();
-                        ctx.ellipse(x * r * 0.9, -r * 0.95, r * 0.25, r * 0.6, (i === 0 ? -0.3 : 0.3), 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.stroke();
-                    });
-
-                    // 얼굴 본체
-                    ctx.fillStyle = "#fff3bf";
-                    ctx.beginPath();
-                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = "#f59f00";
-                    ctx.lineWidth = 5;
-                    ctx.stroke();
-
-                    // 번쩍이는 록스타 눈
-                    ctx.fillStyle = "#212529";
-                    [-0.34, 0.34].forEach(x => {
-                        ctx.beginPath();
-                        ctx.arc(x * r, -r * 0.08, 9, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = "#ffe066";
-                        ctx.beginPath();
-                        ctx.arc(x * r - 3, -r * 0.08 - 3, 4, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = "#212529";
-                    });
-
-                    // 샤우팅 입
-                    ctx.fillStyle = "#c92a2a";
-                    ctx.beginPath();
-                    ctx.ellipse(0, r * 0.25, r * 0.32, r * 0.22, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = "#212529";
-                    ctx.lineWidth = 3.5;
-                    ctx.stroke();
-
-                    // 홍조
-                    ctx.fillStyle = "rgba(255, 107, 107, 0.7)";
-                    ctx.beginPath();
-                    ctx.arc(-r * 0.6, r * 0.15, 16, 0, Math.PI * 2);
-                    ctx.arc(r * 0.6, r * 0.15, 16, 0, Math.PI * 2);
+                    ctx.arc(-r * 0.58, r * 0.18, 15, 0, Math.PI * 2);
+                    ctx.arc(r * 0.58, r * 0.18, 15, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 }
             },
             {
                 level: 10,
-                name: "👑 킹 치이카와",
+                name: "👑 대왕 치이카와",
                 radius: 175,
                 color: "#ffc2d1",
                 score: 2048,
                 voice: "king",
-                desc: "전설의 수박 킹 치이카와!",
+                desc: "전설의 대왕 치이카와!",
                 draw(ctx, r) {
                     ctx.save();
                     // 무지개 왕관 글로우
@@ -1363,10 +1338,10 @@
                     ctx.lineWidth = 6;
                     ctx.stroke();
 
-                    // 화려한 황금 왕관 (Crown)
+                    // 화려한 대왕 황금 왕관
                     ctx.fillStyle = "#ffd43b";
                     ctx.strokeStyle = "#e67700";
-                    ctx.lineWidth = 3.5;
+                    ctx.lineWidth = 4;
                     ctx.beginPath();
                     ctx.moveTo(-r * 0.45, -r * 0.75);
                     ctx.lineTo(-r * 0.55, -r * 1.15);
@@ -1390,7 +1365,7 @@
                     ctx.arc(r * 0.35, -r * 0.95, 5, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // 사랑과 감동의 초롱초롱 눈
+                    // 초롱초롱한 눈
                     ctx.fillStyle = "#212529";
                     [-0.35, 0.35].forEach(x => {
                         ctx.beginPath();
@@ -1443,69 +1418,53 @@
             }
         }
 
-        // Web Audio 기반 고유 캐릭터 음성 & 효과음 합성기
+        // Web Audio 기반 캐릭터 음성 합성기
         function playCharacterVoice(voiceType) {
             if (!isSfxOn) return;
             initAudio();
             if (!audioCtx) return;
 
-            const now = audioCtx.currentTime;
-
             switch (voiceType) {
-                case 'pochette': // Lv 0 뾱!
+                case 'chiikabu': // Lv 0 치이카부 뾱!
                     playToneSequence([
-                        { freq: 880, type: 'sine', duration: 0.08, vol: 0.3 }
+                        { freq: 880, type: 'sine', duration: 0.07, vol: 0.3 }
                     ]);
                     break;
-                case 'shisa': // Lv 1 우레시이!
+                case 'pajama': // Lv 1 파자마파티즈 ("우-와와와~ 우와!")
                     playToneSequence([
-                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.35 },
+                        { freq: 523, type: 'triangle', duration: 0.1, vol: 0.35 },
+                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.4 },
                         { freq: 784, type: 'triangle', duration: 0.12, vol: 0.4 },
                         { freq: 1046, type: 'sine', duration: 0.25, vol: 0.45 }
                     ]);
                     break;
-                case 'kurimanju': // Lv 2 하아아~! (시원한 한잔 사운드)
+                case 'momonga': // Lv 2 모몽가 ("호메로!(칭찬해라!)")
+                    playToneSequence([
+                        { freq: 987, type: 'sine', duration: 0.1, vol: 0.4 },
+                        { freq: 1318, type: 'sine', duration: 0.2, vol: 0.45 }
+                    ]);
+                    break;
+                case 'kurimanju': // Lv 3 쿠리만쥬 ("하아아~!(캬아~)")
                     playToneSequence([
                         { freq: 440, type: 'sawtooth', duration: 0.12, vol: 0.25 },
                         { freq: 330, type: 'sawtooth', duration: 0.25, vol: 0.3 }
                     ]);
                     playNoiseBurst(0.2, 0.15); // 청량감
                     break;
-                case 'momonga': // Lv 3 호메로! (애교 & 하이톤)
+                case 'chiikawa': // Lv 4 치이카와 ("와아!", "후에에~!")
                     playToneSequence([
-                        { freq: 987, type: 'sine', duration: 0.1, vol: 0.4 },
-                        { freq: 1318, type: 'sine', duration: 0.18, vol: 0.45 }
+                        { freq: 1046, type: 'sine', duration: 0.12, vol: 0.45 },
+                        { freq: 1318, type: 'sine', duration: 0.14, vol: 0.5 },
+                        { freq: 1568, type: 'sine', duration: 0.28, vol: 0.55 }
                     ]);
                     break;
-                case 'rakko': // Lv 4 하앗! (검술 기합)
+                case 'rakko': // Lv 5 랏코 ("하앗!" 검술 기합)
                     playToneSequence([
                         { freq: 523, type: 'square', duration: 0.08, vol: 0.35 },
                         { freq: 392, type: 'sawtooth', duration: 0.2, vol: 0.4 }
                     ]);
                     break;
-                case 'hachiware': // Lv 5 난또까 나레~! (어떻게든 돼라!)
-                    playToneSequence([
-                        { freq: 587, type: 'triangle', duration: 0.1, vol: 0.4 },
-                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.4 },
-                        { freq: 880, type: 'sine', duration: 0.15, vol: 0.45 },
-                        { freq: 1174, type: 'sine', duration: 0.3, vol: 0.5 }
-                    ]);
-                    break;
-                case 'chiikawa': // Lv 6 와아~! 후에에~!
-                    playToneSequence([
-                        { freq: 1046, type: 'sine', duration: 0.12, vol: 0.45 },
-                        { freq: 1318, type: 'sine', duration: 0.14, vol: 0.5 },
-                        { freq: 1568, type: 'sine', duration: 0.3, vol: 0.55 }
-                    ]);
-                    break;
-                case 'usagi': // Lv 7 우라~! 야하-! (광기의 토끼)
-                    playToneSequence([
-                        { freq: 440, type: 'sawtooth', duration: 0.08, vol: 0.45 },
-                        { freq: 880, type: 'sawtooth', duration: 0.1, vol: 0.5 },
-                        { freq: 1760, type: 'square', duration: 0.28, vol: 0.6 }
-                    ]);
-                    break;
-                case 'kani': // Lv 8 카니카니~! (후루츠짱)
+                case 'kani': // Lv 6 카니 ("카니카니~!")
                     playToneSequence([
                         { freq: 784, type: 'sine', duration: 0.09, vol: 0.45 },
                         { freq: 880, type: 'sine', duration: 0.09, vol: 0.45 },
@@ -1513,24 +1472,38 @@
                         { freq: 1318, type: 'triangle', duration: 0.25, vol: 0.55 }
                     ]);
                     break;
-                case 'super_usagi': // Lv 9 푸루루루루~ 팟! (일렉트릭 샤우팅)
-                    for (let i = 0; i < 6; i++) {
-                        playToneSequence([{ freq: 600 + (i % 2) * 500, type: 'sawtooth', duration: 0.05, vol: 0.4 }], i * 0.04);
-                    }
-                    setTimeout(() => {
-                        playToneSequence([{ freq: 1760, type: 'square', duration: 0.4, vol: 0.65 }]);
-                    }, 240);
+                case 'shisa': // Lv 7 시사 ("우레시이!(기뻐!)")
+                    playToneSequence([
+                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.38 },
+                        { freq: 784, type: 'triangle', duration: 0.12, vol: 0.42 },
+                        { freq: 1046, type: 'sine', duration: 0.28, vol: 0.48 }
+                    ]);
                     break;
-                case 'king': // Lv 10 대망의 킹 치이카와 수박 완성 팡파레!
+                case 'hachiware': // Lv 8 하치와레 ("난또까 나레~!(어떻게든 돼라!)")
+                    playToneSequence([
+                        { freq: 587, type: 'triangle', duration: 0.1, vol: 0.4 },
+                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.4 },
+                        { freq: 880, type: 'sine', duration: 0.15, vol: 0.45 },
+                        { freq: 1174, type: 'sine', duration: 0.3, vol: 0.55 }
+                    ]);
+                    break;
+                case 'usagi': // Lv 9 우사기 ("우라~!", "야하-!", "이~야하!")
+                    playToneSequence([
+                        { freq: 440, type: 'sawtooth', duration: 0.08, vol: 0.45 },
+                        { freq: 880, type: 'sawtooth', duration: 0.1, vol: 0.5 },
+                        { freq: 1760, type: 'square', duration: 0.32, vol: 0.65 }
+                    ]);
+                    break;
+                case 'king': // Lv 10 대망의 대왕 치이카와 완성 축하 팡파레!
                     playToneSequence([
                         { freq: 523.25, type: 'triangle', duration: 0.15, vol: 0.5 },
                         { freq: 659.25, type: 'triangle', duration: 0.15, vol: 0.5 },
                         { freq: 783.99, type: 'triangle', duration: 0.15, vol: 0.5 },
-                        { freq: 1046.5, type: 'sine', duration: 0.6, vol: 0.7 }
+                        { freq: 1046.5, type: 'sine', duration: 0.65, vol: 0.75 }
                     ]);
                     confetti({
-                        particleCount: 120,
-                        spread: 80,
+                        particleCount: 140,
+                        spread: 85,
                         origin: { y: 0.6 }
                     });
                     break;
