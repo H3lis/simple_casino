@@ -1515,42 +1515,21 @@
             }
         }
 
-        // 실제 캐릭터 음성 MP3 오디오 풀
+        // 사운드 폴더에 실제 존재하는 음성 파일만 사용
         const audioCache = {};
-        const VOICE_FILES = {
-            chiikabu: 'assets/sounds/chiikabu.mp3',
-            pajama: 'assets/sounds/pajama.mp3',
-            momonga: 'assets/sounds/momonga.mp3',
-            kurimanju: 'assets/sounds/kurimanju.mp3',
-            chiikawa: 'assets/sounds/chiikawa.mp3',
-            rakko: 'assets/sounds/rakko.mp3',
-            kani: 'assets/sounds/kani.mp3',
-            shisa: 'assets/sounds/shisa.mp3',
-            hachiware: 'assets/sounds/hachiware.mp3',
-            usagi: 'assets/sounds/usagi.mp3',
-            king: 'assets/sounds/king.mp3'
-        };
+        const VOICE_SRC = 'assets/sounds/bryy.mp3';
 
-        // 실제 캐릭터 음성 재생 함수 (대사 텍스트 없이 진짜 애니 목소리 출력)
+        // 캐릭터 음성 재생 함수 (모든 캐릭터가 bryy.mp3 재생, 신디 폴백 없음)
         function playCharacterVoice(voiceType) {
             if (!isSfxOn) return;
             initAudio();
 
-            // 1. 실제 MP3 음성 파일 우선 재생
-            const src = VOICE_FILES[voiceType];
-            if (src) {
-                try {
-                    const sound = new Audio(src);
-                    sound.volume = 0.85;
-                    sound.play().catch(e => {
-                        console.warn("Audio autoplay blocked or failed, fallback to synth:", e);
-                        fallbackSynthVoice(voiceType);
-                    });
-                } catch (e) {
-                    fallbackSynthVoice(voiceType);
-                }
-            } else {
-                fallbackSynthVoice(voiceType);
+            try {
+                const sound = new Audio(VOICE_SRC);
+                sound.volume = 0.85;
+                sound.play().catch(e => console.warn("Audio play failed:", e));
+            } catch (e) {
+                console.warn("Audio play failed:", e);
             }
 
             // 11단계 대왕 치이카와 축하 콘페티
