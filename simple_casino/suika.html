@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>치이카와 수박 게임 (ちいかわ スイカゲーム) - 실시간 랭킹</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;600;800;900&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+    <!-- Matter.js 2D Physics Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <!-- Firebase SDK (Casino Compatible) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #fef6f9;
+            --main-pink: #ff85a2;
+            --main-pink-light: #ffc2d1;
+            --main-yellow: #ffe57f;
+            --main-blue: #70d6ff;
+            --panel-bg: rgba(255, 255, 255, 0.88);
+            --border-color: rgba(255, 133, 162, 0.25);
+            --text-dark: #3a2e39;
+            --text-muted: #8b7987;
+            --gold: #ffb703;
+            --shadow: 0 10px 30px rgba(255, 133, 162, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(255, 194, 209, 0.45) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 229, 127, 0.4) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, #ffffff 0%, #fef3f6 100%);
+            color: var(--text-dark);
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 10px;
+        }
+
+        /* Top Bar Navigation */
+        .top-navbar {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: var(--panel-bg);
+            border-radius: 18px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(255, 133, 162, 0.12);
+            backdrop-filter: blur(10px);
+        }
+
+        .back-casino-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            background: linear-gradient(135deg, #181135, #352668);
+            color: #ffd166;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(24, 17, 53, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .back-casino-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(24, 17, 53, 0.35);
+        }
+
+        .user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 133, 162, 0.12);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #d6336c;
+            cursor: pointer;
+            border: 1px solid rgba(255, 133, 162, 0.3);
+            transition: all 0.2s;
+        }
+
+        .user-chip:hover {
+            background: rgba(255, 133, 162, 0.2);
+        }
+
+        .audio-toggle-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 6px 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.15s;
+        }
+
+        .audio-toggle-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* Game Header Dashboard */
+        .game-header {
+            width: 100%;
+            max-width: 520px;
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card {
+            background: var(--panel-bg);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            padding: 8px 12px;
+            box-shadow: 0 4px 15px rgba(255, 133, 162, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #d6336c;
+            line-height: 1.2;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .next-preview-card {
+            background: var(--panel-bg);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            padding: 6px 14px;
+            box-shadow: 0 4px 15px rgba(255, 133, 162, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+        }
+
+        #nextCanvas {
+            width: 44px;
+            height: 44px;
+            margin-top: 2px;
+        }
+
+        /* Game Main Canvas Container */
+        .game-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            aspect-ratio: 420 / 600;
+            background: #ffffff;
+            border-radius: 24px;
+            border: 4px solid var(--main-pink-light);
+            box-shadow: 0 12px 35px rgba(255, 133, 162, 0.22);
+            overflow: hidden;
+            touch-action: none;
+            display: flex;
+            justify-content: center;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            touch-action: none;
+            cursor: pointer;
+        }
+
+        /* Danger Deadline line visual */
+        .deadline-indicator {
+            position: absolute;
+            top: 75px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            border-top: 2px dashed rgba(255, 107, 107, 0.6);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 12px;
+        }
+
+        .deadline-badge {
+            background: rgba(255, 107, 107, 0.15);
+            color: #e03131;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 8px;
+            transform: translateY(-50%);
+        }
+
+        /* Drop Guide Top Bar */
+        .drop-zone-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            pointer-events: none;
+        }
+
+        /* Evolution Tier Chart Modal / Bar */
+        .evolution-bar {
+            width: 100%;
+            max-width: 520px;
+            margin-top: 10px;
+            background: var(--panel-bg);
+            border-radius: 18px;
+            border: 2px solid var(--border-color);
+            padding: 10px 14px;
+            box-shadow: 0 4px 15px rgba(255, 133, 162, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .evolution-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .evolution-steps {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow-x: auto;
+            padding: 4px 0;
+            gap: 6px;
+            scrollbar-width: none;
+        }
+
+        .evolution-steps::-webkit-scrollbar {
+            display: none;
+        }
+
+        .evo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            min-width: 38px;
+            text-align: center;
+        }
+
+        .evo-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #ffccd5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .evo-arrow {
+            color: #ffa8ba;
+            font-weight: 900;
+            font-size: 0.75rem;
+        }
+
+        /* Leaderboard Section (Casino Synced) */
+        .leaderboard-section {
+            width: 100%;
+            max-width: 520px;
+            margin-top: 14px;
+            margin-bottom: 24px;
+            background: var(--panel-bg);
+            border-radius: 22px;
+            border: 2px solid var(--border-color);
+            padding: 16px;
+            box-shadow: 0 8px 25px rgba(255, 133, 162, 0.12);
+        }
+
+        .lb-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .lb-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #d6336c;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lb-status {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: rgba(5, 179, 117, 0.12);
+            color: #05b375;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .lb-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #05b375;
+            animation: pulseDot 1.5s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        /* 1st Podium Spotlight */
+        .podium-box {
+            background: linear-gradient(135deg, #fff9db 0%, #fff3bf 100%);
+            border: 2px solid #ffd43b;
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(255, 212, 59, 0.25);
+        }
+
+        .podium-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .podium-crown {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 2px 4px rgba(255, 183, 3, 0.4));
+        }
+
+        .podium-name {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #7f5f00;
+        }
+
+        .podium-score {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #e67700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Table Ranking */
+        .lb-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .lb-table th {
+            text-align: left;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding: 8px 6px;
+            border-bottom: 1px solid rgba(255, 133, 162, 0.2);
+        }
+
+        .lb-table td {
+            padding: 10px 6px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .lb-rank {
+            width: 44px;
+            font-weight: 900;
+        }
+
+        .lb-table tr.my-row {
+            background: rgba(255, 133, 162, 0.15);
+            border-radius: 8px;
+        }
+
+        .lb-table tr.my-row td {
+            color: #d6336c;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(40, 20, 30, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 28px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            border: 3px solid #ffccd5;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #d6336c;
+            margin-bottom: 8px;
+        }
+
+        .modal-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, #ff85a2, #f72585);
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(247, 37, 133, 0.3);
+            transition: all 0.2s;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(247, 37, 133, 0.4);
+        }
+
+        /* Floating Message Toast */
+        .combo-toast {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #ff85a2;
+            padding: 8px 18px;
+            border-radius: 24px;
+            color: #d6336c;
+            font-weight: 900;
+            font-size: 1.1rem;
+            pointer-events: none;
+            box-shadow: 0 8px 25px rgba(255, 133, 162, 0.3);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        .combo-toast.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Bar Navigation (Casino Synced) -->
+    <header class="top-navbar">
+        <a href="index.html" class="back-casino-btn">
+            <span>🎰</span>
+            <span>심플 카지노</span>
+        </a>
+
+        <div id="userChip" class="user-chip" onclick="promptLogin()">
+            <span>🔑</span>
+            <span id="userChipText">로그인</span>
+        </div>
+
+        <div style="display: flex; gap: 6px;">
+            <button id="bgmToggleBtn" class="audio-toggle-btn" title="배경음악 켜기/끄기" onclick="toggleBgm()">🎵</button>
+            <button id="sfxToggleBtn" class="audio-toggle-btn" title="음성 효과음 켜기/끄기" onclick="toggleSfx()">🔊</button>
+        </div>
+    </header>
+
+    <!-- Score & Next Character Dashboard -->
+    <section class="game-header">
+        <div class="stat-card">
+            <span class="stat-label">SCORE 점수</span>
+            <span id="scoreVal" class="stat-value">0</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">BEST 최고점수</span>
+            <span id="bestScoreVal" class="stat-value">0</span>
+        </div>
+        <div class="next-preview-card">
+            <span class="stat-label">NEXT</span>
+            <canvas id="nextCanvas" width="88" height="88"></canvas>
+        </div>
+    </section>
+
+    <!-- Game Physics Canvas Container -->
+    <main class="game-wrapper" id="gameWrapper">
+        <div class="deadline-indicator">
+            <span class="deadline-badge">⚠️ LIMIT</span>
+        </div>
+        <div id="comboToast" class="combo-toast">우사기 등장! 야하~!</div>
+        <canvas id="gameCanvas" width="420" height="600"></canvas>
+    </main>
+
+    <!-- Evolution Tier Bar -->
+    <section class="evolution-bar">
+        <div class="evolution-title">
+            <span>🌱 치이카와 진화 순서 (Merge Guide)</span>
+            <span style="font-size: 0.7rem; color: #ff85a2;">같은 친구가 만나면 커져요!</span>
+        </div>
+        <div class="evolution-steps" id="evoStepsList">
+            <!-- Populated via JS -->
+        </div>
+    </section>
+
+    <!-- Realtime Casino Synced Leaderboard -->
+    <section class="leaderboard-section">
+        <div class="lb-header">
+            <div class="lb-title">
+                <span>🏆</span>
+                <span>실시간 수박 랭킹 (Global Top 20)</span>
+            </div>
+            <div class="lb-status" id="dbStatus">
+                <span class="lb-dot"></span>
+                <span id="dbStatusText">카지노 연동</span>
+            </div>
+        </div>
+
+        <!-- 1st Spotlight Podium -->
+        <div class="podium-box" id="podiumBox" style="display: none;">
+            <div class="podium-left">
+                <span class="podium-crown">👑</span>
+                <div>
+                    <div style="font-size: 0.72rem; font-weight: 800; color: #d97706;">현재 1위 챔피언</div>
+                    <div class="podium-name" id="podiumName">-</div>
+                </div>
+            </div>
+            <div class="podium-score" id="podiumScore">0 P</div>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <table class="lb-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">순위</th>
+                    <th>플레이어</th>
+                    <th style="text-align: right;">최고 점수</th>
+                </tr>
+            </thead>
+            <tbody id="lbTableBody">
+                <tr>
+                    <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 18px;">
+                        랭킹을 불러오는 중입니다...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Game Over Modal -->
+    <div class="modal-overlay" id="gameOverModal">
+        <div class="modal-content">
+            <div style="font-size: 3rem; margin-bottom: 10px;">😭</div>
+            <h2 class="modal-title">GAME OVER</h2>
+            <p class="modal-desc" id="gameOverDesc">치이카와 친구들이 넘쳐버렸어요!</p>
+            <div style="background: #fff0f3; padding: 12px; border-radius: 14px; margin-bottom: 18px;">
+                <div style="font-size: 0.8rem; color: #8b7987; font-weight: 700;">최종 획득 점수</div>
+                <div id="finalScoreText" style="font-size: 2rem; font-weight: 900; color: #d6336c; font-family: 'Outfit';">0</div>
+            </div>
+            <button class="modal-btn" onclick="restartGame()">다시 도전하기 ✨</button>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-content">
+            <div style="font-size: 2.5rem; margin-bottom: 6px;">🔑</div>
+            <h2 class="modal-title">카지노 계정 로그인</h2>
+            <p class="modal-desc">심플 카지노와 동일한 닉네임과 PIN 4자리를 입력하세요.</p>
+            <input type="text" id="loginNickInput" placeholder="닉네임 (2~12자)" maxlength="12"
+                style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #ffccd5; font-size: 1rem; margin-bottom: 10px; outline: none;">
+            <input type="password" id="loginPinInput" placeholder="숫자 PIN 4자리" maxlength="4" pattern="[0-9]*" inputmode="numeric"
+                style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #ffccd5; font-size: 1rem; margin-bottom: 16px; outline: none; text-align: center; letter-spacing: 4px;">
+            <button class="modal-btn" onclick="submitLogin()">로그인 & 동기화 🚀</button>
+            <button onclick="closeLoginModal()" style="margin-top: 10px; background: none; border: none; color: #8b7987; font-weight: 700; cursor: pointer;">취소</button>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+           1. 치이카와 11단계 캐릭터 정의 (사용자 커스텀 사양 적용)
+           ============================================================ */
+        const CHARACTERS = [
+            {
+                level: 0,
+                name: "포셰트 가방",
+                radius: 20,
+                color: "#ffc2d1",
+                score: 2,
+                voice: "pochette",
+                desc: "갑옷아저씨의 포셰트",
+                draw(ctx, r) {
+                    // 도토리/핑크 포셰트 가방 모양
+                    ctx.save();
+                    // 본체 가방
+                    ctx.fillStyle = "#ff97b7";
+                    ctx.beginPath();
+                    ctx.arc(0, 2, r * 0.78, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#c2416b";
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+
+                    // 가방 덮개
+                    ctx.fillStyle = "#ffb3c6";
+                    ctx.beginPath();
+                    ctx.ellipse(0, -r * 0.2, r * 0.65, r * 0.35, 0, 0, Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // 가방 단추/리본
+                    ctx.fillStyle = "#ffe066";
+                    ctx.beginPath();
+                    ctx.arc(0, -r * 0.1, r * 0.18, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#b58900";
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                    // 끈
+                    ctx.strokeStyle = "#804000";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(0, -r * 0.2, r * 0.7, Math.PI * 1.1, Math.PI * 1.9);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 1,
+                name: "시사",
+                radius: 27,
+                color: "#ffe066",
+                score: 4,
+                voice: "shisa",
+                desc: "우레시이! 시사",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 몸체
+                    ctx.fillStyle = "#ffd43b";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#e67700";
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+
+                    // 꼬불꼬불 붉은/주황 갈기 털
+                    ctx.fillStyle = "#ff6b6b";
+                    [-0.5, 0, 0.5].forEach(ang => {
+                        ctx.beginPath();
+                        ctx.arc(Math.sin(ang) * r * 0.75, -r * 0.78 + Math.cos(ang) * 4, r * 0.22, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    // 눈 & 깜찍한 입
+                    ctx.fillStyle = "#49260a";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.3, -r * 0.05, 2.5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.3, -r * 0.05, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 미소 입
+                    ctx.strokeStyle = "#49260a";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(0, r * 0.2, r * 0.25, 0.1, Math.PI - 0.1);
+                    ctx.stroke();
+
+                    // 홍조
+                    ctx.fillStyle = "rgba(255, 107, 107, 0.55)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.45, r * 0.1, 4, 0, Math.PI * 2);
+                    ctx.arc(r * 0.45, r * 0.1, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 2,
+                name: "쿠리만쥬",
+                radius: 36,
+                color: "#e8b87d",
+                score: 8,
+                voice: "kurimanju",
+                desc: "하아아~ 선배",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 얼굴
+                    ctx.fillStyle = "#f3d5b5";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.9, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#8b5a2b";
+                    ctx.lineWidth = 2.8;
+                    ctx.stroke();
+
+                    // 밤색 머리 정수리
+                    ctx.fillStyle = "#8b5a2b";
+                    ctx.beginPath();
+                    ctx.arc(0, -r * 0.15, r * 0.85, Math.PI * 1.15, Math.PI * 1.85);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // 동그란 귀
+                    [-0.58, 0.58].forEach(x => {
+                        ctx.fillStyle = "#f3d5b5";
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.65, r * 0.22, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    // 똘망한 눈
+                    ctx.fillStyle = "#2c1d11";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.28, r * 0.05, 3.2, 0, Math.PI * 2);
+                    ctx.arc(r * 0.28, r * 0.05, 3.2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 시원하게 한잔 마신 "하아~" 세모 입
+                    ctx.fillStyle = "#c94a29";
+                    ctx.beginPath();
+                    ctx.arc(0, r * 0.32, r * 0.18, 0, Math.PI);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.strokeStyle = "#2c1d11";
+                    ctx.lineWidth = 1.8;
+                    ctx.stroke();
+
+                    // 홍조
+                    ctx.fillStyle = "rgba(235, 87, 87, 0.5)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.48, r * 0.18, 5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.48, r * 0.18, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 3,
+                name: "모몽가",
+                radius: 46,
+                color: "#a0e8ff",
+                score: 16,
+                voice: "momonga",
+                desc: "호메로! 모몽가",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 풍성한 하늘빛 귀
+                    ctx.fillStyle = "#70d6ff";
+                    ctx.strokeStyle = "#008ac7";
+                    ctx.lineWidth = 3;
+                    [-0.55, 0.55].forEach(x => {
+                        ctx.beginPath();
+                        ctx.ellipse(x * r, -r * 0.72, r * 0.3, r * 0.42, x * 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    // 귀 안쪽
+                    ctx.fillStyle = "#ffb3c6";
+                    [-0.55, 0.55].forEach(x => {
+                        ctx.beginPath();
+                        ctx.ellipse(x * r, -r * 0.7, r * 0.16, r * 0.26, x * 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    // 얼굴 몸통
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#008ac7";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    // 모몽가 특유의 초롱초롱한 큰 눈
+                    ctx.fillStyle = "#006699";
+                    [-0.32, 0.32].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.05, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                        // 눈망울 하이라이트
+                        ctx.fillStyle = "#ffffff";
+                        ctx.beginPath();
+                        ctx.arc(x * r - 1.5, -r * 0.05 - 1.5, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#006699";
+                    });
+
+                    // 칭찬해라! 앙칼진 세모 입
+                    ctx.strokeStyle = "#222";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(-4, r * 0.2);
+                    ctx.lineTo(0, r * 0.14);
+                    ctx.lineTo(4, r * 0.2);
+                    ctx.stroke();
+
+                    // 볼터치
+                    ctx.fillStyle = "rgba(255, 105, 180, 0.45)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.5, r * 0.15, 6, 0, Math.PI * 2);
+                    ctx.arc(r * 0.5, r * 0.15, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 4,
+                name: "랏코 선생",
+                radius: 58,
+                color: "#e6c280",
+                score: 32,
+                voice: "rakko",
+                desc: "늠름한 검사 선배",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 얼굴
+                    ctx.fillStyle = "#f5deb3";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.9, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#8b572a";
+                    ctx.lineWidth = 3.2;
+                    ctx.stroke();
+
+                    // 둥근 작은 귀
+                    [-0.7, 0.7].forEach(x => {
+                        ctx.fillStyle = "#d29054";
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.4, r * 0.2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    // 이마의 늠름한 십자 흉터
+                    ctx.strokeStyle = "#c0392b";
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(-6, -r * 0.45);
+                    ctx.lineTo(6, -r * 0.45);
+                    ctx.moveTo(0, -r * 0.55);
+                    ctx.lineTo(0, -r * 0.35);
+                    ctx.stroke();
+
+                    // 다부진 눈
+                    ctx.fillStyle = "#1e130c";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.3, -r * 0.05, 4.5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.3, -r * 0.05, 4.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 코 & 하얀 주둥이
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.ellipse(0, r * 0.2, r * 0.35, r * 0.25, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#8b572a";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    ctx.fillStyle = "#1e130c";
+                    ctx.beginPath();
+                    ctx.arc(0, r * 0.12, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 5,
+                name: "하치와레",
+                radius: 72,
+                color: "#64b5f6",
+                score: 64,
+                voice: "hachiware",
+                desc: "난또까 나레~!",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 파란 고양이 귀
+                    ctx.fillStyle = "#42a5f5";
+                    ctx.strokeStyle = "#1976d2";
+                    ctx.lineWidth = 3.5;
+                    [-0.55, 0.55].forEach(x => {
+                        ctx.beginPath();
+                        ctx.moveTo(x * r * 0.4, -r * 0.7);
+                        ctx.lineTo(x * r * 0.9, -r * 1.05);
+                        ctx.lineTo(x * r * 0.98, -r * 0.4);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    // 둥근 흰 얼굴
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#1976d2";
+                    ctx.lineWidth = 3.5;
+                    ctx.stroke();
+
+                    // 파란 팔(八)자 이마 머리
+                    ctx.fillStyle = "#42a5f5";
+                    ctx.beginPath();
+                    ctx.moveTo(-r * 0.88, -r * 0.2);
+                    ctx.bezierCurveTo(-r * 0.5, -r * 0.85, 0, -r * 0.35, 0, -r * 0.35);
+                    ctx.bezierCurveTo(0, -r * 0.35, r * 0.5, -r * 0.85, r * 0.88, -r * 0.2);
+                    ctx.arc(0, 0, r * 0.88, Math.PI * 1.9, Math.PI * 1.1, true);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // 눈 (긍정적인 눈빛)
+                    ctx.fillStyle = "#1e1e1e";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.32, -r * 0.02, 5.5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.32, -r * 0.02, 5.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    // 눈망울 하이라이트
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.32 - 1.8, -r * 0.02 - 1.8, 2, 0, Math.PI * 2);
+                    ctx.arc(r * 0.32 - 1.8, -r * 0.02 - 1.8, 2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 하치와레 특유의 ㅅ자 입 & 작은 송곳니
+                    ctx.strokeStyle = "#1e1e1e";
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.arc(-5, r * 0.18, 5, 0, Math.PI);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(5, r * 0.18, 5, 0, Math.PI);
+                    ctx.stroke();
+
+                    // 핑크 볼터치
+                    ctx.fillStyle = "rgba(255, 133, 162, 0.55)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.55, r * 0.15, 8, 0, Math.PI * 2);
+                    ctx.arc(r * 0.55, r * 0.15, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 6,
+                name: "치이카와",
+                radius: 88,
+                color: "#ffffff",
+                score: 128,
+                voice: "chiikawa",
+                desc: "와! 후에에~ 치이카와",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 작고 둥근 귀
+                    ctx.fillStyle = "#ffffff";
+                    ctx.strokeStyle = "#e87b99";
+                    ctx.lineWidth = 4;
+                    [-0.55, 0.55].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r * 0.9, -r * 0.65, r * 0.25, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                        // 귀 안쪽 핑크
+                        ctx.fillStyle = "#ffccd5";
+                        ctx.beginPath();
+                        ctx.arc(x * r * 0.9, -r * 0.65, r * 0.14, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#ffffff";
+                    });
+
+                    // 하얀 둥근 얼굴
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#e87b99";
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+
+                    // 치이카와 눈 (살짝 겁먹거나 감격한 큰 눈)
+                    ctx.fillStyle = "#222222";
+                    [-0.32, 0.32].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.05, 6.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        // 눈망울 2개
+                        ctx.fillStyle = "#ffffff";
+                        ctx.beginPath();
+                        ctx.arc(x * r - 2, -r * 0.05 - 2, 2.8, 0, Math.PI * 2);
+                        ctx.arc(x * r + 2, -r * 0.05 + 2, 1.4, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#222222";
+                    });
+
+                    // 귀여운 오므린 입 ("와!" 입)
+                    ctx.fillStyle = "#ff6b81";
+                    ctx.beginPath();
+                    ctx.ellipse(0, r * 0.22, 5, 7, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#222";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // 사랑스러운 핑크 볼터치 (사선 줄무늬 디테일)
+                    ctx.fillStyle = "rgba(255, 143, 171, 0.7)";
+                    [-0.55, 0.55].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, r * 0.16, 11, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    ctx.restore();
+                }
+            },
+            {
+                level: 7,
+                name: "우사기",
+                radius: 106,
+                color: "#fff3bf",
+                score: 256,
+                voice: "usagi",
+                desc: "우라~ 야하-! 우사기",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 길쭉한 토끼 귀 (좌우로 쫑긋)
+                    ctx.fillStyle = "#fff3bf";
+                    ctx.strokeStyle = "#fab005";
+                    ctx.lineWidth = 4.5;
+                    [-0.45, 0.45].forEach((x, i) => {
+                        ctx.beginPath();
+                        ctx.ellipse(x * r * 0.9, -r * 0.9, r * 0.22, r * 0.55, (i === 0 ? -0.25 : 0.25), 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+
+                        // 귀 안쪽
+                        ctx.fillStyle = "#ffc9c9";
+                        ctx.beginPath();
+                        ctx.ellipse(x * r * 0.9, -r * 0.9, r * 0.1, r * 0.35, (i === 0 ? -0.25 : 0.25), 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#fff3bf";
+                    });
+
+                    // 둥근 노란 얼굴
+                    ctx.fillStyle = "#fff3bf";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#fab005";
+                    ctx.lineWidth = 4.5;
+                    ctx.stroke();
+
+                    // 광기의 초롱한 눈
+                    ctx.fillStyle = "#212529";
+                    [-0.32, 0.32].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.08, 7, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#ffffff";
+                        ctx.beginPath();
+                        ctx.arc(x * r - 2, -r * 0.08 - 2, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#212529";
+                    });
+
+                    // 광기 어린 "야하~!" 벌린 입
+                    ctx.fillStyle = "#e03131";
+                    ctx.beginPath();
+                    ctx.arc(0, r * 0.2, r * 0.28, 0, Math.PI);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.strokeStyle = "#212529";
+                    ctx.lineWidth = 2.8;
+                    ctx.stroke();
+
+                    // 핑크 볼
+                    ctx.fillStyle = "rgba(255, 107, 107, 0.6)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.58, r * 0.18, 12, 0, Math.PI * 2);
+                    ctx.arc(r * 0.58, r * 0.18, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 8,
+                name: "카니",
+                radius: 126,
+                color: "#ffc9c9",
+                score: 512,
+                voice: "kani",
+                desc: "카니카니! 후루츠짱",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 머리 위의 귀여운 분홍 게 모자 (집게발)
+                    ctx.fillStyle = "#ff6b81";
+                    ctx.strokeStyle = "#c92a2a";
+                    ctx.lineWidth = 4;
+                    // 좌우 집게발
+                    [-0.6, 0.6].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r * 0.95, -r * 0.85, r * 0.24, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    // 게 등껍질 모자
+                    ctx.fillStyle = "#ff8787";
+                    ctx.beginPath();
+                    ctx.ellipse(0, -r * 0.6, r * 0.65, r * 0.35, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // 게 모자의 작은 눈 2개
+                    ctx.fillStyle = "#ffffff";
+                    [-0.2, 0.2].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.8, 6, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#000";
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.8, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#fff";
+                    });
+
+                    // 얼굴 본체
+                    ctx.fillStyle = "#fff0f3";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#ff6b81";
+                    ctx.lineWidth = 4.5;
+                    ctx.stroke();
+
+                    // 카니의 천사 같은 미소 눈
+                    ctx.strokeStyle = "#495057";
+                    ctx.lineWidth = 3.5;
+                    [-0.32, 0.32].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, 0, 8, Math.PI * 1.1, Math.PI * 1.9);
+                        ctx.stroke();
+                    });
+
+                    // 방긋 웃는 입
+                    ctx.fillStyle = "#ff8787";
+                    ctx.beginPath();
+                    ctx.arc(0, r * 0.25, 10, 0, Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // 홍조
+                    ctx.fillStyle = "rgba(255, 107, 129, 0.65)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.55, r * 0.2, 14, 0, Math.PI * 2);
+                    ctx.arc(r * 0.55, r * 0.2, 14, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 9,
+                name: "슈퍼 우사기",
+                radius: 148,
+                color: "#ffe066",
+                score: 1024,
+                voice: "super_usagi",
+                desc: "푸루루루~ 폭주 모드",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 황금 오라 (Aura glow)
+                    ctx.strokeStyle = "rgba(255, 212, 59, 0.8)";
+                    ctx.lineWidth = 8;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.95, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // 번개 스파크 효과
+                    ctx.strokeStyle = "#ffd43b";
+                    ctx.lineWidth = 4;
+                    for (let i = 0; i < 6; i++) {
+                        const ang = (i / 6) * Math.PI * 2;
+                        const x1 = Math.cos(ang) * r * 0.95;
+                        const y1 = Math.sin(ang) * r * 0.95;
+                        const x2 = Math.cos(ang) * (r * 1.15);
+                        const y2 = Math.sin(ang) * (r * 1.15);
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.stroke();
+                    }
+
+                    // 쫑긋 귀
+                    ctx.fillStyle = "#ffe066";
+                    ctx.strokeStyle = "#f59f00";
+                    ctx.lineWidth = 5;
+                    [-0.5, 0.5].forEach((x, i) => {
+                        ctx.beginPath();
+                        ctx.ellipse(x * r * 0.9, -r * 0.95, r * 0.25, r * 0.6, (i === 0 ? -0.3 : 0.3), 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    // 얼굴 본체
+                    ctx.fillStyle = "#fff3bf";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#f59f00";
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+
+                    // 번쩍이는 록스타 눈
+                    ctx.fillStyle = "#212529";
+                    [-0.34, 0.34].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.08, 9, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#ffe066";
+                        ctx.beginPath();
+                        ctx.arc(x * r - 3, -r * 0.08 - 3, 4, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#212529";
+                    });
+
+                    // 샤우팅 입
+                    ctx.fillStyle = "#c92a2a";
+                    ctx.beginPath();
+                    ctx.ellipse(0, r * 0.25, r * 0.32, r * 0.22, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#212529";
+                    ctx.lineWidth = 3.5;
+                    ctx.stroke();
+
+                    // 홍조
+                    ctx.fillStyle = "rgba(255, 107, 107, 0.7)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.6, r * 0.15, 16, 0, Math.PI * 2);
+                    ctx.arc(r * 0.6, r * 0.15, 16, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            },
+            {
+                level: 10,
+                name: "👑 킹 치이카와",
+                radius: 175,
+                color: "#ffc2d1",
+                score: 2048,
+                voice: "king",
+                desc: "전설의 수박 킹 치이카와!",
+                draw(ctx, r) {
+                    ctx.save();
+                    // 무지개 왕관 글로우
+                    const grad = ctx.createRadialGradient(0, 0, r * 0.6, 0, 0, r * 1.05);
+                    grad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+                    grad.addColorStop(0.8, "rgba(255, 192, 203, 0.6)");
+                    grad.addColorStop(1, "rgba(255, 215, 0, 0.8)");
+
+                    // 둥근 귀
+                    ctx.fillStyle = "#ffffff";
+                    ctx.strokeStyle = "#d6336c";
+                    ctx.lineWidth = 6;
+                    [-0.58, 0.58].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r * 0.9, -r * 0.65, r * 0.28, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    });
+
+                    // 얼굴 몸통
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.88, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#d6336c";
+                    ctx.lineWidth = 6;
+                    ctx.stroke();
+
+                    // 화려한 황금 왕관 (Crown)
+                    ctx.fillStyle = "#ffd43b";
+                    ctx.strokeStyle = "#e67700";
+                    ctx.lineWidth = 3.5;
+                    ctx.beginPath();
+                    ctx.moveTo(-r * 0.45, -r * 0.75);
+                    ctx.lineTo(-r * 0.55, -r * 1.15);
+                    ctx.lineTo(-r * 0.2, -r * 0.95);
+                    ctx.lineTo(0, -r * 1.25);
+                    ctx.lineTo(r * 0.2, -r * 0.95);
+                    ctx.lineTo(r * 0.55, -r * 1.15);
+                    ctx.lineTo(r * 0.45, -r * 0.75);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // 왕관 보석
+                    ctx.fillStyle = "#e03131";
+                    ctx.beginPath();
+                    ctx.arc(0, -r * 1.05, 7, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "#1971c2";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.35, -r * 0.95, 5, 0, Math.PI * 2);
+                    ctx.arc(r * 0.35, -r * 0.95, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 사랑과 감동의 초롱초롱 눈
+                    ctx.fillStyle = "#212529";
+                    [-0.35, 0.35].forEach(x => {
+                        ctx.beginPath();
+                        ctx.arc(x * r, -r * 0.02, 11, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#ffffff";
+                        ctx.beginPath();
+                        ctx.arc(x * r - 3.5, -r * 0.02 - 3.5, 4.5, 0, Math.PI * 2);
+                        ctx.arc(x * r + 3.5, -r * 0.02 + 3.5, 2.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = "#212529";
+                    });
+
+                    // 활짝 웃는 환호 입
+                    ctx.fillStyle = "#ff6b81";
+                    ctx.beginPath();
+                    ctx.arc(0, r * 0.25, 14, 0, Math.PI);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.strokeStyle = "#212529";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    // 핑크 볼터치
+                    ctx.fillStyle = "rgba(255, 105, 180, 0.75)";
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.6, r * 0.2, 18, 0, Math.PI * 2);
+                    ctx.arc(r * 0.6, r * 0.2, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+        ];
+
+        /* ============================================================
+           2. Web Audio API 사운드 및 캐릭터 음성 엔진
+           ============================================================ */
+        let audioCtx = null;
+        let isSfxOn = true;
+        let isBgmOn = false;
+        let bgmTimer = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Web Audio 기반 고유 캐릭터 음성 & 효과음 합성기
+        function playCharacterVoice(voiceType) {
+            if (!isSfxOn) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            switch (voiceType) {
+                case 'pochette': // Lv 0 뾱!
+                    playToneSequence([
+                        { freq: 880, type: 'sine', duration: 0.08, vol: 0.3 }
+                    ]);
+                    break;
+                case 'shisa': // Lv 1 우레시이!
+                    playToneSequence([
+                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.35 },
+                        { freq: 784, type: 'triangle', duration: 0.12, vol: 0.4 },
+                        { freq: 1046, type: 'sine', duration: 0.25, vol: 0.45 }
+                    ]);
+                    break;
+                case 'kurimanju': // Lv 2 하아아~! (시원한 한잔 사운드)
+                    playToneSequence([
+                        { freq: 440, type: 'sawtooth', duration: 0.12, vol: 0.25 },
+                        { freq: 330, type: 'sawtooth', duration: 0.25, vol: 0.3 }
+                    ]);
+                    playNoiseBurst(0.2, 0.15); // 청량감
+                    break;
+                case 'momonga': // Lv 3 호메로! (애교 & 하이톤)
+                    playToneSequence([
+                        { freq: 987, type: 'sine', duration: 0.1, vol: 0.4 },
+                        { freq: 1318, type: 'sine', duration: 0.18, vol: 0.45 }
+                    ]);
+                    break;
+                case 'rakko': // Lv 4 하앗! (검술 기합)
+                    playToneSequence([
+                        { freq: 523, type: 'square', duration: 0.08, vol: 0.35 },
+                        { freq: 392, type: 'sawtooth', duration: 0.2, vol: 0.4 }
+                    ]);
+                    break;
+                case 'hachiware': // Lv 5 난또까 나레~! (어떻게든 돼라!)
+                    playToneSequence([
+                        { freq: 587, type: 'triangle', duration: 0.1, vol: 0.4 },
+                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.4 },
+                        { freq: 880, type: 'sine', duration: 0.15, vol: 0.45 },
+                        { freq: 1174, type: 'sine', duration: 0.3, vol: 0.5 }
+                    ]);
+                    break;
+                case 'chiikawa': // Lv 6 와아~! 후에에~!
+                    playToneSequence([
+                        { freq: 1046, type: 'sine', duration: 0.12, vol: 0.45 },
+                        { freq: 1318, type: 'sine', duration: 0.14, vol: 0.5 },
+                        { freq: 1568, type: 'sine', duration: 0.3, vol: 0.55 }
+                    ]);
+                    break;
+                case 'usagi': // Lv 7 우라~! 야하-! (광기의 토끼)
+                    playToneSequence([
+                        { freq: 440, type: 'sawtooth', duration: 0.08, vol: 0.45 },
+                        { freq: 880, type: 'sawtooth', duration: 0.1, vol: 0.5 },
+                        { freq: 1760, type: 'square', duration: 0.28, vol: 0.6 }
+                    ]);
+                    break;
+                case 'kani': // Lv 8 카니카니~! (후루츠짱)
+                    playToneSequence([
+                        { freq: 784, type: 'sine', duration: 0.09, vol: 0.45 },
+                        { freq: 880, type: 'sine', duration: 0.09, vol: 0.45 },
+                        { freq: 1046, type: 'sine', duration: 0.12, vol: 0.5 },
+                        { freq: 1318, type: 'triangle', duration: 0.25, vol: 0.55 }
+                    ]);
+                    break;
+                case 'super_usagi': // Lv 9 푸루루루루~ 팟! (일렉트릭 샤우팅)
+                    for (let i = 0; i < 6; i++) {
+                        playToneSequence([{ freq: 600 + (i % 2) * 500, type: 'sawtooth', duration: 0.05, vol: 0.4 }], i * 0.04);
+                    }
+                    setTimeout(() => {
+                        playToneSequence([{ freq: 1760, type: 'square', duration: 0.4, vol: 0.65 }]);
+                    }, 240);
+                    break;
+                case 'king': // Lv 10 대망의 킹 치이카와 수박 완성 팡파레!
+                    playToneSequence([
+                        { freq: 523.25, type: 'triangle', duration: 0.15, vol: 0.5 },
+                        { freq: 659.25, type: 'triangle', duration: 0.15, vol: 0.5 },
+                        { freq: 783.99, type: 'triangle', duration: 0.15, vol: 0.5 },
+                        { freq: 1046.5, type: 'sine', duration: 0.6, vol: 0.7 }
+                    ]);
+                    confetti({
+                        particleCount: 120,
+                        spread: 80,
+                        origin: { y: 0.6 }
+                    });
+                    break;
+            }
+        }
+
+        function playToneSequence(notes, startOffset = 0) {
+            let offset = startOffset;
+            notes.forEach(note => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = note.type || 'sine';
+                osc.frequency.setValueAtTime(note.freq, audioCtx.currentTime + offset);
+
+                gain.gain.setValueAtTime(note.vol || 0.3, audioCtx.currentTime + offset);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + offset + note.duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(audioCtx.currentTime + offset);
+                osc.stop(audioCtx.currentTime + offset + note.duration);
+
+                offset += note.duration;
+            });
+        }
+
+        function playNoiseBurst(duration, vol) {
+            const bufferSize = audioCtx.sampleRate * duration;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+            noise.connect(gain);
+            gain.connect(audioCtx.destination);
+            noise.start();
+        }
+
+        // 귀여운 치이카와 파스텔 BGM 신디사이저 루프
+        const BGM_MELODY = [
+            523, 659, 784, 1046, 784, 659,
+            587, 740, 880, 1174, 880, 740,
+            659, 784, 1046, 1318, 1046, 784,
+            523, 659, 784, 523
+        ];
+        let bgmNoteIndex = 0;
+
+        function toggleBgm() {
+            initAudio();
+            isBgmOn = !isBgmOn;
+            const btn = document.getElementById('bgmToggleBtn');
+            if (isBgmOn) {
+                btn.innerText = '🎶';
+                btn.style.background = '#ffc2d1';
+                startBgmLoop();
+            } else {
+                btn.innerText = '🎵';
+                btn.style.background = 'white';
+                stopBgmLoop();
+            }
+        }
+
+        function toggleSfx() {
+            isSfxOn = !isSfxOn;
+            const btn = document.getElementById('sfxToggleBtn');
+            btn.innerText = isSfxOn ? '🔊' : '🔇';
+            btn.style.background = isSfxOn ? 'white' : '#e9ecef';
+        }
+
+        function startBgmLoop() {
+            if (bgmTimer) clearInterval(bgmTimer);
+            bgmTimer = setInterval(() => {
+                if (!isBgmOn || !audioCtx) return;
+                const freq = BGM_MELODY[bgmNoteIndex % BGM_MELODY.length];
+                bgmNoteIndex++;
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.28);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }, 300);
+        }
+
+        function stopBgmLoop() {
+            if (bgmTimer) {
+                clearInterval(bgmTimer);
+                bgmTimer = null;
+            }
+        }
+
+        /* ============================================================
+           3. Matter.js 2D 물리 엔진 & 게임 상태
+           ============================================================ */
+        const { Engine, Render, World, Bodies, Body, Events, Composite } = Matter;
+
+        const CANVAS_WIDTH = 420;
+        const CANVAS_HEIGHT = 600;
+        const DEADLINE_Y = 75; // 게임오버 판정 높이
+
+        let engine = null;
+        let canvas = null;
+        let ctx = null;
+
+        let score = 0;
+        let bestScore = 0;
+        let currentDropChar = null; // 현재 손가락/마우스 위치에서 떨어질 대기 캐릭터
+        let nextCharLevel = 0; // 다음에 나올 캐릭터 레벨
+        let dropX = CANVAS_WIDTH / 2;
+        let isDropping = false;
+        let dropCooldown = false;
+        let isGameOver = false;
+        let deadlineTimer = 0; // 데드라인 초과 경고 타이머
+
+        let particles = [];
+
+        function initGame() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+
+            // 물리 엔진 초기화
+            engine = Engine.create({
+                enableSleeping: false,
+                gravity: { x: 0, y: 1.15 } // 쫀득한 낙하 속도
+            });
+
+            // 컨테이너 벽면 및 바닥 생성 (과일들이 밖으로 나가지 못하게 바운더리)
+            const wallOptions = { isStatic: true, friction: 0.1, restitution: 0.25 };
+            const ground = Bodies.rectangle(CANVAS_WIDTH / 2, CANVAS_HEIGHT + 30, CANVAS_WIDTH * 2, 80, wallOptions);
+            const leftWall = Bodies.rectangle(-20, CANVAS_HEIGHT / 2, 50, CANVAS_HEIGHT * 2, wallOptions);
+            const rightWall = Bodies.rectangle(CANVAS_WIDTH + 20, CANVAS_HEIGHT / 2, 50, CANVAS_HEIGHT * 2, wallOptions);
+
+            World.add(engine.world, [ground, leftWall, rightWall]);
+
+            // 충돌 이벤트 리스너: 같은 캐릭터 병합(Merge) 처리
+            Events.on(engine, 'collisionStart', handleCollisions);
+
+            // 첫 번째 과일 및 다음 과일 설정
+            nextCharLevel = getRandomDropLevel();
+            spawnNextFruit();
+
+            // 진화 바 UI 생성
+            renderEvolutionBar();
+
+            // 최고 점수 로컬 불러오기
+            const savedBest = localStorage.getItem('chiikawa_suika_best');
+            if (savedBest) {
+                bestScore = parseInt(savedBest, 10);
+                document.getElementById('bestScoreVal').innerText = bestScore;
+            }
+
+            // 이벤트 바인딩 (PC & 모바일 인터랙션)
+            setupInputListeners();
+
+            // 게임 루프 시작
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 초반에 떨어지는 캐릭터는 Lv 0 ~ Lv 2 (가방, 시사, 쿠리만쥬) 중 랜덤
+        function getRandomDropLevel() {
+            return Math.floor(Math.random() * 3);
+        }
+
+        function spawnNextFruit() {
+            const level = nextCharLevel;
+            const charDef = CHARACTERS[level];
+            currentDropChar = {
+                level: level,
+                radius: charDef.radius,
+                x: dropX,
+                y: 42
+            };
+
+            nextCharLevel = getRandomDropLevel();
+            drawNextPreview();
+            isDropping = false;
+        }
+
+        function drawNextPreview() {
+            const nextC = document.getElementById('nextCanvas');
+            const nctx = nextC.getContext('2d');
+            nctx.clearRect(0, 0, nextC.width, nextC.height);
+
+            const charDef = CHARACTERS[nextCharLevel];
+            nctx.save();
+            nctx.translate(nextC.width / 2, nextC.height / 2);
+            // 크기 스케일링
+            const scale = Math.min(36 / charDef.radius, 1.2);
+            nctx.scale(scale, scale);
+            charDef.draw(nctx, charDef.radius);
+            nctx.restore();
+        }
+
+        // 사용자 조작 (드래그, 마우스 이동, 탭, 스페이스바)
+        function setupInputListeners() {
+            const wrapper = document.getElementById('gameWrapper');
+
+            // 마우스 이동
+            wrapper.addEventListener('mousemove', (e) => {
+                if (isGameOver) return;
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = CANVAS_WIDTH / rect.width;
+                const mouseX = (e.clientX - rect.left) * scaleX;
+                updateDropPosition(mouseX);
+            });
+
+            // 마우스 클릭 드롭
+            wrapper.addEventListener('click', (e) => {
+                if (isGameOver) return;
+                triggerDrop();
+            });
+
+            // 모바일 터치 드래그 & 드롭
+            wrapper.addEventListener('touchstart', (e) => {
+                if (isGameOver) return;
+                initAudio();
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = CANVAS_WIDTH / rect.width;
+                const touchX = (e.touches[0].clientX - rect.left) * scaleX;
+                updateDropPosition(touchX);
+            }, { passive: false });
+
+            wrapper.addEventListener('touchmove', (e) => {
+                if (isGameOver) return;
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = CANVAS_WIDTH / rect.width;
+                const touchX = (e.touches[0].clientX - rect.left) * scaleX;
+                updateDropPosition(touchX);
+            }, { passive: false });
+
+            wrapper.addEventListener('touchend', (e) => {
+                if (isGameOver) return;
+                triggerDrop();
+            });
+
+            // 키보드 조작 (←, →, Space, Enter)
+            window.addEventListener('keydown', (e) => {
+                if (isGameOver) return;
+                if (e.key === 'ArrowLeft') {
+                    updateDropPosition(dropX - 25);
+                } else if (e.key === 'ArrowRight') {
+                    updateDropPosition(dropX + 25);
+                } else if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    triggerDrop();
+                }
+            });
+        }
+
+        function updateDropPosition(targetX) {
+            if (!currentDropChar) return;
+            const minX = currentDropChar.radius + 10;
+            const maxX = CANVAS_WIDTH - currentDropChar.radius - 10;
+            dropX = Math.max(minX, Math.min(maxX, targetX));
+            currentDropChar.x = dropX;
+        }
+
+        function triggerDrop() {
+            if (isDropping || dropCooldown || isGameOver || !currentDropChar) return;
+
+            initAudio();
+            isDropping = true;
+            dropCooldown = true;
+
+            const charDef = CHARACTERS[currentDropChar.level];
+
+            // Matter.js 원형 바디 생성
+            const fruitBody = Bodies.circle(currentDropChar.x, currentDropChar.y, charDef.radius, {
+                restitution: 0.25, // 쫀득한 탄성
+                friction: 0.12,
+                density: 0.0015,
+                label: 'fruit'
+            });
+
+            fruitBody.charLevel = currentDropChar.level;
+            fruitBody.merged = false;
+
+            World.add(engine.world, fruitBody);
+
+            currentDropChar = null;
+
+            // 0.5초 후 다음 과일 등장
+            setTimeout(() => {
+                if (!isGameOver) {
+                    spawnNextFruit();
+                    dropCooldown = false;
+                }
+            }, 500);
+        }
+
+        /* ============================================================
+           4. 병합(Merge) 알고리즘 & 콤보 이펙트
+           ============================================================ */
+        function handleCollisions(event) {
+            const pairs = event.pairs;
+
+            for (let i = 0; i < pairs.length; i++) {
+                const { bodyA, bodyB } = pairs[i];
+
+                if (bodyA.label === 'fruit' && bodyB.label === 'fruit') {
+                    if (bodyA.charLevel === bodyB.charLevel && !bodyA.merged && !bodyB.merged) {
+                        const level = bodyA.charLevel;
+
+                        // 최대 레벨(10)에 도달했으면 합체 불가 (또는 슈퍼 보너스)
+                        if (level >= CHARACTERS.length - 1) continue;
+
+                        bodyA.merged = true;
+                        bodyB.merged = true;
+
+                        // 충돌 중심점 계산
+                        const midX = (bodyA.position.x + bodyB.position.x) / 2;
+                        const midY = (bodyA.position.y + bodyB.position.y) / 2;
+
+                        // 기존 두 객체 제거
+                        World.remove(engine.world, [bodyA, bodyB]);
+
+                        // 다음 레벨(level + 1) 캐릭터 생성
+                        const nextLevel = level + 1;
+                        const nextDef = CHARACTERS[nextLevel];
+
+                        const newFruit = Bodies.circle(midX, midY, nextDef.radius, {
+                            restitution: 0.3,
+                            friction: 0.12,
+                            density: 0.0018,
+                            label: 'fruit'
+                        });
+                        newFruit.charLevel = nextLevel;
+                        newFruit.merged = false;
+
+                        World.add(engine.world, newFruit);
+
+                        // 점수 증가
+                        addScore(nextDef.score);
+
+                        // 사운드 및 캐릭터 음성 재생
+                        playCharacterVoice(nextDef.voice);
+
+                        // 파티클 & 팝 토스트 이펙트
+                        spawnMergeParticles(midX, midY, nextDef.color);
+                        showComboToast(`${nextDef.name} 등장! ${nextDef.desc}`);
+
+                        // 모바일 햅틱 진동
+                        if (navigator.vibrate) {
+                            navigator.vibrate(35);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        function addScore(points) {
+            score += points;
+            document.getElementById('scoreVal').innerText = score;
+
+            if (score > bestScore) {
+                bestScore = score;
+                document.getElementById('bestScoreVal').innerText = bestScore;
+                localStorage.setItem('chiikawa_suika_best', bestScore);
+            }
+        }
+
+        function showComboToast(text) {
+            const toast = document.getElementById('comboToast');
+            toast.innerText = text;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1200);
+        }
+
+        function spawnMergeParticles(x, y, color) {
+            for (let i = 0; i < 16; i++) {
+                const ang = Math.random() * Math.PI * 2;
+                const speed = 2 + Math.random() * 5;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(ang) * speed,
+                    vy: Math.sin(ang) * speed,
+                    radius: 3 + Math.random() * 4,
+                    color: color,
+                    alpha: 1,
+                    decay: 0.03 + Math.random() * 0.02
+                });
+            }
+        }
+
+        /* ============================================================
+           5. 메인 게임 렌더 루프
+           ============================================================ */
+        let lastTime = performance.now();
+
+        function gameLoop(now) {
+            const dt = (now - lastTime) / 1000;
+            lastTime = now;
+
+            // 1. 물리 시뮬레이션 전진
+            Engine.update(engine, 1000 / 60);
+
+            // 2. 화면 클리어
+            ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+            // 3. 상단 가이드 레이저 점선 (Drop Aim Line)
+            if (currentDropChar && !isDropping) {
+                ctx.save();
+                ctx.setLineDash([4, 6]);
+                ctx.strokeStyle = "rgba(255, 133, 162, 0.4)";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(currentDropChar.x, currentDropChar.y + currentDropChar.radius);
+                ctx.lineTo(currentDropChar.x, CANVAS_HEIGHT);
+                ctx.stroke();
+                ctx.restore();
+
+                // 대기 중인 과일 렌더
+                const charDef = CHARACTERS[currentDropChar.level];
+                ctx.save();
+                ctx.translate(currentDropChar.x, currentDropChar.y);
+                charDef.draw(ctx, currentDropChar.radius);
+                ctx.restore();
+            }
+
+            // 4. 월드 내 모든 과일 렌더링
+            const bodies = Composite.allBodies(engine.world);
+            let hasOverDeadline = false;
+
+            bodies.forEach(body => {
+                if (body.label === 'fruit') {
+                    const charDef = CHARACTERS[body.charLevel];
+                    ctx.save();
+                    ctx.translate(body.position.x, body.position.y);
+                    ctx.rotate(body.angle);
+                    charDef.draw(ctx, charDef.radius);
+                    ctx.restore();
+
+                    // 데드라인(DEADLINE_Y) 초과 판정 (완전히 안착된 과일 기준)
+                    if (body.position.y - charDef.radius < DEADLINE_Y && body.velocity.y < 0.2 && body.velocity.y > -0.2) {
+                        hasOverDeadline = true;
+                    }
+                }
+            });
+
+            // 5. 파티클 이펙트 업데이트 & 렌더링
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.15; // 중력
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // 6. 데드라인 경고 및 게임오버 검사
+            if (hasOverDeadline && !isGameOver && bodies.length > 5) {
+                deadlineTimer += dt;
+                if (deadlineTimer > 2.5) { // 2.5초 이상 넘치면 게임오버
+                    triggerGameOver();
+                }
+            } else {
+                deadlineTimer = Math.max(0, deadlineTimer - dt * 2);
+            }
+
+            if (!isGameOver) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function triggerGameOver() {
+            isGameOver = true;
+            document.getElementById('finalScoreText').innerText = score;
+            document.getElementById('gameOverModal').style.display = 'flex';
+
+            // Firebase 실시간 랭킹 자동 업로드
+            syncScoreToCasinoCloud();
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverModal').style.display = 'none';
+
+            // 모든 과일 제거
+            const bodies = Composite.allBodies(engine.world);
+            bodies.forEach(body => {
+                if (body.label === 'fruit') {
+                    World.remove(engine.world, body);
+                }
+            });
+
+            score = 0;
+            document.getElementById('scoreVal').innerText = 0;
+            isGameOver = false;
+            deadlineTimer = 0;
+            particles = [];
+
+            nextCharLevel = getRandomDropLevel();
+            spawnNextFruit();
+
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function renderEvolutionBar() {
+            const container = document.getElementById('evoStepsList');
+            container.innerHTML = '';
+            CHARACTERS.forEach((char, idx) => {
+                const item = document.createElement('div');
+                item.className = 'evo-item';
+
+                // 미니 아이콘 캔버스
+                const miniCanvas = document.createElement('canvas');
+                miniCanvas.width = 44;
+                miniCanvas.height = 44;
+                miniCanvas.style.width = '24px';
+                miniCanvas.style.height = '24px';
+                const mctx = miniCanvas.getContext('2d');
+                mctx.translate(22, 22);
+                const scale = 18 / char.radius;
+                mctx.scale(scale, scale);
+                char.draw(mctx, char.radius);
+
+                const iconWrap = document.createElement('div');
+                iconWrap.className = 'evo-icon';
+                iconWrap.appendChild(miniCanvas);
+
+                const nameLabel = document.createElement('span');
+                nameLabel.innerText = char.name;
+
+                item.appendChild(iconWrap);
+                item.appendChild(nameLabel);
+                container.appendChild(item);
+
+                if (idx < CHARACTERS.length - 1) {
+                    const arrow = document.createElement('div');
+                    arrow.className = 'evo-arrow';
+                    arrow.innerText = '>';
+                    container.appendChild(arrow);
+                }
+            });
+        }
+
+        /* ============================================================
+           6. 심플 카지노 계정 및 Firebase Firestore 랭킹 연동
+           ============================================================ */
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkwUwtm4G3spvJj46H1eYoSNgEck3pOFA",
+            authDomain: "project-simca.firebaseapp.com",
+            databaseURL: "https://project-simca-default-rtdb.firebaseio.com",
+            projectId: "project-simca",
+            storageBucket: "project-simca.firebasestorage.app",
+            messagingSenderId: "941421245529",
+            appId: "1:941421245529:web:83c000aacfe846e7e6ed48",
+            measurementId: "G-GWKDLDC8R7"
+        };
+
+        let firestoreDb = null;
+        let currentUserNick = null;
+        let currentPin = null;
+        let currentUid = null;
+
+        function initCasinoAccountAndFirebase() {
+            // 카지노 세션 읽어오기
+            const sessionNick = localStorage.getItem('royal_neon_session_nick');
+            const sessionPin = localStorage.getItem('royal_neon_session_pin');
+            let uid = localStorage.getItem('royal_neon_uid');
+
+            if (!uid) {
+                uid = 'suika_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+                localStorage.setItem('royal_neon_uid', uid);
+            }
+            currentUid = uid;
+
+            if (sessionNick && sessionPin) {
+                currentUserNick = sessionNick;
+                currentPin = sessionPin;
+                updateUserChipUI(currentUserNick);
+            } else {
+                updateUserChipUI(null);
+            }
+
+            // Firebase 초기화
+            if (typeof firebase !== 'undefined') {
+                try {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    firestoreDb = firebase.firestore();
+                    updateDbStatusUI(true);
+
+                    // 실시간 수박 랭킹 구독 (onSnapshot)
+                    subscribeSuikaLeaderboard();
+                } catch (e) {
+                    console.error("Firebase init failed:", e);
+                    updateDbStatusUI(false);
+                    loadLocalLeaderboard();
+                }
+            } else {
+                updateDbStatusUI(false);
+                loadLocalLeaderboard();
+            }
+        }
+
+        function updateUserChipUI(nick) {
+            const chip = document.getElementById('userChipText');
+            if (nick) {
+                chip.innerText = `${nick} 님`;
+            } else {
+                chip.innerText = "로그인";
+            }
+        }
+
+        function updateDbStatusUI(online) {
+            const statusEl = document.getElementById('dbStatus');
+            const textEl = document.getElementById('dbStatusText');
+            if (online) {
+                statusEl.style.background = 'rgba(5, 179, 117, 0.12)';
+                statusEl.style.color = '#05b375';
+                textEl.innerText = "카지노 실시간 연동";
+            } else {
+                statusEl.style.background = 'rgba(235, 87, 87, 0.12)';
+                statusEl.style.color = '#eb5757';
+                textEl.innerText = "로컬 모드";
+            }
+        }
+
+        function promptLogin() {
+            document.getElementById('loginModal').style.display = 'flex';
+            if (currentUserNick) {
+                document.getElementById('loginNickInput').value = currentUserNick;
+            }
+            if (currentPin) {
+                document.getElementById('loginPinInput').value = currentPin;
+            }
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function submitLogin() {
+            const nick = document.getElementById('loginNickInput').value.trim();
+            const pin = document.getElementById('loginPinInput').value.trim();
+
+            if (!nick || nick.length < 2 || nick.length > 12) {
+                alert("닉네임은 2~12글자로 입력해 주세요.");
+                return;
+            }
+            if (!/^\d{4}$/.test(pin)) {
+                alert("비밀번호는 숫자 4자리로 입력해 주세요.");
+                return;
+            }
+
+            currentUserNick = nick;
+            currentPin = pin;
+
+            // 카지노 세션 저장소에 동기화!
+            localStorage.setItem('royal_neon_session_nick', nick);
+            localStorage.setItem('royal_neon_session_pin', pin);
+
+            updateUserChipUI(nick);
+            closeLoginModal();
+
+            // 기존 점수가 있다면 클라우드 동기화
+            if (score > 0 || bestScore > 0) {
+                syncScoreToCasinoCloud();
+            }
+        }
+
+        // 수박 게임 실시간 랭킹 저장
+        async function syncScoreToCasinoCloud() {
+            const finalScore = Math.max(score, bestScore);
+            if (finalScore <= 0) return;
+
+            const nick = currentUserNick || '익명 치이카와';
+
+            // 로컬 랭킹에도 저장
+            saveLocalScore(nick, finalScore);
+
+            if (firestoreDb) {
+                try {
+                    const docId = `suika_${currentUid}`;
+                    await firestoreDb.collection('suika_leaderboard').doc(docId).set({
+                        uid: currentUid,
+                        nickname: nick,
+                        score: finalScore,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
+                    // 카지노 유저 프로필에도 수박 최고점수 기록 (상호 동기화)
+                    const userDocId = `user_${currentUid}`;
+                    await firestoreDb.collection('casino_users').doc(userDocId).set({
+                        suikaHighScore: finalScore,
+                        suikaLastPlayed: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
+                } catch (err) {
+                    console.warn("Failed to sync score to Firestore:", err);
+                }
+            }
+        }
+
+        // 실시간 리더보드 리스너
+        function subscribeSuikaLeaderboard() {
+            if (!firestoreDb) return;
+
+            firestoreDb.collection('suika_leaderboard')
+                .orderBy('score', 'desc')
+                .limit(20)
+                .onSnapshot((snapshot) => {
+                    const list = [];
+                    snapshot.forEach(doc => {
+                        list.push(doc.data());
+                    });
+                    renderLeaderboard(list);
+                }, (error) => {
+                    console.warn("Firestore leaderboard snapshot error:", error);
+                    loadLocalLeaderboard();
+                });
+        }
+
+        function renderLeaderboard(dataList) {
+            const tbody = document.getElementById('lbTableBody');
+            const podiumBox = document.getElementById('podiumBox');
+            const podiumName = document.getElementById('podiumName');
+            const podiumScore = document.getElementById('podiumScore');
+
+            if (!dataList || dataList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 18px;">아직 등록된 랭킹 기록이 없습니다. 첫 1위에 도전해보세요!</td></tr>`;
+                podiumBox.style.display = 'none';
+                return;
+            }
+
+            // 1위 스포트라이트 포디움
+            const top1 = dataList[0];
+            podiumBox.style.display = 'flex';
+            podiumName.innerText = top1.nickname || '익명';
+            podiumScore.innerText = `${(top1.score || 0).toLocaleString()} P`;
+
+            // 순위 테이블 렌더
+            let html = '';
+            dataList.forEach((item, index) => {
+                const rank = index + 1;
+                let rankBadge = rank;
+                if (rank === 1) rankBadge = '🥇 1';
+                else if (rank === 2) rankBadge = '🥈 2';
+                else if (rank === 3) rankBadge = '🥉 3';
+
+                const isMe = item.uid === currentUid || (currentUserNick && item.nickname === currentUserNick);
+
+                html += `
+                    <tr class="${isMe ? 'my-row' : ''}">
+                        <td class="lb-rank">${rankBadge}</td>
+                        <td>${escapeHtml(item.nickname || '익명')} ${isMe ? '<span style="font-size:0.7rem; font-weight:800; background:#ff85a2; color:white; padding:1px 5px; border-radius:6px; margin-left:4px;">ME</span>' : ''}</td>
+                        <td style="text-align: right; font-weight: 900; font-family: 'Outfit'; color: #d6336c;">${(item.score || 0).toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function saveLocalScore(nick, scr) {
+            let localList = JSON.parse(localStorage.getItem('chiikawa_suika_local_lb') || '[]');
+            const existingIdx = localList.findIndex(x => x.uid === currentUid);
+            if (existingIdx >= 0) {
+                if (scr > localList[existingIdx].score) {
+                    localList[existingIdx].score = scr;
+                    localList[existingIdx].nickname = nick;
+                }
+            } else {
+                localList.push({ uid: currentUid, nickname: nick, score: scr });
+            }
+            localList.sort((a, b) => b.score - a.score);
+            localList = localList.slice(0, 20);
+            localStorage.setItem('chiikawa_suika_local_lb', JSON.stringify(localList));
+        }
+
+        function loadLocalLeaderboard() {
+            const localList = JSON.parse(localStorage.getItem('chiikawa_suika_local_lb') || '[]');
+            renderLeaderboard(localList);
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[m]);
+        }
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('DOMContentLoaded', () => {
+            initGame();
+            initCasinoAccountAndFirebase();
+        });
+    </script>
+</body>
+
+</html>

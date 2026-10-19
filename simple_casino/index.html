@@ -176,6 +176,84 @@
             background: rgba(5, 179, 117, 0.08);
         }
 
+        /* Chiikawa Suika Game Launch Banner */
+        .suika-game-banner {
+            width: 100%;
+            margin-bottom: 14px;
+            padding: 12px 18px;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe3ec 50%, #fff9db 100%);
+            border: 2px solid #ff85a2;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(255, 133, 162, 0.25);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .suika-game-banner:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 133, 162, 0.35);
+            border-color: #f72585;
+        }
+
+        .suika-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .suika-banner-icon {
+            font-size: 2.2rem;
+            animation: bounceSuika 2s infinite ease-in-out;
+            filter: drop-shadow(0 4px 8px rgba(255, 133, 162, 0.3));
+        }
+
+        @keyframes bounceSuika {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-4px) rotate(6deg); }
+        }
+
+        .suika-banner-title {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #d6336c;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .suika-banner-tag {
+            background: #ff85a2;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .suika-banner-desc {
+            font-size: 0.8rem;
+            color: #725b6a;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .suika-banner-btn {
+            background: linear-gradient(135deg, #ff85a2, #f72585);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 800;
+            padding: 8px 14px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(247, 37, 133, 0.3);
+            white-space: nowrap;
+        }
+
         .icon-btn {
             background: rgba(0, 0, 0, 0.03);
             border: 1px solid var(--border-color);
@@ -2450,6 +2528,25 @@
                 </button>
             </div>
         </header>
+
+        <!-- Chiikawa Suika Game Banner -->
+        <a href="suika.html" class="suika-game-banner" title="치이카와 수박 게임 플레이하러 가기">
+            <div class="suika-banner-left">
+                <div class="suika-banner-icon">🍉</div>
+                <div>
+                    <div class="suika-banner-title">
+                        <span>치이카와 수박 게임</span>
+                        <span class="suika-banner-tag">NEW 오픈!</span>
+                    </div>
+                    <div class="suika-banner-desc">
+                        포셰트 가방부터 킹 치이카와까지! 캐릭터 음성 & 실시간 랭킹 경쟁 ✨
+                    </div>
+                </div>
+            </div>
+            <div class="suika-banner-btn">
+                <span>게임 시작 ▶</span>
+            </div>
+        </a>
 
         <!-- Multiplier Flash Hot Time Event Banner (Hidden until activated) -->
         <div class="event-banner" id="event-hot-time-banner" style="display:none;">
