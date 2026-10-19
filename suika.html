@@ -668,53 +668,48 @@
            ============================================================ */
         const CHARACTER_IMAGES = {};
 
-        // 사용자가 넣을 수 있는 다양한 파일명 패턴 자동 감지
-        const IMAGE_CANDIDATES = [
-            ['1', '1_chiikabu', 'chiikabu', 'kabuto', '치이카부', '1_치이카부'],
-            ['2', '2_pajama', 'pajama', 'pajamas', '파자마파티즈', '파자마', '2_파자마파티즈'],
-            ['3', '3_momonga', 'momonga', '모몽가', '3_모몽가'],
-            ['4', '4_kurimanju', 'kurimanju', '쿠리만쥬', '4_쿠리만쥬'],
-            ['5', '5_chiikawa', 'chiikawa', '치이카와', '5_치이카와'],
-            ['6', '6_rakko', 'rakko', '랏코', '6_랏코'],
-            ['7', '7_kani', 'kani', '카니', '7_카니'],
-            ['8', '8_shisa', 'shisa', '시사', '8_시사'],
-            ['9', '9_hachiware', 'hachiware', '하치와레', '9_하치와레'],
-            ['10', '10_usagi', 'usagi', '우사기', '10_우사기'],
-            ['11', '11_king', 'king', 'king_chiikawa', '대왕치이카와', '11_대왕치이카와']
-        ];
-
-        // 검색할 폴더 목록 (assets/images/, assets/raw_images/, raw/, RAW/)
-        const IMAGE_SEARCH_FOLDERS = [
-            'assets/images/',
-            'assets/raw_images/',
-            'raw/',
-            'RAW/',
-            'assets/'
-        ];
-
+        // 사용자가 넣은 이미지 (1.png ~ 11.png 및 한국어 이름 자동 감지)
         function preloadCharacterImages() {
-            IMAGE_CANDIDATES.forEach((names, level) => {
-                const exts = ['.png', '.jpg', '.jpeg', '.webp'];
-                for (const folder of IMAGE_SEARCH_FOLDERS) {
-                    for (const name of names) {
-                        for (const ext of exts) {
-                            const img = new Image();
-                            img.src = `${folder}${name}${ext}`;
-                            img.onload = () => {
-                                if (!CHARACTER_IMAGES[level]) {
-                                    CHARACTER_IMAGES[level] = img;
-                                    if (typeof renderEvolutionBar === 'function') {
-                                        renderEvolutionBar();
-                                    }
-                                    if (typeof drawNextPreview === 'function') {
-                                        drawNextPreview();
-                                    }
-                                }
-                            };
+            const KOREAN_NAMES = [
+                '치이카부', '파자마파티즈', '모몽가', '쿠리만쥬', '치이카와',
+                '랏코', '카니', '시사', '하치와레', '우사기', '대왕치이카와'
+            ];
+            const VOICE_NAMES = [
+                'chiikabu', 'pajama', 'momonga', 'kurimanju', 'chiikawa',
+                'rakko', 'kani', 'shisa', 'hachiware', 'usagi', 'king'
+            ];
+
+            for (let level = 0; level < 11; level++) {
+                const candidates = [
+                    `assets/images/${level + 1}.png`,
+                    `assets/images/${KOREAN_NAMES[level]}.png`,
+                    `assets/images/${encodeURIComponent(KOREAN_NAMES[level])}.png`,
+                    `assets/images/${VOICE_NAMES[level]}.png`,
+                    `assets/images/${level + 1}.jpg`,
+                    `assets/images/${level + 1}.webp`
+                ];
+
+                let idx = 0;
+                function tryNext() {
+                    if (idx >= candidates.length) return;
+                    const src = candidates[idx++];
+                    const img = new Image();
+                    img.onload = () => {
+                        CHARACTER_IMAGES[level] = img;
+                        if (typeof renderEvolutionBar === 'function') {
+                            renderEvolutionBar();
                         }
-                    }
+                        if (typeof drawNextPreview === 'function') {
+                            drawNextPreview();
+                        }
+                    };
+                    img.onerror = () => {
+                        tryNext();
+                    };
+                    img.src = src;
                 }
-            });
+                tryNext();
+            }
         }
         preloadCharacterImages();
 
