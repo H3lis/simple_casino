@@ -664,8 +664,110 @@
 
     <script>
         /* ============================================================
-           1. 치이카와 11단계 캐릭터 정의 (사용자 커스텀 사양 적용)
+           1. 사용자 커스텀 이미지 자동 로더 & 캐릭터 정의
            ============================================================ */
+        const CHARACTER_IMAGES = {};
+
+        // 사용자가 넣을 수 있는 다양한 파일명 패턴 자동 감지
+        const IMAGE_CANDIDATES = [
+            ['1', '1_chiikabu', 'chiikabu', 'kabuto', '치이카부', '1_치이카부'],
+            ['2', '2_pajama', 'pajama', 'pajamas', '파자마파티즈', '파자마', '2_파자마파티즈'],
+            ['3', '3_momonga', 'momonga', '모몽가', '3_모몽가'],
+            ['4', '4_kurimanju', 'kurimanju', '쿠리만쥬', '4_쿠리만쥬'],
+            ['5', '5_chiikawa', 'chiikawa', '치이카와', '5_치이카와'],
+            ['6', '6_rakko', 'rakko', '랏코', '6_랏코'],
+            ['7', '7_kani', 'kani', '카니', '7_카니'],
+            ['8', '8_shisa', 'shisa', '시사', '8_시사'],
+            ['9', '9_hachiware', 'hachiware', '하치와레', '9_하치와레'],
+            ['10', '10_usagi', 'usagi', '우사기', '10_우사기'],
+            ['11', '11_king', 'king', 'king_chiikawa', '대왕치이카와', '11_대왕치이카와']
+        ];
+
+        // 검색할 폴더 목록 (assets/images/, assets/raw_images/, raw/, RAW/)
+        const IMAGE_SEARCH_FOLDERS = [
+            'assets/images/',
+            'assets/raw_images/',
+            'raw/',
+            'RAW/',
+            'assets/'
+        ];
+
+        function preloadCharacterImages() {
+            IMAGE_CANDIDATES.forEach((names, level) => {
+                const exts = ['.png', '.jpg', '.jpeg', '.webp'];
+                for (const folder of IMAGE_SEARCH_FOLDERS) {
+                    for (const name of names) {
+                        for (const ext of exts) {
+                            const img = new Image();
+                            img.src = `${folder}${name}${ext}`;
+                            img.onload = () => {
+                                if (!CHARACTER_IMAGES[level]) {
+                                    CHARACTER_IMAGES[level] = img;
+                                    if (typeof renderEvolutionBar === 'function') {
+                                        renderEvolutionBar();
+                                    }
+                                    if (typeof drawNextPreview === 'function') {
+                                        drawNextPreview();
+                                    }
+                                }
+                            };
+                        }
+                    }
+                }
+            });
+        }
+        preloadCharacterImages();
+
+        // 캐릭터 렌더링 헬퍼 함수 (사용자 이미지가 있으면 자동 원형 클리핑 + 볼륨감 렌더링, 없으면 폴백)
+        function renderCharacterItem(ctx, charDef, r) {
+            const img = CHARACTER_IMAGES[charDef.level];
+            if (img && img.complete && img.naturalWidth > 0) {
+                ctx.save();
+                // 1. 원형 마스크 클리핑
+                ctx.beginPath();
+                ctx.arc(0, 0, r, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+
+                // 2. 부드러운 캐릭터 고유 바탕색
+                ctx.fillStyle = charDef.color || '#ffffff';
+                ctx.fill();
+
+                // 3. 비율 유지하며 원형을 꽉 채우도록 스케일링 (cover)
+                const aspect = img.naturalWidth / img.naturalHeight;
+                let dw = r * 2;
+                let dh = r * 2;
+                if (aspect > 1) {
+                    dw = dh * aspect;
+                } else {
+                    dh = dw / aspect;
+                }
+                ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+                ctx.restore();
+
+                // 4. 깔끔한 외곽선 테두리
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(0, 0, r, 0, Math.PI * 2);
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+                ctx.lineWidth = Math.max(2, r * 0.05);
+                ctx.stroke();
+
+                // 5. 수박게임 특유의 과일 입체 하이라이트 광택
+                const shine = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.05, 0, 0, r);
+                shine.addColorStop(0, "rgba(255, 255, 255, 0.38)");
+                shine.addColorStop(0.5, "rgba(255, 255, 255, 0)");
+                shine.addColorStop(1, "rgba(0, 0, 0, 0.08)");
+                ctx.fillStyle = shine;
+                ctx.beginPath();
+                ctx.arc(0, 0, r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            } else {
+                charDef.draw(ctx, r);
+            }
+        }
+
         const CHARACTERS = [
             {
                 level: 0,
@@ -1418,94 +1520,90 @@
             }
         }
 
-        // Web Audio 기반 캐릭터 음성 합성기
+        // 실제 캐릭터 음성 MP3 오디오 풀
+        const audioCache = {};
+        const VOICE_FILES = {
+            chiikabu: 'assets/sounds/chiikabu.mp3',
+            pajama: 'assets/sounds/pajama.mp3',
+            momonga: 'assets/sounds/momonga.mp3',
+            kurimanju: 'assets/sounds/kurimanju.mp3',
+            chiikawa: 'assets/sounds/chiikawa.mp3',
+            rakko: 'assets/sounds/rakko.mp3',
+            kani: 'assets/sounds/kani.mp3',
+            shisa: 'assets/sounds/shisa.mp3',
+            hachiware: 'assets/sounds/hachiware.mp3',
+            usagi: 'assets/sounds/usagi.mp3',
+            king: 'assets/sounds/king.mp3'
+        };
+
+        // 실제 캐릭터 음성 재생 함수 (대사 텍스트 없이 진짜 애니 목소리 출력)
         function playCharacterVoice(voiceType) {
             if (!isSfxOn) return;
             initAudio();
-            if (!audioCtx) return;
 
-            switch (voiceType) {
-                case 'chiikabu': // Lv 0 치이카부 뾱!
-                    playToneSequence([
-                        { freq: 880, type: 'sine', duration: 0.07, vol: 0.3 }
-                    ]);
-                    break;
-                case 'pajama': // Lv 1 파자마파티즈 ("우-와와와~ 우와!")
-                    playToneSequence([
-                        { freq: 523, type: 'triangle', duration: 0.1, vol: 0.35 },
-                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.4 },
-                        { freq: 784, type: 'triangle', duration: 0.12, vol: 0.4 },
-                        { freq: 1046, type: 'sine', duration: 0.25, vol: 0.45 }
-                    ]);
-                    break;
-                case 'momonga': // Lv 2 모몽가 ("호메로!(칭찬해라!)")
-                    playToneSequence([
-                        { freq: 987, type: 'sine', duration: 0.1, vol: 0.4 },
-                        { freq: 1318, type: 'sine', duration: 0.2, vol: 0.45 }
-                    ]);
-                    break;
-                case 'kurimanju': // Lv 3 쿠리만쥬 ("하아아~!(캬아~)")
-                    playToneSequence([
-                        { freq: 440, type: 'sawtooth', duration: 0.12, vol: 0.25 },
-                        { freq: 330, type: 'sawtooth', duration: 0.25, vol: 0.3 }
-                    ]);
-                    playNoiseBurst(0.2, 0.15); // 청량감
-                    break;
-                case 'chiikawa': // Lv 4 치이카와 ("와아!", "후에에~!")
-                    playToneSequence([
-                        { freq: 1046, type: 'sine', duration: 0.12, vol: 0.45 },
-                        { freq: 1318, type: 'sine', duration: 0.14, vol: 0.5 },
-                        { freq: 1568, type: 'sine', duration: 0.28, vol: 0.55 }
-                    ]);
-                    break;
-                case 'rakko': // Lv 5 랏코 ("하앗!" 검술 기합)
-                    playToneSequence([
-                        { freq: 523, type: 'square', duration: 0.08, vol: 0.35 },
-                        { freq: 392, type: 'sawtooth', duration: 0.2, vol: 0.4 }
-                    ]);
-                    break;
-                case 'kani': // Lv 6 카니 ("카니카니~!")
-                    playToneSequence([
-                        { freq: 784, type: 'sine', duration: 0.09, vol: 0.45 },
-                        { freq: 880, type: 'sine', duration: 0.09, vol: 0.45 },
-                        { freq: 1046, type: 'sine', duration: 0.12, vol: 0.5 },
-                        { freq: 1318, type: 'triangle', duration: 0.25, vol: 0.55 }
-                    ]);
-                    break;
-                case 'shisa': // Lv 7 시사 ("우레시이!(기뻐!)")
-                    playToneSequence([
-                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.38 },
-                        { freq: 784, type: 'triangle', duration: 0.12, vol: 0.42 },
-                        { freq: 1046, type: 'sine', duration: 0.28, vol: 0.48 }
-                    ]);
-                    break;
-                case 'hachiware': // Lv 8 하치와레 ("난또까 나레~!(어떻게든 돼라!)")
-                    playToneSequence([
-                        { freq: 587, type: 'triangle', duration: 0.1, vol: 0.4 },
-                        { freq: 659, type: 'triangle', duration: 0.1, vol: 0.4 },
-                        { freq: 880, type: 'sine', duration: 0.15, vol: 0.45 },
-                        { freq: 1174, type: 'sine', duration: 0.3, vol: 0.55 }
-                    ]);
-                    break;
-                case 'usagi': // Lv 9 우사기 ("우라~!", "야하-!", "이~야하!")
-                    playToneSequence([
-                        { freq: 440, type: 'sawtooth', duration: 0.08, vol: 0.45 },
-                        { freq: 880, type: 'sawtooth', duration: 0.1, vol: 0.5 },
-                        { freq: 1760, type: 'square', duration: 0.32, vol: 0.65 }
-                    ]);
-                    break;
-                case 'king': // Lv 10 대망의 대왕 치이카와 완성 축하 팡파레!
-                    playToneSequence([
-                        { freq: 523.25, type: 'triangle', duration: 0.15, vol: 0.5 },
-                        { freq: 659.25, type: 'triangle', duration: 0.15, vol: 0.5 },
-                        { freq: 783.99, type: 'triangle', duration: 0.15, vol: 0.5 },
-                        { freq: 1046.5, type: 'sine', duration: 0.65, vol: 0.75 }
-                    ]);
-                    confetti({
-                        particleCount: 140,
-                        spread: 85,
-                        origin: { y: 0.6 }
+            // 1. 실제 MP3 음성 파일 우선 재생
+            const src = VOICE_FILES[voiceType];
+            if (src) {
+                try {
+                    const sound = new Audio(src);
+                    sound.volume = 0.85;
+                    sound.play().catch(e => {
+                        console.warn("Audio autoplay blocked or failed, fallback to synth:", e);
+                        fallbackSynthVoice(voiceType);
                     });
+                } catch (e) {
+                    fallbackSynthVoice(voiceType);
+                }
+            } else {
+                fallbackSynthVoice(voiceType);
+            }
+
+            // 11단계 대왕 치이카와 축하 콘페티
+            if (voiceType === 'king') {
+                confetti({
+                    particleCount: 160,
+                    spread: 90,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        // Web Audio 폴백 신디사이저
+        function fallbackSynthVoice(voiceType) {
+            if (!audioCtx) return;
+            switch (voiceType) {
+                case 'chiikabu':
+                    playToneSequence([{ freq: 880, type: 'sine', duration: 0.07, vol: 0.3 }]);
+                    break;
+                case 'pajama':
+                    playToneSequence([{ freq: 523, type: 'triangle', duration: 0.1, vol: 0.35 }, { freq: 784, type: 'triangle', duration: 0.12, vol: 0.4 }, { freq: 1046, type: 'sine', duration: 0.25, vol: 0.45 }]);
+                    break;
+                case 'momonga':
+                    playToneSequence([{ freq: 987, type: 'sine', duration: 0.1, vol: 0.4 }, { freq: 1318, type: 'sine', duration: 0.2, vol: 0.45 }]);
+                    break;
+                case 'kurimanju':
+                    playToneSequence([{ freq: 440, type: 'sawtooth', duration: 0.12, vol: 0.25 }, { freq: 330, type: 'sawtooth', duration: 0.25, vol: 0.3 }]);
+                    break;
+                case 'chiikawa':
+                    playToneSequence([{ freq: 1046, type: 'sine', duration: 0.12, vol: 0.45 }, { freq: 1318, type: 'sine', duration: 0.14, vol: 0.5 }, { freq: 1568, type: 'sine', duration: 0.28, vol: 0.55 }]);
+                    break;
+                case 'rakko':
+                    playToneSequence([{ freq: 523, type: 'square', duration: 0.08, vol: 0.35 }, { freq: 392, type: 'sawtooth', duration: 0.2, vol: 0.4 }]);
+                    break;
+                case 'kani':
+                    playToneSequence([{ freq: 784, type: 'sine', duration: 0.09, vol: 0.45 }, { freq: 1046, type: 'sine', duration: 0.12, vol: 0.5 }]);
+                    break;
+                case 'shisa':
+                    playToneSequence([{ freq: 659, type: 'triangle', duration: 0.1, vol: 0.38 }, { freq: 1046, type: 'sine', duration: 0.28, vol: 0.48 }]);
+                    break;
+                case 'hachiware':
+                    playToneSequence([{ freq: 587, type: 'triangle', duration: 0.1, vol: 0.4 }, { freq: 880, type: 'sine', duration: 0.15, vol: 0.45 }, { freq: 1174, type: 'sine', duration: 0.3, vol: 0.55 }]);
+                    break;
+                case 'usagi':
+                    playToneSequence([{ freq: 440, type: 'sawtooth', duration: 0.08, vol: 0.45 }, { freq: 880, type: 'sawtooth', duration: 0.1, vol: 0.5 }, { freq: 1760, type: 'square', duration: 0.32, vol: 0.65 }]);
+                    break;
+                case 'king':
+                    playToneSequence([{ freq: 523.25, type: 'triangle', duration: 0.15, vol: 0.5 }, { freq: 783.99, type: 'triangle', duration: 0.15, vol: 0.5 }, { freq: 1046.5, type: 'sine', duration: 0.65, vol: 0.75 }]);
                     break;
             }
         }
@@ -1709,7 +1807,7 @@
             // 크기 스케일링
             const scale = Math.min(36 / charDef.radius, 1.2);
             nctx.scale(scale, scale);
-            charDef.draw(nctx, charDef.radius);
+            renderCharacterItem(nctx, charDef, charDef.radius);
             nctx.restore();
         }
 
@@ -1858,9 +1956,8 @@
                         // 사운드 및 캐릭터 음성 재생
                         playCharacterVoice(nextDef.voice);
 
-                        // 파티클 & 팝 토스트 이펙트
+                        // 파티클 이펙트
                         spawnMergeParticles(midX, midY, nextDef.color);
-                        showComboToast(`${nextDef.name} 등장! ${nextDef.desc}`);
 
                         // 모바일 햅틱 진동
                         if (navigator.vibrate) {
@@ -1941,7 +2038,7 @@
                 const charDef = CHARACTERS[currentDropChar.level];
                 ctx.save();
                 ctx.translate(currentDropChar.x, currentDropChar.y);
-                charDef.draw(ctx, currentDropChar.radius);
+                renderCharacterItem(ctx, charDef, currentDropChar.radius);
                 ctx.restore();
             }
 
@@ -1955,7 +2052,7 @@
                     ctx.save();
                     ctx.translate(body.position.x, body.position.y);
                     ctx.rotate(body.angle);
-                    charDef.draw(ctx, charDef.radius);
+                    renderCharacterItem(ctx, charDef, charDef.radius);
                     ctx.restore();
 
                     // 데드라인(DEADLINE_Y) 초과 판정 (완전히 안착된 과일 기준)
@@ -2052,7 +2149,7 @@
                 mctx.translate(22, 22);
                 const scale = 18 / char.radius;
                 mctx.scale(scale, scale);
-                char.draw(mctx, char.radius);
+                renderCharacterItem(mctx, char, char.radius);
 
                 const iconWrap = document.createElement('div');
                 iconWrap.className = 'evo-icon';
