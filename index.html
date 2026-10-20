@@ -1726,7 +1726,7 @@
 
         /* Leaderboard Styling */
         .leaderboard-card {
-            background: var(--card-bg);
+            background: var(--panel-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
@@ -4710,6 +4710,7 @@
                     renderLeaderboard();
                 }, (error) => {
                     console.warn('Firebase season leaderboard sync error:', error);
+                    renderLeaderboard();
                 });
         }
 
@@ -4918,45 +4919,73 @@
             // 1. Update Hall of Fame Champion Banner (Previous Season Winner)
             const hofNameEl = document.getElementById('hof-champ-name');
             const hofScoreEl = document.getElementById('hof-champ-score');
-            if (hofNameEl && lastChampionInfo) {
-                hofNameEl.innerText = lastChampionInfo.name || '기록 없음';
-            }
-            if (hofScoreEl && lastChampionInfo) {
-                hofScoreEl.innerText = (lastChampionInfo.name && lastChampionInfo.name !== '기록 없음' && lastChampionInfo.balance > 0)
-                    ? `₩${formatNumber(lastChampionInfo.balance)}`
-                    : '-';
-            }
+            const champName = (lastChampionInfo && lastChampionInfo.name && lastChampionInfo.name !== '기록 없음')
+                ? lastChampionInfo.name
+                : '황금고니';
+            const champBal = (lastChampionInfo && lastChampionInfo.balance > 0)
+                ? lastChampionInfo.balance
+                : 12500000;
+
+            if (hofNameEl) hofNameEl.innerText = champName;
+            if (hofScoreEl) hofScoreEl.innerText = `₩${formatNumber(champBal)}`;
 
             const myNick = getNickname();
             const myUid = getUserId();
-            let allPlayers = [];
 
-            if (isFirebaseOnline && Array.isArray(cloudLeaderboardData)) {
-                allPlayers = [...cloudLeaderboardData];
-                // Ensure current user is in list if not in top 10
-                const hasMe = allPlayers.some(p => p.isMe || p.uid === myUid);
-                if (!hasMe && state.currentUser) {
-                    allPlayers.push({
-                        uid: myUid,
-                        name: myNick,
-                        balance: state.balance,
-                        isMe: true
-                    });
-                }
-                allPlayers.sort((a, b) => b.balance - a.balance);
-            } else {
-                allPlayers = [
-                    ...DEFAULT_SIMULATED_LEADERBOARD,
-                    { uid: myUid, name: myNick, balance: state.balance, isMe: true }
-                ];
-                allPlayers.sort((a, b) => b.balance - a.balance);
+            // Combine Cloud players with default simulated players so the leaderboard is NEVER empty
+            const playerMap = new Map();
+
+            // 1) Seed with Default Simulated Leaderboard
+            DEFAULT_SIMULATED_LEADERBOARD.forEach((p, idx) => {
+                playerMap.set(`sim_${idx}`, {
+                    uid: `sim_${idx}`,
+                    name: p.name,
+                    balance: p.balance,
+                    isMe: false
+                });
+            });
+
+            // 2) Overwrite / augment with Cloud Data if available
+            if (isFirebaseOnline && Array.isArray(cloudLeaderboardData) && cloudLeaderboardData.length > 0) {
+                cloudLeaderboardData.forEach(p => {
+                    if (p && p.uid) {
+                        playerMap.set(p.uid, {
+                            uid: p.uid,
+                            name: p.name || '익명',
+                            balance: typeof p.balance === 'number' ? p.balance : 0,
+                            isMe: (p.uid === myUid || p.isMe)
+                        });
+                    }
+                });
             }
 
-            // 2. Update Current Season #1 Spotlight Podium
+            // 3) Always ensure current player is present and reflects real-time balance
+            playerMap.set(myUid, {
+                uid: myUid,
+                name: myNick,
+                balance: state.balance,
+                isMe: true
+            });
+
+            const allPlayers = Array.from(playerMap.values());
+            allPlayers.sort((a, b) => b.balance - a.balance);
+
+            // Limit to Top 10 for clean display, but ensure 'isMe' is visible
+            let displayList = allPlayers.slice(0, 10);
+            const isMeInTop10 = displayList.some(p => p.isMe || p.uid === myUid);
+            if (!isMeInTop10) {
+                const myRank = allPlayers.findIndex(p => p.isMe || p.uid === myUid) + 1;
+                const myPlayer = allPlayers.find(p => p.isMe || p.uid === myUid);
+                if (myPlayer) {
+                    displayList[9] = { ...myPlayer, customRank: myRank };
+                }
+            }
+
+            // 4. Update Current Season #1 Spotlight Podium
             const spotNameEl = document.getElementById('spotlight-champ-name');
             const spotBalEl = document.getElementById('spotlight-champ-balance');
-            if (allPlayers.length > 0) {
-                const top1 = allPlayers[0];
+            if (displayList.length > 0) {
+                const top1 = displayList[0];
                 if (spotNameEl) {
                     const champTag = isChampion(top1.name, top1.uid) ? '<span class="champion-badge">👑 전 시즌 1위</span>' : '';
                     const meTag = (top1.isMe || top1.uid === myUid) ? '<span class="player-tag-me">ME</span>' : '';
@@ -4965,25 +4994,11 @@
                 if (spotBalEl) {
                     spotBalEl.innerText = `₩${formatNumber(top1.balance)}`;
                 }
-            } else {
-                if (spotNameEl) spotNameEl.innerText = '플레이어 대기 중';
-                if (spotBalEl) spotBalEl.innerText = `₩1,000,000`;
             }
 
-            // 3. Render Leaderboard Table Rows
-            if (allPlayers.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="3" style="text-align: center; padding: 24px; color: var(--text-secondary);">
-                            ✨ 새로운 시즌이 시작되었습니다! 게임을 플레이하여 1위에 도전하세요!
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tbody.innerHTML = allPlayers.map((player, idx) => {
-                const rankNum = idx + 1;
+            // 5. Render Leaderboard Table Rows
+            tbody.innerHTML = displayList.map((player, idx) => {
+                const rankNum = player.customRank || (idx + 1);
                 let rankIcon = '';
                 let rankRowClass = '';
 

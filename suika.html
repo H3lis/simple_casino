@@ -2399,27 +2399,69 @@
                 });
         }
 
+        const DEFAULT_SUIKA_LEADERBOARD = [
+            { nickname: '치이카와마스터', score: 3240 },
+            { nickname: '하치와레러버', score: 2850 },
+            { nickname: '우사기야하', score: 2410 },
+            { nickname: '쿠리만쥬선배', score: 1980 },
+            { nickname: '모몬가어리광', score: 1520 },
+            { nickname: '뾱뾱이치이카부', score: 980 }
+        ];
+
         function renderLeaderboard(dataList) {
             const tbody = document.getElementById('lbTableBody');
             const podiumBox = document.getElementById('podiumBox');
             const podiumName = document.getElementById('podiumName');
             const podiumScore = document.getElementById('podiumScore');
 
-            if (!dataList || dataList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 18px;">아직 등록된 랭킹 기록이 없습니다. 첫 1위에 도전해보세요!</td></tr>`;
-                podiumBox.style.display = 'none';
-                return;
+            const playerMap = new Map();
+
+            // 1) Seed with Default Simulated Leaderboard
+            DEFAULT_SUIKA_LEADERBOARD.forEach((p, idx) => {
+                playerMap.set(`sim_${idx}`, {
+                    uid: `sim_${idx}`,
+                    nickname: p.nickname,
+                    score: p.score
+                });
+            });
+
+            // 2) Overwrite with incoming cloud or local data
+            if (Array.isArray(dataList) && dataList.length > 0) {
+                dataList.forEach(item => {
+                    const id = item.uid || item.nickname;
+                    if (id) {
+                        playerMap.set(id, {
+                            uid: item.uid || id,
+                            nickname: item.nickname || '익명',
+                            score: typeof item.score === 'number' ? item.score : 0
+                        });
+                    }
+                });
             }
 
+            // 3) Include current user if they have score or nickname
+            const myEffectiveScore = Math.max(score, bestScore);
+            if (myEffectiveScore > 0 || currentUserNick) {
+                playerMap.set(currentUid, {
+                    uid: currentUid,
+                    nickname: currentUserNick || '치이카와 (나)',
+                    score: myEffectiveScore
+                });
+            }
+
+            const mergedList = Array.from(playerMap.values());
+            mergedList.sort((a, b) => b.score - a.score);
+            const finalList = mergedList.slice(0, 15);
+
             // 1위 스포트라이트 포디움
-            const top1 = dataList[0];
+            const top1 = finalList[0];
             podiumBox.style.display = 'flex';
             podiumName.innerText = top1.nickname || '익명';
             podiumScore.innerText = `${(top1.score || 0).toLocaleString()} P`;
 
             // 순위 테이블 렌더
             let html = '';
-            dataList.forEach((item, index) => {
+            finalList.forEach((item, index) => {
                 const rank = index + 1;
                 let rankBadge = rank;
                 if (rank === 1) rankBadge = '🥇 1';
