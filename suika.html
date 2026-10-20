@@ -3,7 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
     <title>치이카와 수박 게임 (ちいかわ スイカゲーム) - 실시간 랭킹</title>
 
     <!-- Google Fonts -->
@@ -41,7 +44,12 @@
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none;
             touch-action: manipulation;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
         }
 
         body {
@@ -53,11 +61,14 @@
             color: var(--text-dark);
             font-family: 'Outfit', 'Noto Sans KR', sans-serif;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             overflow-x: hidden;
-            padding: 10px;
+            padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
         }
 
         /* Top Bar Navigation */
@@ -529,6 +540,70 @@
         .combo-toast.show {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        /* =======================================================
+           IPHONE 17 & MOBILE RESPONSIVE OPTIMIZATIONS
+           ======================================================= */
+        @media (max-width: 480px) {
+            .top-navbar {
+                padding: 6px 10px;
+                margin-bottom: 8px;
+            }
+
+            .back-casino-btn {
+                padding: 6px 10px;
+                font-size: 0.78rem;
+            }
+
+            .user-chip {
+                padding: 5px 10px;
+                font-size: 0.78rem;
+            }
+
+            .stat-card {
+                padding: 6px 10px;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .next-preview-card {
+                padding: 4px 10px;
+                min-width: 70px;
+            }
+
+            .game-wrapper {
+                border-radius: 20px;
+                border-width: 3px;
+                max-height: calc(100dvh - 210px);
+            }
+
+            .evolution-bar {
+                padding: 8px 10px;
+                margin-top: 8px;
+            }
+
+            .leaderboard-card {
+                padding: 14px;
+                margin-top: 10px;
+            }
+        }
+
+        /* 120Hz ProMotion Responsive Touch Interaction Feedback */
+        button, .back-casino-btn, .user-chip, .audio-toggle-btn, .retry-btn, .btn-nick-edit {
+            -webkit-tap-highlight-color: transparent !important;
+            touch-action: manipulation;
+        }
+
+        button:active,
+        .back-casino-btn:active,
+        .user-chip:active,
+        .audio-toggle-btn:active,
+        .retry-btn:active {
+            transform: scale(0.95) !important;
+            transition: transform 0.08s ease !important;
         }
     </style>
 </head>

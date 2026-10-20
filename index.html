@@ -3,7 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
     <title>Royal Neon Casino - 홀짝 & 주사위 게임</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,6 +38,12 @@
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
         }
 
         body {
@@ -46,11 +55,14 @@
             color: var(--text-main);
             font-family: 'Outfit', 'Noto Sans KR', sans-serif;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             overflow-x: hidden;
-            padding: 20px;
+            padding: max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
         }
 
         /* Container Layout */
@@ -2477,6 +2489,386 @@
             color: #ff3d00;
             font-weight: 900;
         }
+
+        /* =======================================================
+           IPHONE 17 & MOBILE RESPONSIVE OPTIMIZATIONS
+           ======================================================= */
+        @media (max-width: 680px) {
+            body {
+                padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+            }
+
+            .container {
+                margin: 6px auto;
+                max-width: 100%;
+                width: 100%;
+            }
+
+            header {
+                margin-bottom: 16px;
+                padding: 0 4px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .logo {
+                font-size: 1.32rem;
+                letter-spacing: 1px;
+            }
+
+            .logo svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            .header-actions {
+                gap: 6px;
+            }
+
+            .reset-countdown-badge {
+                padding: 5px 10px;
+                font-size: 0.74rem;
+                border-radius: 16px;
+            }
+
+            .btn-auth-header {
+                padding: 5px 10px;
+                font-size: 0.74rem;
+                border-radius: 16px;
+            }
+
+            .icon-btn {
+                width: 34px;
+                height: 34px;
+            }
+
+            /* Chiikawa Suika Launch Banner */
+            .suika-game-banner {
+                padding: 10px 12px;
+                border-radius: 16px;
+                margin-bottom: 12px;
+                gap: 8px;
+            }
+
+            .suika-banner-icon {
+                font-size: 1.7rem;
+            }
+
+            .suika-banner-title {
+                font-size: 0.92rem;
+            }
+
+            .suika-banner-desc {
+                font-size: 0.72rem;
+            }
+
+            .suika-banner-btn {
+                font-size: 0.76rem;
+                padding: 6px 10px;
+                border-radius: 10px;
+            }
+
+            /* Event Banner */
+            .event-banner {
+                padding: 10px 12px;
+                border-radius: 14px;
+                margin-bottom: 15px;
+            }
+
+            .event-title {
+                font-size: 0.95rem !important;
+            }
+
+            /* Balance Dashboard */
+            .dashboard-card {
+                padding: 16px;
+                border-radius: 20px;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .balance-value-row {
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .balance-amount {
+                font-size: clamp(1.6rem, 7vw, 2.25rem);
+            }
+
+            .btn-reset {
+                padding: 7px 12px;
+                font-size: 0.8rem;
+                border-radius: 10px;
+            }
+
+            /* Betting Settings Card */
+            .bet-card {
+                padding: 16px;
+                border-radius: 18px;
+                margin-bottom: 16px;
+            }
+
+            .bet-input-wrapper {
+                padding: 6px 10px;
+                margin-bottom: 10px;
+            }
+
+            .bet-input {
+                font-size: 1.15rem;
+            }
+
+            .bet-percent-bar-wrap {
+                padding: 8px 10px;
+                margin-bottom: 10px;
+            }
+
+            .percent-quick-grid {
+                gap: 4px;
+                margin-bottom: 10px;
+            }
+
+            .btn-percent {
+                font-size: 0.74rem;
+                padding: 7px 2px;
+                border-radius: 6px;
+            }
+
+            .quick-bet-grid {
+                gap: 5px;
+            }
+
+            .btn-quick {
+                font-size: 0.75rem;
+                padding: 9px 2px;
+                border-radius: 8px;
+            }
+
+            /* Game Tabs */
+            .game-tabs {
+                gap: 4px;
+                padding: 4px;
+                border-radius: 14px;
+                margin-bottom: 16px;
+            }
+
+            .tab-btn {
+                padding: 10px 3px;
+                font-size: 0.76rem;
+                gap: 4px;
+                flex-direction: column;
+                letter-spacing: -0.3px;
+            }
+
+            .tab-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            /* Game Panels */
+            .game-panel {
+                padding: 16px;
+                border-radius: 20px;
+            }
+
+            /* 1. Odd/Even */
+            .oe-choices {
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+
+            .choice-btn {
+                padding: 14px 8px;
+                font-size: 1.05rem;
+                border-radius: 14px;
+            }
+
+            .choice-btn .sub-label {
+                font-size: 0.72rem;
+            }
+
+            .coin-container {
+                width: 110px;
+                height: 110px;
+                margin: 15px auto 25px auto;
+            }
+
+            .coin-face {
+                font-size: 2rem;
+            }
+
+            /* 2. Dice */
+            .dice-modes {
+                margin-bottom: 15px;
+            }
+
+            .mode-btn {
+                font-size: 0.75rem;
+                padding: 7px;
+            }
+
+            .hl-choices {
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .exact-choices {
+                gap: 5px;
+                margin-bottom: 15px;
+            }
+
+            .btn-number {
+                padding: 9px 0;
+                font-size: 0.95rem;
+                border-radius: 8px;
+            }
+
+            .dice-scene {
+                width: 70px;
+                height: 70px;
+                margin: 25px auto 35px auto;
+            }
+
+            .dice-face {
+                width: 70px;
+                height: 70px;
+            }
+
+            .dice-face.front { transform: rotateY(0deg) translateZ(35px); }
+            .dice-face.back { transform: rotateY(180deg) translateZ(35px); }
+            .dice-face.right { transform: rotateY(90deg) translateZ(35px); }
+            .dice-face.left { transform: rotateY(-90deg) translateZ(35px); }
+            .dice-face.top { transform: rotateX(90deg) translateZ(35px); }
+            .dice-face.bottom { transform: rotateX(-90deg) translateZ(35px); }
+
+            /* 3. Slot Machine - iPhone 17 Perfect Scaling */
+            .slot-machine-container {
+                width: 100%;
+                overflow: visible;
+                display: flex;
+                justify-content: center;
+                transform: scale(0.85);
+                transform-origin: center top;
+                margin: 5px auto -40px auto;
+            }
+
+            .slot-actions-group {
+                gap: 8px;
+                margin-top: 10px;
+            }
+
+            .payout-table {
+                margin-top: 15px;
+                padding-top: 12px;
+            }
+
+            .payout-table-grid {
+                font-size: 0.72rem;
+                gap: 6px;
+            }
+
+            /* 4. Cards Mini-Game */
+            .cards-container {
+                gap: 10px;
+                margin: 15px auto 15px auto;
+            }
+
+            .card-wrapper {
+                width: 82px;
+                height: 126px;
+            }
+
+            .card-pattern-symbol {
+                font-size: 1.8rem;
+            }
+
+            .card-front-multiplier {
+                font-size: 1.35rem;
+            }
+
+            /* Common Play Button */
+            .btn-play-action {
+                padding: 14px 12px;
+                font-size: 1.05rem;
+                border-radius: 12px;
+            }
+
+            /* Leaderboard & Highlights */
+            .leaderboard-card {
+                padding: 16px;
+                border-radius: 18px;
+                margin-top: 18px;
+            }
+
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 8px 6px;
+                font-size: 0.8rem;
+            }
+
+            .current-leader-spotlight,
+            .hall-of-fame-banner {
+                padding: 10px 12px;
+                border-radius: 14px;
+            }
+
+            .auth-modal-card {
+                padding: 22px 18px;
+                border-radius: 22px;
+                max-width: calc(100vw - 32px);
+                max-height: 85dvh;
+                overflow-y: auto;
+            }
+        }
+
+        /* Ultra Compact Screens (width < 390px, e.g. iPhone mini/older) */
+        @media (max-width: 390px) {
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .slot-machine-container {
+                transform: scale(0.77);
+                margin: 0 auto -65px auto;
+            }
+
+            .card-wrapper {
+                width: 72px;
+                height: 112px;
+            }
+
+            .btn-percent {
+                font-size: 0.68rem;
+            }
+
+            .tab-btn {
+                font-size: 0.72rem;
+                padding: 8px 2px;
+            }
+        }
+
+        /* 120Hz ProMotion Responsive Touch Interaction Feedback */
+        button, .choice-btn, .card-wrapper, .btn-quick, .btn-percent, .tab-btn, .btn-play-action, .icon-btn, .btn-reset, .btn-auth-header {
+            -webkit-tap-highlight-color: transparent !important;
+            touch-action: manipulation;
+        }
+
+        button:active:not(:disabled),
+        .choice-btn:active,
+        .btn-quick:active:not(:disabled),
+        .btn-percent:active:not(:disabled),
+        .tab-btn:active,
+        .icon-btn:active,
+        .btn-reset:active,
+        .btn-auth-header:active {
+            transform: scale(0.95) !important;
+            transition: transform 0.08s ease !important;
+        }
+
+        .card-wrapper:active:not(.disabled-element) {
+            transform: scale(0.94) !important;
+        }
     </style>
 </head>
 
@@ -3191,6 +3583,7 @@
             }
 
             playClick() {
+                triggerHaptic('light');
                 if (this.isMuted) return;
                 this.init();
                 if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -3212,6 +3605,7 @@
             }
 
             playRoll() {
+                triggerHaptic('light');
                 if (this.isMuted) return;
                 this.init();
                 if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -3232,6 +3626,7 @@
             }
 
             playWin() {
+                triggerHaptic('success');
                 if (this.isMuted) return;
                 this.init();
                 if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -3258,6 +3653,7 @@
             }
 
             playLose() {
+                triggerHaptic('error');
                 if (this.isMuted) return;
                 this.init();
                 if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -3280,6 +3676,7 @@
             }
 
             playJackpot() {
+                triggerHaptic('success');
                 if (this.isMuted) return;
                 this.init();
                 if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -3307,7 +3704,28 @@
             }
         }
 
+        // --- IPHONE & MOBILE HAPTIC VIBRATION FEEDBACK ---
+        function triggerHaptic(type = 'light') {
+            if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+                try {
+                    if (type === 'light') navigator.vibrate(10);
+                    else if (type === 'medium') navigator.vibrate(22);
+                    else if (type === 'success') navigator.vibrate([15, 30, 25]);
+                    else if (type === 'error') navigator.vibrate([40, 40, 40]);
+                } catch (e) { }
+            }
+        }
+
         const audio = new CasinoAudio();
+
+        // Unlock iOS Safari Web Audio on first touch interaction
+        window.addEventListener('touchstart', function unlockAudioOnce() {
+            audio.init();
+            if (audio.ctx && audio.ctx.state === 'suspended') {
+                audio.ctx.resume();
+            }
+            window.removeEventListener('touchstart', unlockAudioOnce);
+        }, { passive: true });
 
         // --- GAME CORE STATE ---
         let state = {
