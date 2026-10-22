@@ -952,7 +952,7 @@
             {
                 level: 2,
                 name: "모몽가",
-                radius: 36,
+                radius: 35,
                 color: "#70d6ff",
                 score: 8,
                 voice: "momonga",
@@ -1019,7 +1019,7 @@
             {
                 level: 3,
                 name: "쿠리만쥬",
-                radius: 46,
+                radius: 44,
                 color: "#e8b87d",
                 score: 16,
                 voice: "kurimanju",
@@ -1080,7 +1080,7 @@
             {
                 level: 4,
                 name: "치이카와",
-                radius: 58,
+                radius: 54,
                 color: "#ffffff",
                 score: 32,
                 voice: "chiikawa",
@@ -1149,7 +1149,7 @@
             {
                 level: 5,
                 name: "랏코",
-                radius: 72,
+                radius: 66,
                 color: "#e6c280",
                 score: 64,
                 voice: "rakko",
@@ -1210,7 +1210,7 @@
             {
                 level: 6,
                 name: "카니",
-                radius: 88,
+                radius: 80,
                 color: "#ffc9c9",
                 score: 128,
                 voice: "kani",
@@ -1285,7 +1285,7 @@
             {
                 level: 7,
                 name: "시사",
-                radius: 106,
+                radius: 95,
                 color: "#ffe066",
                 score: 256,
                 voice: "shisa",
@@ -1335,7 +1335,7 @@
             {
                 level: 8,
                 name: "하치와레",
-                radius: 126,
+                radius: 112,
                 color: "#64b5f6",
                 score: 512,
                 voice: "hachiware",
@@ -1409,7 +1409,7 @@
             {
                 level: 9,
                 name: "우사기",
-                radius: 148,
+                radius: 130,
                 color: "#fff3bf",
                 score: 1024,
                 voice: "usagi",
@@ -1477,7 +1477,7 @@
             {
                 level: 10,
                 name: "👑 대왕 치이카와",
-                radius: 175,
+                radius: 150,
                 color: "#ffc2d1",
                 score: 2048,
                 voice: "king",
@@ -1794,7 +1794,7 @@
             });
 
             // 컨테이너 벽면 및 바닥 생성 (과일들이 밖으로 나가지 못하게 바운더리)
-            const wallOptions = { isStatic: true, friction: 0.1, restitution: 0.25 };
+            const wallOptions = { isStatic: true, friction: 0.05, restitution: 0.1 };
             const ground = Bodies.rectangle(CANVAS_WIDTH / 2, CANVAS_HEIGHT + 30, CANVAS_WIDTH * 2, 80, wallOptions);
             const leftWall = Bodies.rectangle(-20, CANVAS_HEIGHT / 2, 50, CANVAS_HEIGHT * 2, wallOptions);
             const rightWall = Bodies.rectangle(CANVAS_WIDTH + 20, CANVAS_HEIGHT / 2, 50, CANVAS_HEIGHT * 2, wallOptions);
@@ -1936,9 +1936,9 @@
 
             // Matter.js 원형 바디 생성
             const fruitBody = Bodies.circle(currentDropChar.x, currentDropChar.y, charDef.radius, {
-                restitution: 0.25, // 쫀득한 탄성
-                friction: 0.12,
-                density: 0.0015,
+                restitution: 0.16, // 부드러운 안착 탄성
+                friction: 0.08,
+                density: 0.0016,
                 label: 'fruit'
             });
 
@@ -1989,9 +1989,9 @@
                         const nextDef = CHARACTERS[nextLevel];
 
                         const newFruit = Bodies.circle(midX, midY, nextDef.radius, {
-                            restitution: 0.3,
-                            friction: 0.12,
-                            density: 0.0018,
+                            restitution: 0.16,
+                            friction: 0.08,
+                            density: 0.0020,
                             label: 'fruit'
                         });
                         newFruit.charLevel = nextLevel;
@@ -2104,8 +2104,8 @@
                     renderCharacterItem(ctx, charDef, charDef.radius);
                     ctx.restore();
 
-                    // 데드라인(DEADLINE_Y) 초과 판정 (완전히 안착된 과일 기준)
-                    if (body.position.y - charDef.radius < DEADLINE_Y && body.velocity.y < 0.2 && body.velocity.y > -0.2) {
+                    // 데드라인(DEADLINE_Y) 초과 판정 (완전히 안착되어 안정된 과일 기준)
+                    if (body.position.y - charDef.radius < DEADLINE_Y && Math.abs(body.velocity.y) < 0.25 && Math.abs(body.velocity.x) < 0.25) {
                         hasOverDeadline = true;
                     }
                 }
@@ -2133,10 +2133,10 @@
                 ctx.restore();
             }
 
-            // 6. 데드라인 경고 및 게임오버 검사
+            // 6. 데드라인 경고 및 게임오버 검사 (충분한 3.5초 유예 시간 제공)
             if (hasOverDeadline && !isGameOver && bodies.length > 5) {
                 deadlineTimer += dt;
-                if (deadlineTimer > 2.5) { // 2.5초 이상 넘치면 게임오버
+                if (deadlineTimer > 3.5) { // 3.5초 이상 안정적으로 넘쳤을 때 게임오버
                     triggerGameOver();
                 }
             } else {
