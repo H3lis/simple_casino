@@ -2020,11 +2020,11 @@
 
         function addScore(points) {
             score += points;
-            document.getElementById('scoreVal').innerText = score;
+            document.getElementById('scoreVal').innerText = score.toLocaleString();
 
             if (score > bestScore) {
                 bestScore = score;
-                document.getElementById('bestScoreVal').innerText = bestScore;
+                document.getElementById('bestScoreVal').innerText = bestScore.toLocaleString();
                 localStorage.setItem('chiikawa_suika_best', bestScore);
             }
         }
@@ -2150,7 +2150,7 @@
 
         function triggerGameOver() {
             isGameOver = true;
-            document.getElementById('finalScoreText').innerText = score;
+            document.getElementById('finalScoreText').innerText = score.toLocaleString();
             document.getElementById('gameOverModal').style.display = 'flex';
 
             // Firebase 실시간 랭킹 자동 업로드
@@ -2159,6 +2159,11 @@
 
         function restartGame() {
             document.getElementById('gameOverModal').style.display = 'none';
+
+            // 게임 재시작 전 현재 점수 동기화 확인
+            if (score > 0) {
+                syncScoreToCasinoCloud();
+            }
 
             // 모든 과일 제거
             const bodies = Composite.allBodies(engine.world);
@@ -2169,7 +2174,7 @@
             });
 
             score = 0;
-            document.getElementById('scoreVal').innerText = 0;
+            document.getElementById('scoreVal').innerText = "0";
             isGameOver = false;
             deadlineTimer = 0;
             particles = [];
@@ -2238,6 +2243,11 @@
         let currentUserNick = null;
         let currentPin = null;
         let currentUid = null;
+        let latestLeaderboardRaw = [];
+
+        function getNormalizedUid(nick) {
+            return 'user_' + encodeURIComponent(nick.trim().toLowerCase());
+        }
 
         function initCasinoAccountAndFirebase() {
             // 카지노 세션 읽어오기
@@ -2245,17 +2255,19 @@
             const sessionPin = localStorage.getItem('royal_neon_session_pin');
             let uid = localStorage.getItem('royal_neon_uid');
 
-            if (!uid) {
-                uid = 'suika_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
-                localStorage.setItem('royal_neon_uid', uid);
-            }
-            currentUid = uid;
-
-            if (sessionNick && sessionPin) {
-                currentUserNick = sessionNick;
-                currentPin = sessionPin;
+            if (sessionNick && sessionNick.trim().length >= 2) {
+                currentUserNick = sessionNick.trim();
+                currentPin = sessionPin || '';
+                // 닉네임이 있으면 닉네임 기반의 일관된 UID 사용
+                currentUid = getNormalizedUid(currentUserNick);
+                localStorage.setItem('royal_neon_uid', currentUid);
                 updateUserChipUI(currentUserNick);
             } else {
+                if (!uid) {
+                    uid = 'suika_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+                    localStorage.setItem('royal_neon_uid', uid);
+                }
+                currentUid = uid;
                 updateUserChipUI(null);
             }
 
@@ -2268,6 +2280,9 @@
                     firestoreDb = firebase.firestore();
                     updateDbStatusUI(true);
 
+                    // 계정 최고 기록 클라우드에서 조회 및 동기화
+                    restoreCloudBestScore();
+
                     // 실시간 수박 랭킹 구독 (onSnapshot)
                     subscribeSuikaLeaderboard();
                 } catch (e) {
@@ -2278,6 +2293,24 @@
             } else {
                 updateDbStatusUI(false);
                 loadLocalLeaderboard();
+            }
+        }
+
+        async function restoreCloudBestScore() {
+            if (!firestoreDb || !currentUid) return;
+            try {
+                const docId = `suika_${currentUid}`;
+                const doc = await firestoreDb.collection('suika_leaderboard').doc(docId).get();
+                if (doc.exists) {
+                    const cloudScore = doc.data().score || 0;
+                    if (cloudScore > bestScore) {
+                        bestScore = cloudScore;
+                        document.getElementById('bestScoreVal').innerText = bestScore.toLocaleString();
+                        localStorage.setItem('chiikawa_suika_best', bestScore);
+                    }
+                }
+            } catch (e) {
+                console.warn("restoreCloudBestScore notice:", e);
             }
         }
 
@@ -2293,10 +2326,11 @@
         function updateDbStatusUI(online) {
             const statusEl = document.getElementById('dbStatus');
             const textEl = document.getElementById('dbStatusText');
+            if (!statusEl || !textEl) return;
             if (online) {
                 statusEl.style.background = 'rgba(5, 179, 117, 0.12)';
                 statusEl.style.color = '#05b375';
-                textEl.innerText = "카지노 실시간 연동";
+                textEl.innerText = "실시간 랭킹 연동";
             } else {
                 statusEl.style.background = 'rgba(235, 87, 87, 0.12)';
                 statusEl.style.color = '#eb5757';
@@ -2318,7 +2352,7 @@
             document.getElementById('loginModal').style.display = 'none';
         }
 
-        function submitLogin() {
+        async function submitLogin() {
             const nick = document.getElementById('loginNickInput').value.trim();
             const pin = document.getElementById('loginPinInput').value.trim();
 
@@ -2333,21 +2367,29 @@
 
             currentUserNick = nick;
             currentPin = pin;
+            currentUid = getNormalizedUid(nick);
 
             // 카지노 세션 저장소에 동기화!
             localStorage.setItem('royal_neon_session_nick', nick);
             localStorage.setItem('royal_neon_session_pin', pin);
+            localStorage.setItem('royal_neon_nickname', nick);
+            localStorage.setItem('royal_neon_uid', currentUid);
 
             updateUserChipUI(nick);
             closeLoginModal();
 
-            // 기존 점수가 있다면 클라우드 동기화
+            // 이전 최고 점수 클라우드에서 복원 시도
+            await restoreCloudBestScore();
+
+            // 현재 점수 또는 최고점수가 있다면 클라우드 동기화
             if (score > 0 || bestScore > 0) {
-                syncScoreToCasinoCloud();
+                await syncScoreToCasinoCloud();
+            } else if (latestLeaderboardRaw) {
+                renderLeaderboard(latestLeaderboardRaw);
             }
         }
 
-        // 수박 게임 실시간 랭킹 저장
+        // 수박 게임 실시간 랭킹 저장 (최고 기록 갱신 보장)
         async function syncScoreToCasinoCloud() {
             const finalScore = Math.max(score, bestScore);
             if (finalScore <= 0) return;
@@ -2360,19 +2402,37 @@
             if (firestoreDb) {
                 try {
                     const docId = `suika_${currentUid}`;
-                    await firestoreDb.collection('suika_leaderboard').doc(docId).set({
+                    const docRef = firestoreDb.collection('suika_leaderboard').doc(docId);
+
+                    // 기존 점수보다 높을 때만 점수 갱신 (다운그레이드 방지)
+                    let targetScore = finalScore;
+                    try {
+                        const existingDoc = await docRef.get();
+                        if (existingDoc && existingDoc.exists) {
+                            const existingScore = existingDoc.data().score || 0;
+                            if (existingScore > targetScore) {
+                                targetScore = existingScore;
+                            }
+                        }
+                    } catch (e) {
+                        // ignore read error
+                    }
+
+                    await docRef.set({
                         uid: currentUid,
                         nickname: nick,
-                        score: finalScore,
+                        score: targetScore,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
 
                     // 카지노 유저 프로필에도 수박 최고점수 기록 (상호 동기화)
-                    const userDocId = `user_${currentUid}`;
-                    await firestoreDb.collection('casino_users').doc(userDocId).set({
-                        suikaHighScore: finalScore,
-                        suikaLastPlayed: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
+                    if (currentUserNick) {
+                        const userDocId = currentUid;
+                        await firestoreDb.collection('casino_users').doc(userDocId).set({
+                            suikaHighScore: targetScore,
+                            suikaLastPlayed: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true }).catch(() => {});
+                    }
 
                 } catch (err) {
                     console.warn("Failed to sync score to Firestore:", err);
@@ -2386,94 +2446,142 @@
 
             firestoreDb.collection('suika_leaderboard')
                 .orderBy('score', 'desc')
-                .limit(20)
+                .limit(50)
                 .onSnapshot((snapshot) => {
                     const list = [];
                     snapshot.forEach(doc => {
-                        list.push(doc.data());
+                        const data = doc.data();
+                        if (data) {
+                            list.push({
+                                uid: data.uid || doc.id.replace('suika_', ''),
+                                nickname: data.nickname || '익명',
+                                score: typeof data.score === 'number' ? data.score : 0
+                            });
+                        }
                     });
+                    latestLeaderboardRaw = list;
                     renderLeaderboard(list);
                 }, (error) => {
                     console.warn("Firestore leaderboard snapshot error:", error);
+                    updateDbStatusUI(false);
                     loadLocalLeaderboard();
                 });
         }
 
-        const DEFAULT_SUIKA_LEADERBOARD = [
-            { nickname: '치이카와마스터', score: 3240 },
-            { nickname: '하치와레러버', score: 2850 },
-            { nickname: '우사기야하', score: 2410 },
-            { nickname: '쿠리만쥬선배', score: 1980 },
-            { nickname: '모몬가어리광', score: 1520 },
-            { nickname: '뾱뾱이치이카부', score: 980 }
-        ];
-
+        // 더미 데이터(DEFAULT_SUIKA_LEADERBOARD) 제거
+        // 중복 닉네임 병합 및 순수 실시간 플레이어 기록만 집계
         function renderLeaderboard(dataList) {
             const tbody = document.getElementById('lbTableBody');
             const podiumBox = document.getElementById('podiumBox');
             const podiumName = document.getElementById('podiumName');
             const podiumScore = document.getElementById('podiumScore');
 
+            if (!tbody) return;
+
+            // 중복 닉네임 집계 맵 (가장 높은 점수 유지)
             const playerMap = new Map();
 
-            // 1) Seed with Default Simulated Leaderboard
-            DEFAULT_SUIKA_LEADERBOARD.forEach((p, idx) => {
-                playerMap.set(`sim_${idx}`, {
-                    uid: `sim_${idx}`,
-                    nickname: p.nickname,
-                    score: p.score
-                });
-            });
-
-            // 2) Overwrite with incoming cloud or local data
-            if (Array.isArray(dataList) && dataList.length > 0) {
+            // 1) 전달받은 리더보드 데이터 집계
+            if (Array.isArray(dataList)) {
                 dataList.forEach(item => {
-                    const id = item.uid || item.nickname;
-                    if (id) {
-                        playerMap.set(id, {
-                            uid: item.uid || id,
-                            nickname: item.nickname || '익명',
-                            score: typeof item.score === 'number' ? item.score : 0
+                    if (!item) return;
+                    const nick = (item.nickname || '익명').trim();
+                    const scr = typeof item.score === 'number' ? item.score : 0;
+                    if (scr <= 0) return;
+
+                    // 더미데이터 방어 필터
+                    const dummyNicks = ['치이카와마스터', '하치와레러버', '우사기야하', '쿠리만쥬선배', '모몬가어리광', '뾱뾱이치이카부'];
+                    if (dummyNicks.includes(nick) || String(item.uid).startsWith('sim_')) {
+                        return;
+                    }
+
+                    // 닉네임이 있는 플레이어는 닉네임별 단 1건으로 통일 (대소문자 무시)
+                    // 익명 플레이어는 uid별로 집계
+                    const isAnon = nick === '익명' || nick === '익명 치이카와';
+                    const key = isAnon ? (item.uid || `anon_${Math.random()}`) : `nick_${nick.toLowerCase()}`;
+
+                    if (playerMap.has(key)) {
+                        const existing = playerMap.get(key);
+                        if (scr > existing.score) {
+                            existing.score = scr;
+                            existing.uid = item.uid || existing.uid;
+                        }
+                    } else {
+                        playerMap.set(key, {
+                            uid: item.uid,
+                            nickname: nick,
+                            score: scr
                         });
                     }
                 });
             }
 
-            // 3) Include current user if they have score or nickname
+            // 2) 현재 플레이어 점수 반영
             const myEffectiveScore = Math.max(score, bestScore);
-            if (myEffectiveScore > 0 || currentUserNick) {
-                playerMap.set(currentUid, {
-                    uid: currentUid,
-                    nickname: currentUserNick || '치이카와 (나)',
-                    score: myEffectiveScore
-                });
+            if (myEffectiveScore > 0) {
+                const myNick = (currentUserNick || '치이카와 (나)').trim();
+                const isAnon = !currentUserNick;
+                const myKey = isAnon ? currentUid : `nick_${myNick.toLowerCase()}`;
+
+                if (playerMap.has(myKey)) {
+                    const existing = playerMap.get(myKey);
+                    if (myEffectiveScore > existing.score) {
+                        existing.score = myEffectiveScore;
+                    }
+                    existing.isMe = true;
+                    existing.uid = currentUid;
+                    if (currentUserNick) existing.nickname = currentUserNick;
+                } else {
+                    playerMap.set(myKey, {
+                        uid: currentUid,
+                        nickname: myNick,
+                        score: myEffectiveScore,
+                        isMe: true
+                    });
+                }
             }
 
             const mergedList = Array.from(playerMap.values());
             mergedList.sort((a, b) => b.score - a.score);
-            const finalList = mergedList.slice(0, 15);
+            const finalList = mergedList.slice(0, 20);
 
-            // 1위 스포트라이트 포디움
+            // 랭킹 데이터가 없는 경우 (더미데이터 제거 후 실제 플레이어 없음)
+            if (finalList.length === 0) {
+                if (podiumBox) podiumBox.style.display = 'none';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 26px 12px; font-size: 0.88rem; line-height: 1.6;">
+                            아직 등록된 랭킹 기록이 없습니다.<br>
+                            <span style="font-size: 0.8rem; color: var(--main-pink); font-weight: 700;">첫 1위에 도전해보세요! 🍉</span>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // 1위 스포트라이트 포디움 표시
             const top1 = finalList[0];
-            podiumBox.style.display = 'flex';
-            podiumName.innerText = top1.nickname || '익명';
-            podiumScore.innerText = `${(top1.score || 0).toLocaleString()} P`;
+            if (podiumBox && podiumName && podiumScore) {
+                podiumBox.style.display = 'flex';
+                podiumName.innerText = top1.nickname;
+                podiumScore.innerText = `${(top1.score || 0).toLocaleString()} P`;
+            }
 
-            // 순위 테이블 렌더
+            // 순위 테이블 렌더링
             let html = '';
             finalList.forEach((item, index) => {
                 const rank = index + 1;
-                let rankBadge = rank;
+                let rankBadge = `${rank}`;
                 if (rank === 1) rankBadge = '🥇 1';
                 else if (rank === 2) rankBadge = '🥈 2';
                 else if (rank === 3) rankBadge = '🥉 3';
 
-                const isMe = item.uid === currentUid || (currentUserNick && item.nickname === currentUserNick);
+                const isMe = item.isMe || item.uid === currentUid || (currentUserNick && item.nickname.toLowerCase() === currentUserNick.toLowerCase());
 
                 html += `
                     <tr class="${isMe ? 'my-row' : ''}">
                         <td class="lb-rank">${rankBadge}</td>
-                        <td>${escapeHtml(item.nickname || '익명')} ${isMe ? '<span style="font-size:0.7rem; font-weight:800; background:#ff85a2; color:white; padding:1px 5px; border-radius:6px; margin-left:4px;">ME</span>' : ''}</td>
+                        <td>${escapeHtml(item.nickname)} ${isMe ? '<span style="font-size:0.7rem; font-weight:800; background:#ff85a2; color:white; padding:1px 5px; border-radius:6px; margin-left:4px;">ME</span>' : ''}</td>
                         <td style="text-align: right; font-weight: 900; font-family: 'Outfit'; color: #d6336c;">${(item.score || 0).toLocaleString()}</td>
                     </tr>
                 `;
@@ -2483,8 +2591,15 @@
         }
 
         function saveLocalScore(nick, scr) {
+            if (!scr || scr <= 0) return;
             let localList = JSON.parse(localStorage.getItem('chiikawa_suika_local_lb') || '[]');
-            const existingIdx = localList.findIndex(x => x.uid === currentUid);
+            const isAnon = !currentUserNick;
+
+            const existingIdx = localList.findIndex(x => {
+                if (isAnon) return x.uid === currentUid;
+                return (x.nickname && x.nickname.toLowerCase() === nick.toLowerCase()) || x.uid === currentUid;
+            });
+
             if (existingIdx >= 0) {
                 if (scr > localList[existingIdx].score) {
                     localList[existingIdx].score = scr;
@@ -2493,13 +2608,22 @@
             } else {
                 localList.push({ uid: currentUid, nickname: nick, score: scr });
             }
+
+            // 더미 필터링
+            const dummyNicks = new Set(['치이카와마스터', '하치와레러버', '우사기야하', '쿠리만쥬선배', '모몬가어리광', '뾱뾱이치이카부']);
+            localList = localList.filter(item => !dummyNicks.has(item.nickname) && !String(item.uid).startsWith('sim_'));
+
             localList.sort((a, b) => b.score - a.score);
-            localList = localList.slice(0, 20);
+            localList = localList.slice(0, 30);
             localStorage.setItem('chiikawa_suika_local_lb', JSON.stringify(localList));
         }
 
         function loadLocalLeaderboard() {
-            const localList = JSON.parse(localStorage.getItem('chiikawa_suika_local_lb') || '[]');
+            let localList = JSON.parse(localStorage.getItem('chiikawa_suika_local_lb') || '[]');
+            const dummyNicks = new Set(['치이카와마스터', '하치와레러버', '우사기야하', '쿠리만쥬선배', '모몬가어리광', '뾱뾱이치이카부']);
+            localList = localList.filter(item => !dummyNicks.has(item.nickname) && !String(item.uid).startsWith('sim_'));
+            localStorage.setItem('chiikawa_suika_local_lb', JSON.stringify(localList));
+            latestLeaderboardRaw = localList;
             renderLeaderboard(localList);
         }
 
@@ -2508,6 +2632,13 @@
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
             })[m]);
         }
+
+        // 창 닫기/이동 전 점수 안전 동기화
+        window.addEventListener('beforeunload', () => {
+            if (score > 0 || bestScore > 0) {
+                syncScoreToCasinoCloud();
+            }
+        });
 
         // 페이지 로드 시 초기화
         window.addEventListener('DOMContentLoaded', () => {
